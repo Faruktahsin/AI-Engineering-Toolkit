@@ -1,0 +1,20 @@
+{
+  "name": "Gmail AI Assistant",
+  "description": "Example n8n workflow for AI-powered Gmail processing.",
+  "version": "1.0",
+  "status": "Under Development",
+  "features": [
+    "Summarize emails",
+    "Detect priority",
+    "Extract action items",
+    "Generate draft replies"
+  ],
+  "planned_nodes": [
+    "Gmail Trigger",
+    "AI Model",
+    "IF",
+    "Google Sheets",
+    "Notion",
+    "Gmail Reply"
+  ]
+}
