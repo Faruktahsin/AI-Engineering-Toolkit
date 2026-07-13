@@ -58,3 +58,40 @@ If you'd like to contribute, feel free to open an issue or submit a pull request
 ## 📄 License
 
 This project is released under the MIT License.
+
+---
+
+## 📌 Current Status
+
+The project is currently under active development.
+
+### Completed
+
+- ✅ Project structure
+- ✅ Project documentation
+- ✅ Engineering AI prompt collection
+- ✅ Initial Python utility
+- ✅ Workflow documentation
+- ✅ Contribution guidelines
+- ✅ Code of Conduct
+- ✅ Project roadmap
+
+### Currently Working On
+
+- 🚧 n8n workflow collection
+- 🚧 AI automation templates
+- 🚧 Engineering study resources
+- 🚧 Additional Python utilities
+
+### Future Goals
+
+- AI Agents
+- WhatsApp Automation
+- Gmail AI Assistant
+- YouTube Automation
+- Google Drive Automation
+- Notion Knowledge Base
+- MCP Examples
+- Community Contributions
+
+---
