@@ -1,3 +1,15 @@
+![License](https://img.shields.io/badge/License-MIT-blue.svg)
+
+![Python](https://img.shields.io/badge/Python-3.12-yellow)
+
+![Open Source](https://img.shields.io/badge/Open%20Source-Yes-success)
+
+![GitHub last commit](https://img.shields.io/github/last-commit/Faruktahsin/AI-Engineering-Toolkit)
+
+![GitHub repo size](https://img.shields.io/github/repo-size/Faruktahsin/AI-Engineering-Toolkit)
+
+![GitHub stars](https://img.shields.io/github/stars/Faruktahsin/AI-Engineering-Toolkit?style=social)
+
 # AI Engineering Toolkit
 
 An open-source collection of AI tools, automation workflows, prompts, and engineering resources designed to help students, developers, and engineers build, learn, and automate more effectively.
