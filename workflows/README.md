@@ -1,14 +1,35 @@
-# n8n Workflows
+# AI Automation Workflows
 
-This directory contains reusable n8n workflows focused on AI, automation, and productivity.
+This directory contains reusable automation workflows built primarily with n8n.
 
-## Planned Workflows
+The goal is to provide practical workflows that help students, developers, and engineers automate repetitive tasks using modern AI models and cloud services.
 
-- AI Document Summarizer
-- Gmail AI Assistant
-- Telegram Notification Bot
-- PDF Processing Workflow
-- Student Study Assistant
+## Planned Workflow Categories
+
+### AI Assistants
 - AI Research Assistant
+- AI Study Assistant
+- AI Document Summarizer
 
-The workflow collection will continue to grow over time.
+### Communication
+- Gmail AI Assistant
+- WhatsApp AI Assistant
+- Telegram AI Bot
+- Discord AI Assistant
+
+### Productivity
+- Google Drive Automation
+- Notion Knowledge Base
+- Calendar Automation
+- PDF Processing
+
+### AI Platforms
+- OpenAI
+- Claude
+- Gemini
+
+### Content Automation
+- YouTube Transcript Analyzer
+- YouTube Video Summarizer
+
+More production-ready workflows will be added over time.
