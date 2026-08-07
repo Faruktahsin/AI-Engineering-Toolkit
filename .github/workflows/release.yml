@@ -80,7 +80,7 @@ jobs:
 
       - name: Generate Build Attestations
         if: ${{ inputs.dry_run != true }}
-        uses: actions/attest-build-provenance@v1
+        uses: actions/attest-build-provenance@v3
         with:
           subject-path: 'packages/*/dist/**'
 
