@@ -1,0 +1,27 @@
+schema:
+  - changed-files:
+      - any-glob-to-any-file: 'packages/schema/**/*'
+
+domain:
+  - changed-files:
+      - any-glob-to-any-file: 'packages/domain/**/*'
+
+storage:
+  - changed-files:
+      - any-glob-to-any-file: 'packages/storage/**/*'
+
+mcp-server:
+  - changed-files:
+      - any-glob-to-any-file: 'packages/mcp-server/**/*'
+
+compiler:
+  - changed-files:
+      - any-glob-to-any-file: 'packages/compiler/**/*'
+
+compiler-cli:
+  - changed-files:
+      - any-glob-to-any-file: 'packages/compiler-cli/**/*'
+
+ci-cd:
+  - changed-files:
+      - any-glob-to-any-file: '.github/**/*'

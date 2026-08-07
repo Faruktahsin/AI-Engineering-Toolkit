@@ -1,0 +1,20 @@
+{
+  "extends": "./tsconfig.base.json",
+  "files": [],
+  "references": [
+    { "path": "./packages/errors" },
+    { "path": "./packages/logging" },
+    { "path": "./packages/utils" },
+    { "path": "./packages/schema" },
+    { "path": "./packages/config" },
+    { "path": "./packages/domain" },
+    { "path": "./packages/storage" },
+    { "path": "./packages/compiler" },
+    { "path": "./packages/mcp-server" },
+    { "path": "./packages/compiler-cli" },
+    { "path": "./packages/contracts" },
+    { "path": "./packages/testing" },
+    { "path": "./packages/core" },
+    { "path": "./packages/pakb" }
+  ]
+}

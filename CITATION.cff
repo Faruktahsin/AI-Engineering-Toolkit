@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+title: "AI Engineering Toolkit & PAKB Context Engine"
+message: "If you use AI Engineering Toolkit or PAKB in your technical projects or research, please cite it as below."
+type: software
+authors:
+  - family-names: "Arik"
+    given-names: "Faruk Tahsin"
+    email: "faruktahsin@gmail.com"
+repository-code: "https://github.com/faruktahsin/AI-Engineering-Toolkit"
+url: "https://github.com/faruktahsin/AI-Engineering-Toolkit"
+abstract: "A production-grade open-source toolkit and context compilation engine for AI engineers, autonomous agents, and local memory systems."
+license: MIT
+version: 1.0.0
+date-released: 2026-08-06

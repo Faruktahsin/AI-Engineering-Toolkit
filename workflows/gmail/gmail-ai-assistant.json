@@ -9,12 +9,5 @@
     "Extract action items",
     "Generate draft replies"
   ],
-  "planned_nodes": [
-    "Gmail Trigger",
-    "AI Model",
-    "IF",
-    "Google Sheets",
-    "Notion",
-    "Gmail Reply"
-  ]
+  "planned_nodes": ["Gmail Trigger", "AI Model", "IF", "Google Sheets", "Notion", "Gmail Reply"]
 }

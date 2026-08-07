@@ -1,0 +1,97 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: '22.x'
+  PNPM_VERSION: '9.7.0'
+
+jobs:
+  ci:
+    name: CI (${{ matrix.os }}, Node ${{ env.NODE_VERSION }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        shell: bash
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify Node.js version requirement
+        shell: bash
+        run: pnpm run check:node
+
+      - name: Scan for zero-width Unicode characters
+        shell: bash
+        run: pnpm run check:zero-width
+
+      - name: Scan for committed secrets
+        shell: bash
+        run: pnpm run check:secrets
+
+      - name: Run TypeScript typecheck
+        shell: bash
+        run: pnpm run typecheck
+
+      - name: Run Biome linter
+        shell: bash
+        run: pnpm run lint
+
+      - name: Build workspace packages
+        shell: bash
+        run: pnpm run build
+
+      - name: Run Vitest test suite
+        shell: bash
+        run: pnpm run test
+
+      - name: Upload build distribution artifacts
+        if: matrix.os == 'ubuntu-latest' && github.event_name == 'push'
+        uses: actions/upload-artifact@v4
+        with:
+          name: pakb-dist-artifacts-${{ github.sha }}
+          path: |
+            packages/*/dist
+            outputs/
+          retention-days: 7
+
+      - name: Generate CI Summary
+        if: always()
+        shell: bash
+        run: |
+          echo "### 🚀 PAKB CI Job Summary (${{ matrix.os }})" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status:** ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Node Version:** \`${{ env.NODE_VERSION }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **pnpm Version:** \`${{ env.PNPM_VERSION }}\`" >> $GITHUB_STEP_SUMMARY

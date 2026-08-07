@@ -1,0 +1,24 @@
+# AI Engineering Toolkit Codeowners Specification
+# Global Maintainers
+* @faruktahsin
+
+# Core Monorepo & Packages
+/packages/ @faruktahsin
+/packages/pakb/ @faruktahsin
+/packages/core/ @faruktahsin
+/packages/eval/ @faruktahsin
+/packages/storage/ @faruktahsin
+/packages/compiler/ @faruktahsin
+
+# Applications & Documentation
+/apps/ @faruktahsin
+/docs/ @faruktahsin
+
+# Python Package
+/python/ @faruktahsin
+
+# Workflows & Workspaces
+/workflows/ @faruktahsin
+/prompts/ @faruktahsin
+/cookbooks/ @faruktahsin
+/research/ @faruktahsin

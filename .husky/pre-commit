@@ -1,0 +1,4 @@
+#!/bin/sh
+pnpm biome check --write .
+pnpm check:zero-width
+pnpm check:secrets

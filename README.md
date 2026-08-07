@@ -1,109 +1,92 @@
-![License](https://img.shields.io/badge/License-MIT-blue.svg)
+# AI Engineering Toolkit (`AIET`)
 
-![Python](https://img.shields.io/badge/Python-3.12-yellow)
+> **Production-grade open-source product ecosystem and educational toolkit for AI Systems Engineering, Context Intelligence, and Local Agent Memory.**
 
-![Open Source](https://img.shields.io/badge/Open%20Source-Yes-success)
-
-![GitHub last commit](https://img.shields.io/github/last-commit/Faruktahsin/AI-Engineering-Toolkit)
-
-![GitHub repo size](https://img.shields.io/github/repo-size/Faruktahsin/AI-Engineering-Toolkit)
-
-![GitHub stars](https://img.shields.io/github/stars/Faruktahsin/AI-Engineering-Toolkit?style=social)
-
-# AI Engineering Toolkit
-
-An open-source collection of AI tools, automation workflows, prompts, and engineering resources designed to help students, developers, and engineers build, learn, and automate more effectively.
-
-## 🎯 Project Vision
-
-AI Engineering Toolkit aims to make practical AI resources more accessible by bringing together reusable prompts, automation workflows, study resources, and developer tools in one place.
-
-This project is developed as a long-term open-source initiative and will continue to grow with community contributions.
+[![CI](https://github.com/faruktahsin/AI-Engineering-Toolkit/actions/workflows/ci.yml/badge.svg)](https://github.com/faruktahsin/AI-Engineering-Toolkit/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node: >=22.0.0](https://img.shields.io/badge/Node.js-%3E%3D22.0.0-green.svg)](https://nodejs.org)
+[![Python: >=3.11](https://img.shields.io/badge/Python-%3E%3D3.11-blue.svg)](https://python.org)
+[![pnpm: >=9.0.0](https://img.shields.io/badge/pnpm-%3E%3D9.0.0-orange.svg)](https://pnpm.io)
 
 ---
 
-## 🚀 Planned Features
+## Architecture Overview
 
-- AI Prompt Library
-- n8n Automation Workflows
-- Engineering Study Resources
-- Python Utilities
-- Productivity Templates
-- Documentation
-- Learning Guides
+The **AI Engineering Toolkit** provides a complete ecosystem for building zero-leak, token-optimized, production-grade AI systems. 
 
----
-
-## 📂 Repository Structure
-
-```text
-docs/
-prompts/
-workflows/
-python/
-engineering/
-resources/
-assets/
+```
++-----------------------------------------------------------------------------------+
+|                            AI ENGINEERING TOOLKIT                                 |
+|                             (Parent Repository)                                   |
++-----------------------------------------------------------------------------------+
+                                          |
+      +-------------------+---------------+---------------+-------------------+
+      |                   |               |               |                   |
+[Subsystem 01]      [Subsystem 02]  [Subsystem 03]  [Subsystem 04]      [Subsystem 05]
+  PAKB Engine         Prompt Lab     Agent Harness    Eval Suite        Workflow Engine
+ (Context/MCP)     (Engineering)  (Exec Runtimes)  (Benchmarking)      (n8n/LangGraph)
 ```
 
 ---
 
-## 🛣️ Roadmap
+## Subsystems & Features
 
-- [ ] Create AI Prompt Library
-- [ ] Publish n8n Workflows
-- [ ] Add Python Utilities
-- [ ] Build Engineering Knowledge Base
-- [ ] Improve Documentation
-- [ ] Welcome Community Contributions
+### 1. Subsystem 01: PAKB (Personal AI Knowledge Base) — *Flagship Module*
+- **5 Fundamental Primitives**: `Entity`, `Directive`, `Assertion`, `Event`, and `Relation`.
+- **Local SQLite Storage Engine**: WAL mode, JSON1 validation, FTS5 full-text search, and recursive CTE graph traversal in <3ms.
+- **Deterministic Context Compiler**: 7-stage build pipeline, `cl100k_base` (tiktoken) profiling, zero-width Unicode decontamination, and reproducible build manifests.
+- **Model Context Protocol (MCP) Server**: Exposes stdio and SSE tools to Claude Code, Cursor, Windsurf, and custom agent runtimes.
 
----
+### 2. Cross-Platform SDK Parity
+- **TypeScript / Node.js**: `@aiet/core`, `@aiet/pakb`, `@aiet/eval`, `@aiet/storage`, `@aiet/compiler`, `@aiet/cli`.
+- **Python**: `aiet-python` (`uv pip install aiet-python`) with FastMCP bindings and `pytest` integration.
 
-## 🤝 Contributing
-
-Contributions, ideas, bug reports, and suggestions are always welcome.
-
-If you'd like to contribute, feel free to open an issue or submit a pull request.
+### 3. Prompt Engineering & Evaluation
+- Versioned XML schemas and Promptfoo benchmark evaluation suites.
 
 ---
 
-## 📄 License
+## Quickstart
 
-This project is released under the MIT License.
+### Node.js / TypeScript
+```bash
+# Install dependencies across the monorepo
+pnpm install
+
+# Run typecheck & linting
+pnpm typecheck
+pnpm lint
+
+# Run unit and integration tests
+pnpm test
+
+# Build all packages via Turborepo
+pnpm build
+```
+
+### Python
+```bash
+cd python
+uv venv
+source .venv/bin/activate
+uv pip install -e ".[dev]"
+pytest
+```
+
+---
+
+## Documentation & Learning Resources
+
+- [System Architecture](ARCHITECTURE.md)
+- [Strategic Vision](VISION.md) & [Mission Statement](MISSION.md)
+- [Development Guide](DEVELOPMENT.md)
+- [AI Engineering Handbook](AI_ENGINEERING_GUIDE.md)
+- [AI Engineering Interview Kit](INTERVIEW_GUIDE.md)
+- [Awesome AI Engineering Resources](awesome/README.md)
+- [Architecture Decisions (ADRs)](DECISIONS.md)
 
 ---
 
-## 📌 Current Status
+## License
 
-The project is currently under active development.
-
-### Completed
-
-- ✅ Project structure
-- ✅ Project documentation
-- ✅ Engineering AI prompt collection
-- ✅ Initial Python utility
-- ✅ Workflow documentation
-- ✅ Contribution guidelines
-- ✅ Code of Conduct
-- ✅ Project roadmap
-
-### Currently Working On
-
-- 🚧 n8n workflow collection
-- 🚧 AI automation templates
-- 🚧 Engineering study resources
-- 🚧 Additional Python utilities
-
-### Future Goals
-
-- AI Agents
-- WhatsApp Automation
-- Gmail AI Assistant
-- YouTube Automation
-- Google Drive Automation
-- Notion Knowledge Base
-- MCP Examples
-- Community Contributions
-
----
+[MIT](LICENSE)

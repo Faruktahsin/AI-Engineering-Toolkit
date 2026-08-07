@@ -1,0 +1,40 @@
+name: Bug Report
+description: Create a report to help us fix a bug in AI Engineering Toolkit
+title: "[BUG]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a bug! Please fill out the form below carefully.
+  - type: input
+    id: package
+    attributes:
+      label: Subsystem / Package
+      description: Which package or subsystem is affected? (e.g., @aiet/pakb, @aiet/core, python, cli)
+      placeholder: "@aiet/pakb"
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce & Code Example
+      description: Provide reproduction code or step-by-step instructions.
+      render: typescript
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment Details
+      description: Node.js version, Python version, OS, SQLite version.
+      placeholder: "Node 22.4.0, macOS Sonoma, SQLite 3.46"
+    validations:
+      required: true
