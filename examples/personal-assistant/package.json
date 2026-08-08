@@ -1,0 +1,26 @@
+{
+  "name": "@aiet/example-personal-assistant",
+  "version": "1.0.0",
+  "private": true,
+  "description": "General AI Personal Assistant with OpenAI Agents SDK integration and memory explainability built on AIET",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs && tsc --emitDeclarationOnly",
+    "start": "tsx src/index.ts",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@aiet/adapter-openai-agents": "workspace:*",
+    "@aiet/core": "workspace:*",
+    "@aiet/domain": "workspace:*",
+    "@aiet/schema": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsup": "^8.3.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.4",
+    "vitest": "^2.1.0"
+  }
+}
