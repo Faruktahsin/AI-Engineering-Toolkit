@@ -330,4 +330,173 @@ describe("PAKB Storage Package (@aiet/storage Integration Tests)", () => {
       expect(graph.edges).toHaveLength(1);
     });
   });
+
+  describe("7. Vector Storage & Hybrid Search Engine", () => {
+    it("should upsert, retrieve, and query vector embeddings", async () => {
+      const ent = {
+        schema_version: "1.0.0",
+        id: generateULID("entity"),
+        created_at: "2026-08-05T12:00:00Z",
+        updated_at: "2026-08-05T12:00:00Z",
+        last_verified: "2026-08-05T12:00:00Z",
+        sensitivity: SensitivityTier.PUBLIC,
+        volatility: VolatilityRating.LOW,
+        activation: ActivationClass.ALWAYS_ON,
+        name: "Vector Node",
+        type: EntityType.ORGANIZATION,
+      };
+      await repo.insertPrimitive(ent);
+
+      const embedding = new Float32Array([0.5, 0.5, 0.5, 0.5]);
+      await repo.upsertVectorEmbedding(ent.id, embedding);
+
+      const retrieved = await repo.getVectorEmbedding(ent.id);
+      expect(retrieved).not.toBeNull();
+      if (retrieved) {
+        expect(Array.from(retrieved)).toEqual(Array.from(embedding));
+      }
+
+      const searchResult = await repo.searchVector(embedding, { limit: 5 });
+      expect(searchResult.total_matches).toBe(1);
+      expect(searchResult.results[0]?.primitive_id).toBe(ent.id);
+      expect(searchResult.results[0]?.similarity_score).toBeCloseTo(1.0);
+    });
+
+    it("should combine FTS5 BM25 and Vector Search using Reciprocal Rank Fusion (RRF)", async () => {
+      const assertion1 = {
+        schema_version: "1.0.0",
+        id: generateULID("assertion"),
+        created_at: "2026-08-05T12:00:00Z",
+        updated_at: "2026-08-05T12:00:00Z",
+        last_verified: "2026-08-05T12:00:00Z",
+        sensitivity: SensitivityTier.PUBLIC,
+        volatility: VolatilityRating.LOW,
+        activation: ActivationClass.ALWAYS_ON,
+        claim: "Quantum computing accelerates hybrid retrieval benchmarks.",
+        evidence_type: EvidenceType.STATED,
+        type: AssertionType.FACT,
+      };
+
+      const assertion2 = {
+        schema_version: "1.0.0",
+        id: generateULID("assertion"),
+        created_at: "2026-08-05T12:00:00Z",
+        updated_at: "2026-08-05T12:00:00Z",
+        last_verified: "2026-08-05T12:00:00Z",
+        sensitivity: SensitivityTier.PUBLIC,
+        volatility: VolatilityRating.LOW,
+        activation: ActivationClass.ALWAYS_ON,
+        claim: "Neural vector embeddings index semantic knowledge.",
+        evidence_type: EvidenceType.STATED,
+        type: AssertionType.FACT,
+      };
+
+      await repo.insertPrimitive(assertion1);
+      await repo.insertPrimitive(assertion2);
+
+      const vec1 = new Float32Array([1.0, 0.0, 0.0, 0.0]);
+      const vec2 = new Float32Array([0.0, 1.0, 0.0, 0.0]);
+
+      await repo.upsertVectorEmbedding(assertion1.id, vec1);
+      await repo.upsertVectorEmbedding(assertion2.id, vec2);
+
+      // Perform Hybrid Search (FTS query + Vector query)
+      const hybridRes = await repo.searchHybrid("Quantum", vec1, { limit: 5, alpha: 0.5 });
+      expect(hybridRes.total_matches).toBeGreaterThan(0);
+      expect(hybridRes.results[0]?.primitive_id).toBe(assertion1.id);
+      expect(hybridRes.results[0]?.combined_score).toBeGreaterThan(0);
+    });
+  });
+
+  describe("8. Production Memory Lifecycle & Consolidation Engine", () => {
+    it("should track access count, importance score, and touch timestamps", async () => {
+      const ent = {
+        schema_version: "1.0.0",
+        id: generateULID("entity"),
+        created_at: "2026-08-05T12:00:00Z",
+        updated_at: "2026-08-05T12:00:00Z",
+        last_verified: "2026-08-05T12:00:00Z",
+        sensitivity: SensitivityTier.PUBLIC,
+        volatility: VolatilityRating.LOW,
+        activation: ActivationClass.ALWAYS_ON,
+        name: "Lifecycle Test Entity",
+        type: EntityType.WORKSTREAM,
+      };
+
+      await repo.insertPrimitive(ent);
+      await repo.setMemoryImportance(ent.id, 0.95);
+      await repo.touchMemoryAccess(ent.id);
+
+      const lifecycle = await repo.getMemoryLifecycle(ent.id);
+      expect(lifecycle).not.toBeNull();
+      expect(lifecycle?.importance_score).toBeCloseTo(0.95);
+      expect(lifecycle?.access_count).toBe(1);
+    });
+
+    it("should merge duplicate memories and transfer relations & embeddings", async () => {
+      const primary = {
+        schema_version: "1.0.0",
+        id: generateULID("entity"),
+        created_at: "2026-08-05T12:00:00Z",
+        updated_at: "2026-08-05T12:00:00Z",
+        last_verified: "2026-08-05T12:00:00Z",
+        sensitivity: SensitivityTier.PUBLIC,
+        volatility: VolatilityRating.LOW,
+        activation: ActivationClass.ALWAYS_ON,
+        name: "Primary Customer Support Entity",
+        type: EntityType.ORGANIZATION,
+      };
+
+      const duplicate = {
+        schema_version: "1.0.0",
+        id: generateULID("entity"),
+        created_at: "2026-08-05T12:00:00Z",
+        updated_at: "2026-08-05T12:00:00Z",
+        last_verified: "2026-08-05T12:00:00Z",
+        sensitivity: SensitivityTier.PUBLIC,
+        volatility: VolatilityRating.LOW,
+        activation: ActivationClass.ALWAYS_ON,
+        name: "Duplicate Customer Support Entity",
+        type: EntityType.ORGANIZATION,
+      };
+
+      await repo.insertPrimitive(primary);
+      await repo.insertPrimitive(duplicate);
+
+      const vec = new Float32Array([0.1, 0.2, 0.3]);
+      await repo.upsertVectorEmbedding(duplicate.id, vec);
+
+      await repo.mergeMemories(primary.id, [duplicate.id]);
+
+      expect(await repo.getPrimitive(duplicate.id)).toBeNull();
+      const transferredVec = await repo.getVectorEmbedding(primary.id);
+      expect(transferredVec).not.toBeNull();
+    });
+
+    it("should retrieve ranked memories factoring relevance, importance, and recency", async () => {
+      const assertion = {
+        schema_version: "1.0.0",
+        id: generateULID("assertion"),
+        created_at: "2026-08-05T12:00:00Z",
+        updated_at: "2026-08-05T12:00:00Z",
+        last_verified: "2026-08-05T12:00:00Z",
+        sensitivity: SensitivityTier.PUBLIC,
+        volatility: VolatilityRating.LOW,
+        activation: ActivationClass.ALWAYS_ON,
+        claim:
+          "Ranked memory retrieval factors relevance, importance, and exponential recency decay.",
+        evidence_type: EvidenceType.STATED,
+        type: AssertionType.FACT,
+      };
+
+      await repo.insertPrimitive(assertion);
+      await repo.setMemoryImportance(assertion.id, 0.8);
+
+      const ranked = await repo.retrieveRankedMemories("recency decay", null, { limit: 5 });
+      expect(ranked.total_matches).toBeGreaterThan(0);
+      expect(ranked.results[0]?.primitive_id).toBe(assertion.id);
+      expect(ranked.results[0]?.importance_score).toBeCloseTo(0.8);
+      expect(ranked.results[0]?.final_score).toBeGreaterThan(0);
+    });
+  });
 });

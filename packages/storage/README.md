@@ -1,30 +1,12 @@
 # `@aiet/storage`
 
-Canonical SQLite storage engine, DDL migrations, Drizzle ORM, JCS hashing, FTS5 search, and recursive graph query engine for the Personal AI Knowledge Base (PAKB).
+> Local-first SQLite WAL memory database, FTS5 BM25 search, vector embeddings, and Reciprocal Rank Fusion (RRF) hybrid retrieval for **AIET**.
 
-## Installation
+---
 
-```bash
-pnpm add @aiet/storage
-```
+## Features
 
-## Usage
-
-```typescript
-import { PAKBStorageRepository } from "@aiet/storage";
-
-const repo = new PAKBStorageRepository({ db_path: "path/to/pakb.db" });
-
-// 1. Insert Primitive
-repo.insertPrimitive(myEntity);
-
-// 2. Search FTS5
-const searchResults = repo.searchFTS5("architecture");
-
-// 3. Graph Traversal (MAX_DEPTH <= 3)
-const graph = repo.traverseGraph(entityId, 2);
-```
-
-## License
-
-[MIT](../../LICENSE)
+- **Local-First SQLite WAL**: Fast, embedded relational database with zero external server dependencies.
+- **Full-Text Search (FTS5)**: BM25 rank scoring over entity names, directives, assertions, and events.
+- **Hybrid Retrieval**: Combines keyword FTS5 BM25 scores and high-dimensional vector cosine similarity via Reciprocal Rank Fusion (RRF).
+- **Memory Lifecycle Engine**: Recency decay half-life, access frequency counters, and importance scoring.

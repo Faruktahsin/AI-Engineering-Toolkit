@@ -1,7 +1,7 @@
 {
-  "name": "@aiet/schema",
+  "name": "@aiet/embeddings-openai",
   "version": "1.0.0",
-  "description": "Canonical JSON Schema Draft 2020-12 and TypeScript interfaces for AI Engineering Toolkit (AIET)",
+  "description": "OpenAI embedding provider for AIET vector memory",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -20,7 +20,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@aiet/errors": "workspace:*"
+    "@aiet/embeddings": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

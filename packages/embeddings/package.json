@@ -1,7 +1,7 @@
 {
-  "name": "@aiet/schema",
+  "name": "@aiet/embeddings",
   "version": "1.0.0",
-  "description": "Canonical JSON Schema Draft 2020-12 and TypeScript interfaces for AI Engineering Toolkit (AIET)",
+  "description": "Pluggable embedding provider abstraction and vector similarity utilities for AIET hybrid memory search",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -19,9 +19,7 @@
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist"
   },
-  "dependencies": {
-    "@aiet/errors": "workspace:*"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/node": "^22.0.0",
     "tsup": "^8.2.4",

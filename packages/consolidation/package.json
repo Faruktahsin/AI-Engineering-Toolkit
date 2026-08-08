@@ -1,7 +1,7 @@
 {
-  "name": "@aiet/schema",
+  "name": "@aiet/consolidation",
   "version": "1.0.0",
-  "description": "Canonical JSON Schema Draft 2020-12 and TypeScript interfaces for AI Engineering Toolkit (AIET)",
+  "description": "Autonomous memory consolidation engine for AIET (duplicate detection, contradiction resolution, memory lineage, governance proposal integration)",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -20,7 +20,14 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@aiet/errors": "workspace:*"
+    "@aiet/decision-engine": "workspace:*",
+    "@aiet/domain": "workspace:*",
+    "@aiet/embeddings": "workspace:*",
+    "@aiet/extractor": "workspace:*",
+    "@aiet/governance": "workspace:*",
+    "@aiet/schema": "workspace:*",
+    "@aiet/storage": "workspace:*",
+    "ulid": "^2.3.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

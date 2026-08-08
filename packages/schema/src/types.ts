@@ -8,45 +8,27 @@ import type {
   EntityType,
   EventType,
   EvidenceType,
-  PAKBErrorCode,
   RelationPredicate,
   SensitivityTier,
   VolatilityRating,
 } from "./enums";
 
-export class PAKBError extends Error {
-  public readonly code: PAKBErrorCode;
-  public readonly target_id?: string | null;
-  public readonly details?: Record<string, unknown> | null;
-
-  constructor(
-    message: string,
-    code: PAKBErrorCode,
-    target_id?: string | null,
-    details?: Record<string, unknown> | null,
-  ) {
-    super(message);
-    this.name = this.constructor.name;
-    this.code = code;
-    this.target_id = target_id ?? null;
-    this.details = details ?? null;
-    Object.setPrototypeOf(this, new.target.prototype);
-  }
-}
-
-export class IDCollisionError extends PAKBError {}
-export class ImmutableFieldViolationError extends PAKBError {}
-export class DanglingReferenceError extends PAKBError {}
-export class ConcurrentModificationError extends PAKBError {}
-export class PreambleBudgetExceededError extends PAKBError {}
-export class SecurityRedactionError extends PAKBError {}
-export class SchemaValidationError extends PAKBError {}
-export class SecretDetectedError extends PAKBError {}
-export class InvalidIDFormatError extends PAKBError {}
-export class PrimitiveNotFoundError extends PAKBError {}
-export class DatabaseAccessError extends PAKBError {}
-export class EmitterFormattingError extends PAKBError {}
-export class ArtifactEmissionError extends PAKBError {}
+export {
+  ArtifactEmissionError,
+  ConcurrentModificationError,
+  DanglingReferenceError,
+  DatabaseAccessError,
+  EmitterFormattingError,
+  IDCollisionError,
+  ImmutableFieldViolationError,
+  InvalidIDFormatError,
+  PAKBError,
+  PreambleBudgetExceededError,
+  PrimitiveNotFoundError,
+  SchemaValidationError,
+  SecretDetectedError,
+  SecurityRedactionError,
+} from "@aiet/errors";
 
 export interface BasePrimitive {
   readonly schema_version: string;
