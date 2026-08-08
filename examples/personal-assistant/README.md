@@ -10,9 +10,9 @@ This official example demonstrates how developers build a General AI Personal As
 flowchart TD
     User([User]) --> Assistant[PersonalAssistantAgent]
     Assistant --> OpenAITools["@aiet/adapter-openai-agents (Function Tools)"]
-    OpenAITools --> Core SDK["@aiet/core (AIETClient)"]
+    OpenAITools --> CoreSDK["@aiet/core (AIETClient)"]
     Assistant --> Explainability["Memory Explainability Engine"]
-    Core SDK --> Storage["SQLite WAL Local Store"]
+    CoreSDK --> Storage["SQLite WAL Local Store"]
 ```
 
 ---

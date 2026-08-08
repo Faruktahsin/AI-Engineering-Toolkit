@@ -9,11 +9,11 @@ This official example demonstrates how software engineers build an AI Coding Ass
 ```mermaid
 flowchart TD
     User([Developer]) --> Agent[CodingAgent]
-    Agent --> Core SDK["@aiet/core (AIETClient)"]
-    Core SDK --> MemoryEngine["SQLite WAL Memory Engine"]
-    Core SDK --> Compiler["Context Compiler"]
+    Agent --> CoreSDK["@aiet/core (AIETClient)"]
+    CoreSDK --> MemoryEngine["SQLite WAL Memory Engine"]
+    CoreSDK --> Compiler["Context Compiler"]
     Compiler --> Artifacts["CLAUDE.md / AGENTS.md"]
-    Core SDK --> MCP["@aiet/mcp-server"]
+    CoreSDK --> MCP["@aiet/mcp-server"]
     MCP --> Editor["Claude Code / Cursor / Windsurf"]
 ```
 

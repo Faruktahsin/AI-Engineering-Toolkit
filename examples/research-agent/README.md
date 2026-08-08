@@ -9,7 +9,7 @@ This official example demonstrates how researchers and knowledge engineers build
 ```mermaid
 flowchart TD
     Researcher([Researcher]) --> Agent[ResearchAgent]
-    Agent --> Core SDK["@aiet/core (AIETClient)"]
+    Agent --> CoreSDK["@aiet/core (AIETClient)"]
     Agent --> Consolidation["@aiet/consolidation Engine"]
     Agent --> Checkpointer["@aiet/adapter-langgraph Checkpointer"]
     Checkpointer --> EventStore["Event Primitives (session_log)"]

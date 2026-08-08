@@ -8,8 +8,8 @@ This official example demonstrates how enterprise developers build a compliant A
 
 ```mermaid
 flowchart TD
-    Customer([Customer / Agent]) --> SupportAgent[CustomerSupportAgent]
-    SupportAgent --> Core SDK["@aiet/core (AIETClient)"]
+    Customer["Customer / Agent"] --> SupportAgent[CustomerSupportAgent]
+    SupportAgent --> CoreSDK["@aiet/core (AIETClient)"]
     SupportAgent --> VercelAdapter["@aiet/adapter-vercel Provider"]
     SupportAgent --> Governance["@aiet/governance Proposal Engine"]
     Governance --> AuditLog["Audit Ledger (JCS Hashes)"]
