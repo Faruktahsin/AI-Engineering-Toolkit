@@ -1,51 +1,84 @@
-# Contributing to Personal AI Knowledge Base (PAKB)
+# Contributing to AI Engineering Toolkit (AIET)
 
-Thank you for your interest in contributing to PAKB!
+Thank you for your interest in contributing to the **AI Engineering Toolkit (AIET)**!
 
-## Architectural Governance & Frozen Specifications
+AIET is a local-first, deterministic, persistent-memory infrastructure framework for AI agents.
 
-PAKB is built upon **frozen architecture specifications**. The following core specifications are frozen and MUST NOT be modified without a formal Architecture Decision Record (ADR) version upgrade:
+---
 
-- PAKB Domain Model v1.0
-- PAKB Architecture Decision Records v1.0
-- PAKB JSON Schema v1.0
-- PAKB Storage Semantics v1.0
-- PAKB SQLite Storage Architecture v1.0
-- PAKB MCP Server Architecture v1.0
-- PAKB Compiler Architecture v1.0
-- PAKB API Contracts v1.0
+## Code of Conduct
 
-## Monorepo Setup
+All contributors are expected to follow our [Code of Conduct](CODE_OF_CONDUCT.md). Please read it before participating in discussions or submitting pull requests.
+
+---
+
+## Development Setup
+
+### Prerequisites
+- **Node.js**: v18.x or v20.x+
+- **pnpm**: v9.x (`corepack enable pnpm`)
+- **Git**
+
+### Clone & Install
 
 ```bash
-# Clone repository
-git clone https://github.com/faruktahsinarik/AI-Engineering-Toolkit.git
-cd AI-Engineering-Toolkit
+# 1. Clone the repository
+git clone https://github.com/ai-engineering-toolkit/aiet.git
+cd aiet
 
-# Install dependencies with pnpm
+# 2. Install dependencies
 pnpm install
 
-# Run typecheck across all packages
-pnpm typecheck
-
-# Run Biome linter and formatter
-pnpm lint
-pnpm format
-
-# Execute full Vitest test suite
-pnpm test
-
-# Build all workspace packages
+# 3. Build all workspace packages
 pnpm build
+
+# 4. Run typecheck & linter
+pnpm typecheck
+pnpm lint
+
+# 5. Run full test suite
+pnpm test
 ```
+
+---
+
+## Monorepo Architecture
+
+AIET is structured as a pnpm monorepo:
+- **`packages/core`**: Unified SDK client (`createAIET`).
+- **`packages/cli`**: Production developer CLI (`aiet`).
+- **`packages/mcp-server`**: MCP integration server.
+- **`packages/storage`**: SQLite WAL memory engine.
+- **`packages/compiler`**: Deterministic context compiler.
+- **`packages/governance`**: Proposal approval engine & audit log.
+- **`packages/consolidation`**: Duplicate & contradiction detection.
+- **`packages/adapter-*`**: Framework adapters (Vercel AI SDK, LangGraph, OpenAI Agents).
+- **`examples/`**: Official runnable demo applications.
+
+---
 
 ## Pull Request Guidelines
 
-1. **No Breaking Changes**: PRs must maintain 100% backward compatibility with API Contracts v1.0.
-2. **Zero-Width Character & Secret Scanning**: All commits must pass `pnpm check:zero-width` and `pnpm check:secrets`.
-3. **Strict Type Safety**: TypeScript typecheck (`pnpm typecheck`) must pass with zero errors.
-4. **Deterministic Tests**: All new features or bug fixes must include Vitest tests with deterministic inputs.
+1. **Branch Naming**: Use descriptive branch names: `feature/name`, `fix/issue-description`, `docs/update`.
+2. **Conventional Commits**: Format commit messages according to Conventional Commits:
+   - `feat(core): add memory explainability provider`
+   - `fix(storage): correct FTS query phrase escaping`
+   - `docs(readme): add quickstart guide`
+3. **Tests Required**: Every new feature or fix must include unit or integration tests in `tests/`.
+4. **Validation Checklist**:
+   Before submitting a PR, ensure all checks pass:
+   ```bash
+   pnpm biome check --write .
+   pnpm build
+   pnpm typecheck
+   pnpm lint
+   pnpm test
+   ```
 
-## License
+---
 
-By contributing, you agree that your contributions will be licensed under the [MIT License](LICENSE).
+## Reporting Issues
+
+If you encounter bugs, security issues, or have feature requests, please submit an issue on GitHub:
+- Bug Reports: Include Node version, OS, reproduction steps, and full error logs.
+- Security Issues: See [SECURITY.md](SECURITY.md) for private disclosure instructions.

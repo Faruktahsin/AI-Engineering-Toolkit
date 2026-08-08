@@ -45,3 +45,8 @@ outputs/*
 tmp-better-sqlite3.js
 trace.txt
 .merget/
+scratch/
+examples/**/dist/
+examples/**/*.db
+examples/**/*.db-wal
+examples/**/*.db-shm

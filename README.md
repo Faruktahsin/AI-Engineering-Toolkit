@@ -1,92 +1,132 @@
 # AI Engineering Toolkit (`AIET`)
 
-> **Production-grade open-source product ecosystem and educational toolkit for AI Systems Engineering, Context Intelligence, and Local Agent Memory.**
+> **Local-First, Deterministic, Persistent-Memory Infrastructure Framework for Autonomous AI Agents.**
 
-[![CI](https://github.com/faruktahsin/AI-Engineering-Toolkit/actions/workflows/ci.yml/badge.svg)](https://github.com/faruktahsin/AI-Engineering-Toolkit/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Node: >=22.0.0](https://img.shields.io/badge/Node.js-%3E%3D22.0.0-green.svg)](https://nodejs.org)
-[![Python: >=3.11](https://img.shields.io/badge/Python-%3E%3D3.11-blue.svg)](https://python.org)
-[![pnpm: >=9.0.0](https://img.shields.io/badge/pnpm-%3E%3D9.0.0-orange.svg)](https://pnpm.io)
+[![CI](https://github.com/ai-engineering-toolkit/aiet/actions/workflows/ci.yml/badge.svg)](https://github.com/ai-engineering-toolkit/aiet/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![npm version](https://img.shields.io/badge/npm-v0.1.0--alpha-orange.svg)](https://www.npmjs.com/package/@aiet/core)
+[![Node: >=18.0.0](https://img.shields.io/badge/Node.js-%3E%3D18.0.0-green.svg)](https://nodejs.org)
+[![pnpm: >=9.0.0](https://img.shields.io/badge/pnpm-%3E%3D9.0.0-red.svg)](https://pnpm.io)
 
 ---
 
-## Architecture Overview
+## 💡 What is AIET?
 
-The **AI Engineering Toolkit** provides a complete ecosystem for building zero-leak, token-optimized, production-grade AI systems. 
+**AI-Engineering-Toolkit (`AIET`)** is a production-grade infrastructure framework designed for software engineers building stateful, persistent-memory AI agents.
+
+AIET solves the challenges of unstructured prompt context, context overflows, memory fragmentation, and unvetted autonomous agent mutations by providing:
+
+- **5 Standardized Memory Primitives**: (`Entity`, `Directive`, `Assertion`, `Event`, `Relation`) with strict Zod & JSON Schemas.
+- **Autonomous Memory Formation**: Candidate extraction (`@aiet/extractor`) and scoring engine (`@aiet/decision-engine`) for `CREATE`, `UPDATE`, `MERGE`, and `IGNORE` decisions.
+- **Mandatory Safety & Governance**: Proposal approval workflows (`memory_proposals`) and tamper-evident audit ledger (`audit_log`) using JCS SHA-256 hash chains.
+- **Autonomous Memory Consolidation**: Duplicate & contradiction detection (`@aiet/consolidation`) to supersede outdated facts or resolve conflicting preferences.
+- **Deterministic 7-Stage Context Compiler**: Fits context into strict token budgets with bit-for-bit reproducible build manifests (`AGENTS.md`, `CLAUDE.md`, `.cursorrules`).
+- **Hybrid RRF Retrieval Engine**: SQLite WAL database with FTS5 BM25 search, vector embeddings, recency decay, and RRF ranking.
+- **Framework Adapters & MCP Integration**: Native adapters for Vercel AI SDK, LangGraph, OpenAI Agents SDK, and Model Context Protocol (MCP) for Claude Code, Cursor, and Windsurf.
+
+---
+
+## 🏛️ Architecture Overview
+
+AIET is organized as a high-performance monorepo of 28 workspace packages:
 
 ```
-+-----------------------------------------------------------------------------------+
-|                            AI ENGINEERING TOOLKIT                                 |
-|                             (Parent Repository)                                   |
-+-----------------------------------------------------------------------------------+
-                                          |
-      +-------------------+---------------+---------------+-------------------+
-      |                   |               |               |                   |
-[Subsystem 01]      [Subsystem 02]  [Subsystem 03]  [Subsystem 04]      [Subsystem 05]
-  PAKB Engine         Prompt Lab     Agent Harness    Eval Suite        Workflow Engine
- (Context/MCP)     (Engineering)  (Exec Runtimes)  (Benchmarking)      (n8n/LangGraph)
+                                  +------------------------------------+
+                                  |             @aiet/core             |
+                                  |    (Unified Primary SDK Facade)    |
+                                  +------------------------------------+
+                                                    |
+         +-----------------+----------------+-------+--------+------------------+
+         |                 |                |                |                  |
+   @aiet/memory     @aiet/compiler   @aiet/governance  @aiet/consolidation  @aiet/mcp-server
+  (SQLite & RRF)   (Context Engine)  (Audit Ledger)   (De-duplication)   (MCP Stdio Server)
+         |                 |                |                |                  |
+         +-----------------+----------------+----------------+------------------+
+                                                    |
+                                                @aiet/cli
+                                       (Developer CLI: aiet)
 ```
 
 ---
 
-## Subsystems & Features
+## 🚀 Framework Integration Matrix & Official Examples
 
-### 1. Subsystem 01: PAKB (Personal AI Knowledge Base) — *Flagship Module*
-- **5 Fundamental Primitives**: `Entity`, `Directive`, `Assertion`, `Event`, and `Relation`.
-- **Local SQLite Storage Engine**: WAL mode, JSON1 validation, FTS5 full-text search, and recursive CTE graph traversal in <3ms.
-- **Deterministic Context Compiler**: 7-stage build pipeline, `cl100k_base` (tiktoken) profiling, zero-width Unicode decontamination, and reproducible build manifests.
-- **Model Context Protocol (MCP) Server**: Exposes stdio and SSE tools to Claude Code, Cursor, Windsurf, and custom agent runtimes.
+AIET provides official, production-quality example applications demonstrating how to build autonomous agents across major frameworks:
 
-### 2. Cross-Platform SDK Parity
-- **TypeScript / Node.js**: `@aiet/core`, `@aiet/pakb`, `@aiet/eval`, `@aiet/storage`, `@aiet/compiler`, `@aiet/cli`.
-- **Python**: `aiet-python` (`uv pip install aiet-python`) with FastMCP bindings and `pytest` integration.
-
-### 3. Prompt Engineering & Evaluation
-- Versioned XML schemas and Promptfoo benchmark evaluation suites.
+| Framework / Adapter | Example Application | Capabilities Demonstrated | Link |
+| :--- | :--- | :--- | :--- |
+| **Native SDK (`@aiet/core`)** | `examples/coding-agent` | Developer preferences, ADR decision assertions, context compiler, MCP | [View Demo](examples/coding-agent) |
+| **LangGraph (`@aiet/adapter-langgraph`)** | `examples/research-agent` | State checkpointing (`createAIETCheckpointer`), contradiction detection, memory consolidation | [View Demo](examples/research-agent) |
+| **Vercel AI SDK (`@aiet/adapter-vercel`)** | `examples/customer-support-agent` | `AIETMemoryProvider`, SSE memory event streaming, governance approval workflow | [View Demo](examples/customer-support-agent) |
+| **OpenAI Agents SDK (`@aiet/adapter-openai-agents`)** | `examples/personal-assistant` | Function-calling tools (`createAIETAgentTools`), memory explainability | [View Demo](examples/personal-assistant) |
 
 ---
 
-## Quickstart
+## 🛠️ CLI Quickstart
 
-### Node.js / TypeScript
+### 1. Installation
+
 ```bash
-# Install dependencies across the monorepo
-pnpm install
-
-# Run typecheck & linting
-pnpm typecheck
-pnpm lint
-
-# Run unit and integration tests
-pnpm test
-
-# Build all packages via Turborepo
-pnpm build
+# Install AIET CLI globally or locally
+npm install -g @aiet/cli
 ```
 
-### Python
+### 2. Initialize Workspace & Connect MCP
+
 ```bash
-cd python
-uv venv
-source .venv/bin/activate
-uv pip install -e ".[dev]"
-pytest
+# Initialize AIET workspace
+aiet init
+
+# Check system diagnostics
+aiet doctor
+
+# Connect AIET MCP server to Claude Code or Cursor
+aiet connect claude
+aiet connect cursor
+```
+
+### 3. Usage in Node.js / TypeScript
+
+```typescript
+import { createAIET } from "@aiet/core";
+
+// Initialize AIET client
+const aiet = createAIET();
+
+// Add persistent developer preference
+await aiet.memory.add({
+  schema_version: "1.0.0",
+  id: "dir_01H...",
+  statement: "Prefer TypeScript strict mode and pure functional helpers",
+  domain: "coding_style",
+});
+
+// Perform Hybrid RRF memory search
+const searchRes = await aiet.memory.search("coding style preferences", { limit: 5 });
+console.log(searchRes.results);
+
+// Compile deterministic context files
+const compiled = await aiet.compiler.compile("AGENTS.md");
+console.log(compiled.content);
+
+// Inspect governance audit ledger
+const auditLog = await aiet.governance.getAuditHistory();
+console.log(auditLog);
 ```
 
 ---
 
-## Documentation & Learning Resources
+## 📖 Documentation Suite
 
-- [System Architecture](ARCHITECTURE.md)
-- [Strategic Vision](VISION.md) & [Mission Statement](MISSION.md)
-- [Development Guide](DEVELOPMENT.md)
-- [AI Engineering Handbook](AI_ENGINEERING_GUIDE.md)
-- [AI Engineering Interview Kit](INTERVIEW_GUIDE.md)
-- [Awesome AI Engineering Resources](awesome/README.md)
-- [Architecture Decisions (ADRs)](DECISIONS.md)
+- **[Developer Examples Guide](docs/examples-guide.md)**: Guide for choosing and running AIET demo apps.
+- **[npm Publishing Strategy](docs/npm-publishing-strategy.md)**: Package matrix and semantic versioning SLA.
+- **[GitHub Release Checklist](docs/github-release-checklist.md)**: Pre-release verification rules.
+- **[Contributing Guide](CONTRIBUTING.md)**: Developer setup, PR standards, and conventional commit rules.
+- **[Security Policy](SECURITY.md)**: Local-first zero-egress policies and vulnerability reporting.
+- **[Changelog](CHANGELOG.md)**: Detailed release history.
 
 ---
 
-## License
+## 📄 License
 
-[MIT](LICENSE)
+AIET is open-source software licensed under the [Apache-2.0 License](LICENSE).

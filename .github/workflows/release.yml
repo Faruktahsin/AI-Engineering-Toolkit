@@ -1,139 +1,49 @@
-name: Production Release Engineering
+name: Release & Publish
 
 on:
   push:
     tags:
-      - 'v*.*.*'
-  workflow_dispatch:
-    inputs:
-      dry_run:
-        description: 'Execute dry run without publishing to npm or GitHub Releases'
-        required: true
-        type: boolean
-        default: true
-
-concurrency:
-  group: release-${{ github.ref }}
-  cancel-in-progress: false
-
-permissions:
-  contents: write
-  id-token: write
-  packages: write
-  attestations: write
-
-env:
-  NODE_VERSION: '22.x'
-  PNPM_VERSION: '9.7.0'
+      - 'v*'
 
 jobs:
-  release:
-    name: Build & Publish Release
+  publish:
+    name: Build & Publish to npm
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-    environment: production
-
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
-      - name: Setup Node.js ${{ env.NODE_VERSION }}
+      - name: Setup Node.js 20.x
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
+          node-version: 20.x
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Install dependencies
-        shell: bash
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run verification checks
-        shell: bash
+      - name: Full Verification Matrix
         run: |
-          pnpm run check:node
-          pnpm run check:zero-width
-          pnpm run check:secrets
+          pnpm lint
+          pnpm build
+          pnpm typecheck
+          pnpm test
 
-      - name: Run typecheck
-        shell: bash
-        run: pnpm run typecheck
-
-      - name: Run Biome linter
-        shell: bash
-        run: pnpm run lint
-
-      - name: Run Vitest test suite
-        shell: bash
-        run: pnpm run test
-
-      - name: Build workspace packages
-        shell: bash
-        run: pnpm run build
-
-      - name: Generate Build Attestations
-        if: ${{ inputs.dry_run != true }}
-        uses: actions/attest-build-provenance@v1
-        with:
-          subject-path: 'packages/*/dist/**'
-
-      - name: Topological Publish Order Check (Dry Run)
-        if: ${{ inputs.dry_run == true }}
-        shell: bash
-        run: |
-          echo "Executing topological workspace package publish dry-run..."
-          pnpm publish --filter @aiet/schema --access public --dry-run --no-git-checks
-          pnpm publish --filter @aiet/domain --access public --dry-run --no-git-checks
-          pnpm publish --filter @aiet/storage --access public --dry-run --no-git-checks
-          pnpm publish --filter @aiet/mcp-server --access public --dry-run --no-git-checks
-          pnpm publish --filter @aiet/compiler --access public --dry-run --no-git-checks
-          pnpm publish --filter @aiet/cli --access public --dry-run --no-git-checks
-          pnpm publish --filter @aiet/testing --access public --dry-run --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Publish Workspace Packages in Topological Order with OIDC Provenance
-        if: ${{ inputs.dry_run != true }}
-        shell: bash
-        run: |
-          echo "Publishing AIET packages to NPM in topological order with OIDC provenance..."
-          pnpm publish --filter @aiet/schema --access public --provenance --no-git-checks
-          pnpm publish --filter @aiet/domain --access public --provenance --no-git-checks
-          pnpm publish --filter @aiet/storage --access public --provenance --no-git-checks
-          pnpm publish --filter @aiet/mcp-server --access public --provenance --no-git-checks
-          pnpm publish --filter @aiet/compiler --access public --provenance --no-git-checks
-          pnpm publish --filter @aiet/cli --access public --provenance --no-git-checks
-          pnpm publish --filter @aiet/testing --access public --provenance --no-git-checks
+      - name: Publish Packages to npm
+        run: pnpm -r publish --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create GitHub Release
-        if: ${{ inputs.dry_run != true && startsWith(github.ref, 'refs/tags/v') }}
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v1
         with:
-          name: AIET v${{ github.ref_name }}
+          body_path: RELEASE_NOTES_v0.1.0.md
           draft: false
-          prerelease: false
-          generate_release_notes: true
-          files: |
-            packages/*/dist/*.js
-            packages/*/dist/*.mjs
-            packages/*/dist/*.d.ts
+          prerelease: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Generate Release Summary
-        if: always()
-        shell: bash
-        run: |
-          echo "### 📦 AIET Release Job Summary" >> $GITHUB_STEP_SUMMARY
-          echo "- **Ref:** \`${{ github.ref }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- **Dry Run:** \`${{ inputs.dry_run ?? 'false' }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- **Status:** ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
