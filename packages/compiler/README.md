@@ -1,36 +1,11 @@
 # `@aiet/compiler`
 
-Deterministic `cl100k_base` token profiler, priority ranker, and context compiler pipeline for the Personal AI Knowledge Base (PAKB).
+> Deterministic context compiler and token budgeting engine for **AIET**.
 
-## Installation
+---
 
-```bash
-pnpm add @aiet/compiler
-```
+## Features
 
-## Usage
-
-```typescript
-import {
-  profileTokens,
-  profileBatch,
-  sortByPriority,
-  calculateBudget,
-  DEFAULT_TIER0_BUDGET
-} from "@aiet/compiler";
-
-// 1. Exact cl100k_base Token Profiling
-const tokenCount = profileTokens("Hello World"); // Exact tiktoken token count
-
-// 2. Priority Sorting
-const sortedPrimitives = sortByPriority(myPrimitives);
-
-// 3. Tier 0 Preamble Budget Fitting (<=500 tokens)
-const budgetResult = calculateBudget(myPrimitives, DEFAULT_TIER0_BUDGET);
-console.log(`Tier 0 Fitted: ${budgetResult.tier0_fitted.length}`);
-console.log(`Tier 1 Demoted: ${budgetResult.tier1_demoted.length}`);
-```
-
-## License
-
-[MIT](../../LICENSE)
+- **Multi-Stage Pipeline**: Filtering, priority scoring, budget fitting, and format output stages.
+- **Token Budget Enforcement**: Fits system instructions within tight token windows (e.g. $\le 500$ tokens) using exact tokenizers (`cl100k_base`).
+- **Reproducible Artifacts**: SHA-256 JCS canonical hash generation for bit-for-bit identical preamble output builds.

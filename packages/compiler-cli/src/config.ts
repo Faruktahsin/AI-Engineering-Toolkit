@@ -4,7 +4,7 @@ export interface CLIConfig {
   budget: number;
   strict_mode: boolean;
   targets: readonly string[];
-  dry_run?: boolean;
+  dry_run?: boolean | undefined;
 }
 
 import fs from "node:fs";
@@ -28,6 +28,17 @@ export class ConfigurationError extends Error {
   }
 }
 
+import { z } from "zod";
+
+export const PAKBConfigSchema = z.object({
+  input: z.string().min(1).default(DEFAULT_CONFIG.input),
+  output: z.string().min(1).default(DEFAULT_CONFIG.output),
+  targets: z.array(z.string()).default([...DEFAULT_CONFIG.targets]),
+  budget: z.number().int().positive().default(DEFAULT_CONFIG.budget),
+  strict_mode: z.boolean().default(DEFAULT_CONFIG.strict_mode),
+  dry_run: z.boolean().optional(),
+});
+
 /**
  * Loads and validates pakb.config.json file from disk.
  */
@@ -38,7 +49,6 @@ export function loadConfig(configPath?: string): PAKBConfig {
     if (configPath) {
       throw new ConfigurationError(`Configuration file not found: '${resolvedPath}'`);
     }
-    // Return default config if no explicit config path provided and default missing
     return DEFAULT_CONFIG;
   }
 
@@ -60,36 +70,17 @@ export function loadConfig(configPath?: string): PAKBConfig {
     );
   }
 
-  if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) {
+  const result = PAKBConfigSchema.safeParse(parsed);
+  if (!result.success) {
+    const formattedErrors = result.error.issues
+      .map((issue) => `${issue.path.join(".")}: ${issue.message}`)
+      .join("; ");
     throw new ConfigurationError(
-      `Configuration file '${resolvedPath}' must contain a JSON object.`,
+      `Configuration validation failed for '${resolvedPath}': ${formattedErrors}`,
     );
   }
 
-  const obj = parsed as Record<string, unknown>;
-
-  const input = typeof obj["input"] === "string" ? (obj["input"] as string) : DEFAULT_CONFIG.input;
-  const output =
-    typeof obj["output"] === "string" ? (obj["output"] as string) : DEFAULT_CONFIG.output;
-  const budget =
-    typeof obj["budget"] === "number" && (obj["budget"] as number) > 0
-      ? (obj["budget"] as number)
-      : DEFAULT_CONFIG.budget;
-  const strict_mode =
-    typeof obj["strict_mode"] === "boolean"
-      ? (obj["strict_mode"] as boolean)
-      : DEFAULT_CONFIG.strict_mode;
-  const targets = Array.isArray(obj["targets"])
-    ? (obj["targets"] as unknown[]).map(String)
-    : DEFAULT_CONFIG.targets;
-
-  return {
-    input,
-    output,
-    targets,
-    budget,
-    strict_mode,
-  };
+  return result.data;
 }
 
 /**

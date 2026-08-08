@@ -15,13 +15,23 @@
   "files": ["dist"],
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm && tsc --emitDeclarationOnly",
-    "test": "vitest run --passWithNoTests",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist"
   },
   "dependencies": {
+    "@aiet/cli": "workspace:*",
     "@aiet/compiler": "workspace:*",
+    "@aiet/consolidation": "workspace:*",
+    "@aiet/contracts": "workspace:*",
+    "@aiet/decision-engine": "workspace:*",
     "@aiet/domain": "workspace:*",
+    "@aiet/embeddings": "workspace:*",
+    "@aiet/embeddings-ollama": "workspace:*",
+    "@aiet/embeddings-openai": "workspace:*",
+    "@aiet/errors": "workspace:*",
+    "@aiet/extractor": "workspace:*",
+    "@aiet/governance": "workspace:*",
     "@aiet/mcp-server": "workspace:*",
     "@aiet/schema": "workspace:*",
     "@aiet/storage": "workspace:*"

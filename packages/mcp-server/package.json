@@ -21,7 +21,9 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.1",
+    "@aiet/consolidation": "workspace:*",
     "@aiet/domain": "workspace:*",
+    "@aiet/governance": "workspace:*",
     "@aiet/schema": "workspace:*",
     "@aiet/storage": "workspace:*",
     "tiktoken": "^1.0.15"

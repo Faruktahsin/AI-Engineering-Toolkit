@@ -101,3 +101,23 @@ export class PAKBCLI {
     }
   }
 }
+
+export async function executeCompilationPipeline(
+  config: CLIConfig,
+  options: CLIOptions,
+): Promise<{ success: boolean; durationMs: number; exitCode: number; message: string }> {
+  const startTime = Date.now();
+  const cli = new PAKBCLI();
+  const result = await cli.compile({
+    ...options,
+    input: config.input,
+    output: config.output,
+  });
+  const durationMs = Date.now() - startTime;
+  return {
+    success: result.exitCode === 0,
+    durationMs,
+    exitCode: result.exitCode,
+    message: result.message,
+  };
+}
