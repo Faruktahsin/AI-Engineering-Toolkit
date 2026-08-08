@@ -1,0 +1,7 @@
+{
+  "input": "./primitives",
+  "output": "./dist",
+  "targets": ["AGENTS.md", "CLAUDE.md", ".cursorrules", "manifest.json"],
+  "budget": 500,
+  "strict_mode": true
+}

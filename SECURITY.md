@@ -1,29 +1,39 @@
-# PAKB Security Policy & Vulnerability Disclosure
+# Security & Privacy Policy for AIET
 
-## Security Model & Guarantees
+## Overview
 
-The Personal AI Knowledge Base (PAKB) adheres to a strict local-first security architecture:
+The **AI Engineering Toolkit (AIET)** is built around strict **privacy-first**, **local-first**, and **zero-egress** core design principles.
 
-1. **Zero External Egress by Default**: PAKB runs locally over `stdio` or loopback `127.0.0.1` transport interfaces.
-2. **Strict Sensitivity Boundaries (ADR-002)**: Primitives classified as `sensitivity: restricted` (credentials, private PII, medical records, financial keys) are permanently excluded from LLM context windows and prompt emissions.
-3. **Pre-Commit Zero-Width Character Sanitization**: Pre-commit hooks strip Unicode format characters (`\p{Cf}`) to prevent prompt injection via invisible characters.
-4. **Credential Scanning**: Automated scanning blocks hardcoded API keys and PEM private keys prior to commit and compilation.
+- **Local Storage**: All persistent memories, vector embeddings, proposals, and audit logs remain strictly within local SQLite WAL databases (`.aiet/memory.db` or configured local path).
+- **Zero Egress**: AIET does not transmit or report local memory primitives, search queries, or environment context to any remote telemetry or third-party server.
+- **Sensitivity Tiers**: Memory primitives enforce sensitivity boundaries (`PUBLIC`, `INTERNAL`, `RESTRICTED`). Restricted memories are never compiled into context outputs or transmitted unless explicitly approved via `@aiet/governance`.
 
-## Reporting a Vulnerability
+---
 
-If you discover a security vulnerability or prompt injection vector in PAKB, please **do NOT report it publicly** via GitHub Issues.
+## Reporting a Security Vulnerability
 
-Instead, please report security issues directly to the security maintainers:
+If you discover a security vulnerability or credential leak within AIET, please **do NOT report it in public GitHub issues**.
 
-* **Primary Security Contact:** Faruk Tahsin (`faruktahsin@gmail.com`)
-* **Security Response SLA:** We aim to acknowledge reports within **24 hours** and provide an initial assessment or patch plan within **72 hours**.
+Instead, report vulnerabilities privately by emailing:
+**`security@ai-engineering-toolkit.org`**
 
-Please include in your report:
-- Type of vulnerability (e.g., prompt injection, credential disclosure, zero-width smuggling, path traversal).
-- Affected package (`@aiet/schema`, `@aiet/domain`, `@aiet/storage`, `@aiet/mcp-server`, `@aiet/compiler`, `@aiet/cli`).
-- Step-by-step reproduction code or primitive payload.
-- Potential impact.
+Please include:
+1. Description of the vulnerability.
+2. Steps to reproduce or proof-of-concept script.
+3. Impact assessment (e.g. context leakage, SQL injection, bypass of governance approval).
 
-## Security Updates
+---
 
-Security fixes are released as patch updates to the stable `1.0.x` release series and published to npm with cryptographic OIDC build provenance attestations.
+## Disclosure Timeline
+
+- **Response Time**: We acknowledge receipt of vulnerability reports within 48 hours.
+- **Patch SLA**: Critical security fixes will be released as patch versions within 7 business days.
+- **Credit**: Vulnerability reporters will be credited in `RELEASE_NOTES.md` and release announcements (unless anonymity is requested).
+
+---
+
+## Security Best Practices for AIET Developers
+
+1. **Credential Hygiene**: Never commit `.env` files, API keys, or raw SQLite database files (`*.sqlite`, `*.db`) to version control.
+2. **Governance Gate**: Always route automated AI agent memory mutations through `@aiet/governance` memory proposals when handling sensitive entities or policy exemptions.
+3. **Audit Log Integrity**: Do not clear or alter `audit_log` tables manually. AIET relies on JCS SHA-256 hash chains for tamper verification.

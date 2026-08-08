@@ -1,27 +1,24 @@
 ## Description
 Briefly describe the changes introduced in this Pull Request and their technical rationale.
 
-## Related Issue / Ticket
+## Related Issue
 Fixes #(issue number)
 
-## Subsystem / Package Affected
-- [ ] `@aiet/core` (Core SDK)
-- [ ] `@aiet/pakb` (Personal AI Knowledge Base)
-- [ ] `@aiet/eval` (Evaluation Harness)
-- [ ] `@aiet/storage` (SQLite Engine)
-- [ ] `@aiet/compiler` (Context Compiler)
+## Packages Affected
+- [ ] `@aiet/core` (Core SDK Facade)
 - [ ] `@aiet/cli` (CLI Binary)
-- [ ] `aiet-python` (Python SDK)
-- [ ] `apps/docs` (Documentation Portal)
-- [ ] Workflows / Prompts / Cookbooks
+- [ ] `@aiet/compiler` (Context Compiler Engine)
+- [ ] `@aiet/storage` (SQLite & FTS5 Repository)
+- [ ] `@aiet/mcp-server` (MCP Server & Tools)
+- [ ] `@aiet/schema` (JSON Schemas)
+- [ ] `@aiet/errors` (Domain Error Classes)
+- [ ] `@aiet/config` (Zod Config Schema)
+- [ ] `examples/` (Consumer Examples)
+- [ ] Documentation (`docs/`, `README.md`)
 
-## Quality & Testing Checklist
-- [ ] All unit and integration tests pass (`pnpm test` / `pytest`)
-- [ ] Typechecking passes with zero errors (`pnpm typecheck` / `pyright`)
-- [ ] Code formatted and linted according to standards (`pnpm lint` / `ruff`)
-- [ ] Zero-width Unicode decontamination check passes (`pnpm check:zero-width`)
-- [ ] Changeset created if package versioning affected (`pnpm changeset`)
-- [ ] Documentation updated to reflect changes
-
-## Screenshots / Benchmarks (if applicable)
-Add visual proof, terminal recordings, or performance benchmark results.
+## Quality Verification Checklist
+- [ ] `corepack pnpm build` passes with zero errors.
+- [ ] `corepack pnpm typecheck` passes with zero errors.
+- [ ] `corepack pnpm lint` passes with zero Biome errors/warnings.
+- [ ] `corepack pnpm test` passes all unit and integration tests.
+- [ ] New code includes test coverage.

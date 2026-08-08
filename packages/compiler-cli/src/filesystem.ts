@@ -8,13 +8,10 @@ export function loadInputPrimitives(inputPath: string): AnyPrimitive[] {
   const stats = statSync(resolvedPath);
 
   if (stats.isDirectory()) {
-    const files = readdirSync(resolvedPath)
-      .filter((file) => file.endsWith(".json"))
-      .sort();
-
     const primitives: AnyPrimitive[] = [];
-    for (const file of files) {
-      const filePath = path.join(resolvedPath, file);
+    const files = getJsonFilesRecursive(resolvedPath).sort();
+
+    for (const filePath of files) {
       const raw = readFileSync(filePath, "utf8");
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed)) {
@@ -47,4 +44,21 @@ export function writeArtifactsAtomic(
   }
 
   return writtenFiles;
+}
+
+function getJsonFilesRecursive(dirPath: string): string[] {
+  const results: string[] = [];
+  const entries = readdirSync(dirPath);
+
+  for (const entry of entries) {
+    const fullPath = path.join(dirPath, entry);
+    const stats = statSync(fullPath);
+    if (stats.isDirectory()) {
+      results.push(...getJsonFilesRecursive(fullPath));
+    } else if (stats.isFile() && entry.endsWith(".json")) {
+      results.push(fullPath);
+    }
+  }
+
+  return results;
 }

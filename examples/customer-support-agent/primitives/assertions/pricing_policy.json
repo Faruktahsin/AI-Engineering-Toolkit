@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0.0",
+  "id": "ast_01J4X89K9Z1A2B3C4D5E6F7G84",
+  "created_at": "2026-08-08T00:00:00Z",
+  "updated_at": "2026-08-08T00:00:00Z",
+  "last_verified": "2026-08-08T00:00:00Z",
+  "sensitivity": "public",
+  "volatility": "low",
+  "activation": "always_on",
+  "claim": "CloudScale AI platform includes 100 free GPU node hours per month for startup tier subscribers.",
+  "evidence_type": "stated",
+  "type": "fact",
+  "status": "accepted"
+}

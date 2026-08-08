@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0.0",
+  "id": "ent_01J4X89K9Z1A2B3C4D5E6F7G82",
+  "created_at": "2026-08-08T00:00:00Z",
+  "updated_at": "2026-08-08T00:00:00Z",
+  "last_verified": "2026-08-08T00:00:00Z",
+  "sensitivity": "public",
+  "volatility": "low",
+  "activation": "always_on",
+  "name": "Nova Support Persona",
+  "type": "contact",
+  "status": "active",
+  "description": "Polite, technical customer support agent for CloudScale AI platform inquiries."
+}

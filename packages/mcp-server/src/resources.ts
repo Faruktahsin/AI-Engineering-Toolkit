@@ -1,6 +1,8 @@
 import {
   ActivationClass,
   PAKBErrorCode,
+  PrimitiveNotFoundError,
+  SchemaValidationError,
   SecurityRedactionError,
   SensitivityTier,
 } from "@aiet/schema";
@@ -11,7 +13,10 @@ export class PAKBResourceProvider {
 
   public async readResource(uri: string) {
     if (typeof uri !== "string") {
-      throw new Error("Resource URI must be a string.");
+      throw new SchemaValidationError(
+        "Resource URI must be a string.",
+        PAKBErrorCode.SCHEMA_VALIDATION_ERROR,
+      );
     }
 
     if (uri === "pakb://preamble/tier0") {
@@ -30,11 +35,20 @@ PAKB Tier 0 System Preamble content. This resource is intended for generating th
     );
     if (entityMatch) {
       const primitiveId = typeof entityMatch[2] === "string" ? entityMatch[2] : undefined;
-      if (!primitiveId) throw new Error(`Resource not found: ${uri}`);
+      if (!primitiveId) {
+        throw new PrimitiveNotFoundError(
+          `Resource not found: ${uri}`,
+          PAKBErrorCode.PRIMITIVE_NOT_FOUND_ERROR,
+        );
+      }
 
       const primitive = await this.storage.getPrimitive(primitiveId);
       if (!primitive) {
-        throw new Error(`Resource not found: ${uri}`);
+        throw new PrimitiveNotFoundError(
+          `Resource not found: ${uri}`,
+          PAKBErrorCode.PRIMITIVE_NOT_FOUND_ERROR,
+          primitiveId,
+        );
       }
 
       if (
@@ -55,6 +69,9 @@ PAKB Tier 0 System Preamble content. This resource is intended for generating th
       };
     }
 
-    throw new Error(`Unsupported resource URI: ${uri}`);
+    throw new SchemaValidationError(
+      `Unsupported resource URI: ${uri}`,
+      PAKBErrorCode.SCHEMA_VALIDATION_ERROR,
+    );
   }
 }

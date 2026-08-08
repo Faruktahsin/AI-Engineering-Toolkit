@@ -1,4 +1,4 @@
-import { PAKBError } from "@aiet/schema";
+import { PAKBError, PAKBErrorCode, SchemaValidationError } from "@aiet/schema";
 import type { PAKBStorageRepository } from "@aiet/storage";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
@@ -165,6 +165,67 @@ export class PAKBMCPServer {
               },
             },
           },
+          {
+            name: "pakb_list_memory_proposals",
+            description: "Lists pending memory proposals requiring human approval.",
+            inputSchema: { type: "object", properties: {} },
+          },
+          {
+            name: "pakb_approve_memory",
+            description: "Approves a pending memory proposal by proposal ID.",
+            inputSchema: {
+              type: "object",
+              properties: {
+                proposal_id: { type: "string" },
+              },
+              required: ["proposal_id"],
+            },
+          },
+          {
+            name: "pakb_reject_memory",
+            description: "Rejects a pending memory proposal by proposal ID.",
+            inputSchema: {
+              type: "object",
+              properties: {
+                proposal_id: { type: "string" },
+                reason: { type: "string" },
+              },
+              required: ["proposal_id"],
+            },
+          },
+          {
+            name: "pakb_memory_audit",
+            description: "Retrieves audit history ledger logs.",
+            inputSchema: { type: "object", properties: {} },
+          },
+          {
+            name: "pakb_find_duplicates",
+            description: "Finds potential duplicate primitives in storage.",
+            inputSchema: { type: "object", properties: {} },
+          },
+          {
+            name: "pakb_list_contradictions",
+            description: "Lists detected memory contradictions.",
+            inputSchema: {
+              type: "object",
+              properties: {
+                status: { type: "string", enum: ["detected", "resolved", "ignored"] },
+              },
+            },
+          },
+          {
+            name: "pakb_resolve_contradiction",
+            description: "Resolves a detected memory contradiction.",
+            inputSchema: {
+              type: "object",
+              properties: {
+                contradiction_id: { type: "string" },
+                action: { type: "string", enum: ["merge", "supersede", "archive", "coexist"] },
+                reasoning: { type: "string" },
+              },
+              required: ["contradiction_id"],
+            },
+          },
         ],
       };
     });
@@ -188,8 +249,25 @@ export class PAKBMCPServer {
           result = await this.toolExecutor.proposeMemory(safeArgs);
         } else if (name === "pakb_compile_preamble") {
           result = await this.toolExecutor.compilePreamble(safeArgs);
+        } else if (name === "pakb_list_memory_proposals") {
+          result = await this.toolExecutor.listMemoryProposals();
+        } else if (name === "pakb_approve_memory") {
+          result = await this.toolExecutor.approveMemory(safeArgs);
+        } else if (name === "pakb_reject_memory") {
+          result = await this.toolExecutor.rejectMemory(safeArgs);
+        } else if (name === "pakb_memory_audit") {
+          result = await this.toolExecutor.memoryAudit();
+        } else if (name === "pakb_find_duplicates") {
+          result = await this.toolExecutor.findDuplicates();
+        } else if (name === "pakb_list_contradictions") {
+          result = await this.toolExecutor.listContradictions(safeArgs);
+        } else if (name === "pakb_resolve_contradiction") {
+          result = await this.toolExecutor.resolveContradiction(safeArgs);
         } else {
-          throw new Error(`Unknown MCP tool name: '${name}'.`);
+          throw new SchemaValidationError(
+            `Unknown MCP tool name: '${name}'.`,
+            PAKBErrorCode.SCHEMA_VALIDATION_ERROR,
+          );
         }
 
         return {
@@ -201,7 +279,13 @@ export class PAKBMCPServer {
           ],
         };
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : String(err);
+        let errorMessage: string;
+        if (err instanceof PAKBError) {
+          errorMessage = `[${err.code}] ${err.message}`;
+        } else {
+          errorMessage = err instanceof Error ? err.message : String(err);
+        }
+
         return {
           isError: true,
           content: [

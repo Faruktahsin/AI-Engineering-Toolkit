@@ -7,11 +7,13 @@ export enum ProposalType {
   SUPERSEDE = "SUPERSEDE",
 }
 
-export enum ProposalStatus {
+export enum StagedProposalStatus {
   PENDING_HUMAN_REVIEW = "pending_human_review",
   APPROVED = "approved",
   REJECTED = "rejected",
 }
+export type ProposalStatus = StagedProposalStatus;
+export const ProposalStatus = StagedProposalStatus;
 
 export interface MemoryProposalInput {
   readonly proposal_type: ProposalType;
@@ -21,22 +23,22 @@ export interface MemoryProposalInput {
   readonly target_primitive_id?: string | null;
 }
 
-export interface MemoryProposalRecord {
+export interface StagedProposalRecord {
   readonly proposal_id: string;
   readonly proposal_type: ProposalType;
   readonly target_primitive_type: string;
   readonly payload: Record<string, unknown>;
   readonly rationale: string;
-  readonly status: ProposalStatus;
+  readonly status: StagedProposalStatus;
   readonly sanitization_status: "clean" | "sanitized";
   readonly summary_diff: string;
   readonly created_at: string;
 }
 
 export class ProposalStagingQueue {
-  private readonly proposals = new Map<string, MemoryProposalRecord>();
+  private readonly proposals = new Map<string, StagedProposalRecord>();
 
-  public proposeMemory(input: MemoryProposalInput): MemoryProposalRecord {
+  public proposeMemory(input: MemoryProposalInput): StagedProposalRecord {
     // 1. Secret Scanning
     const serializedPayload = JSON.stringify(input.payload);
     const secretScan = containsSecrets(serializedPayload);
@@ -69,13 +71,13 @@ export class ProposalStagingQueue {
 
     const diffSummary = `+ [${input.target_primitive_type.toUpperCase()}] ${summaryText}`;
 
-    const record: MemoryProposalRecord = {
+    const record: StagedProposalRecord = {
       proposal_id: proposalId,
       proposal_type: input.proposal_type,
       target_primitive_type: input.target_primitive_type,
       payload: payloadObj,
       rationale: sanitizedRationale,
-      status: ProposalStatus.PENDING_HUMAN_REVIEW,
+      status: StagedProposalStatus.PENDING_HUMAN_REVIEW,
       sanitization_status: "clean",
       summary_diff: diffSummary,
       created_at: now,
@@ -85,11 +87,11 @@ export class ProposalStagingQueue {
     return record;
   }
 
-  public getProposal(proposalId: string): MemoryProposalRecord | null {
+  public getProposal(proposalId: string): StagedProposalRecord | null {
     return this.proposals.get(proposalId) ?? null;
   }
 
-  public listProposals(status?: ProposalStatus): MemoryProposalRecord[] {
+  public listProposals(status?: StagedProposalStatus): StagedProposalRecord[] {
     const list = Array.from(this.proposals.values());
     if (status) {
       return list.filter((p) => p.status === status);

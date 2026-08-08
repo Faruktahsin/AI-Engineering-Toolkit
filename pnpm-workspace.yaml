@@ -1,6 +1,7 @@
 packages:
   - "packages/*"
   - "apps/*"
+  - "examples/*"
 allowBuilds:
   '@biomejs/biome': true
   better-sqlite3: true

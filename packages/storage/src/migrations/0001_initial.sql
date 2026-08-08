@@ -150,6 +150,36 @@ CREATE TABLE IF NOT EXISTS audit_log (
     new_jcs_hash TEXT NOT NULL
 );
 
+-- Vector Embeddings Table
+CREATE TABLE IF NOT EXISTS vector_embeddings (
+    primitive_id TEXT PRIMARY KEY REFERENCES primitives_registry(id) ON DELETE CASCADE,
+    dimensions INTEGER NOT NULL,
+    embedding_blob BLOB NOT NULL,
+    updated_at TEXT NOT NULL
+);
+
+-- Memory Lifecycle Table
+CREATE TABLE IF NOT EXISTS memory_lifecycle (
+    primitive_id TEXT PRIMARY KEY REFERENCES primitives_registry(id) ON DELETE CASCADE,
+    importance_score REAL NOT NULL DEFAULT 0.5,
+    access_count INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL,
+    last_accessed_at TEXT NOT NULL,
+    metadata TEXT
+);
+
+-- Memory Proposals Table
+CREATE TABLE IF NOT EXISTS memory_proposals (
+    proposal_id TEXT PRIMARY KEY,
+    candidate_primitive_json TEXT NOT NULL,
+    decision_type TEXT NOT NULL,
+    target_primitive_id TEXT REFERENCES primitives_registry(id) ON DELETE CASCADE,
+    confidence_score REAL NOT NULL,
+    status TEXT NOT NULL,
+    reasoning TEXT,
+    created_at TEXT NOT NULL
+);
+
 -- Schema Migrations Tracking Table
 CREATE TABLE IF NOT EXISTS schema_migrations (
     version_code INTEGER PRIMARY KEY,

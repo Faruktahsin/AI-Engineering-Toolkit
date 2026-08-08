@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@aiet/domain": "workspace:*",
+    "@aiet/embeddings": "workspace:*",
     "@aiet/schema": "workspace:*",
     "better-sqlite3": "^11.1.2",
     "canonicalize": "^2.0.0",

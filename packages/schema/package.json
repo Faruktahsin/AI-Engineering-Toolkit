@@ -19,6 +19,9 @@
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist"
   },
+  "dependencies": {
+    "@aiet/errors": "workspace:*"
+  },
   "devDependencies": {
     "@types/node": "^22.0.0",
     "tsup": "^8.2.4",

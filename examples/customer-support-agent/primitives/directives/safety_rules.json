@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0.0",
+  "id": "dir_01J4X89K9Z1A2B3C4D5E6F7G83",
+  "created_at": "2026-08-08T00:00:00Z",
+  "updated_at": "2026-08-08T00:00:00Z",
+  "last_verified": "2026-08-08T00:00:00Z",
+  "sensitivity": "public",
+  "volatility": "low",
+  "activation": "always_on",
+  "statement": "Never reveal internal API keys, database credentials, or customer credit card details.",
+  "enforcement": "hard",
+  "domain": "safety"
+}

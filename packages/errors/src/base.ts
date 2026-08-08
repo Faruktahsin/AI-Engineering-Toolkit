@@ -40,3 +40,17 @@ export class PAKBError extends AIETError {
     super(message, { code, targetId, details });
   }
 }
+
+export class IDCollisionError extends PAKBError {}
+export class ImmutableFieldViolationError extends PAKBError {}
+export class DanglingReferenceError extends PAKBError {}
+export class ConcurrentModificationError extends PAKBError {}
+export class PreambleBudgetExceededError extends PAKBError {}
+export class SecurityRedactionError extends PAKBError {}
+export class SchemaValidationError extends PAKBError {}
+export class SecretDetectedError extends PAKBError {}
+export class InvalidIDFormatError extends PAKBError {}
+export class PrimitiveNotFoundError extends PAKBError {}
+export class DatabaseAccessError extends PAKBError {}
+export class EmitterFormattingError extends PAKBError {}
+export class ArtifactEmissionError extends PAKBError {}

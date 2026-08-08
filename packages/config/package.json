@@ -21,7 +21,8 @@
   },
   "dependencies": {
     "@aiet/errors": "workspace:*",
-    "@aiet/utils": "workspace:*"
+    "@aiet/utils": "workspace:*",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

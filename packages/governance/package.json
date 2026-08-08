@@ -1,0 +1,36 @@
+{
+  "name": "@aiet/governance",
+  "version": "1.0.0",
+  "description": "Autonomous memory governance safety layer, proposal staging queue, and audit ledger for AIET",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm && tsc --emitDeclarationOnly",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@aiet/decision-engine": "workspace:*",
+    "@aiet/domain": "workspace:*",
+    "@aiet/extractor": "workspace:*",
+    "@aiet/schema": "workspace:*",
+    "@aiet/storage": "workspace:*",
+    "ulid": "^2.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsup": "^8.2.4",
+    "typescript": "^5.5.4",
+    "vitest": "^2.0.5"
+  }
+}

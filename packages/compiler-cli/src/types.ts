@@ -4,7 +4,7 @@ export interface PAKBConfig {
   readonly targets: readonly string[];
   readonly budget: number;
   readonly strict_mode: boolean;
-  readonly dry_run?: boolean;
+  readonly dry_run?: boolean | undefined;
 }
 
 export interface CLIOptions {
@@ -15,6 +15,7 @@ export interface CLIOptions {
   readonly dryRun?: boolean;
   readonly verbose?: boolean;
   readonly failOnWarning?: boolean;
+  readonly watch?: boolean;
 }
 
 export interface CLIResult {
