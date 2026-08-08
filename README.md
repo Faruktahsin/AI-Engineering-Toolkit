@@ -2,11 +2,11 @@
 
 > **Local-First, Deterministic, Persistent-Memory Infrastructure Framework for Autonomous AI Agents.**
 
-[![CI](https://github.com/ai-engineering-toolkit/aiet/actions/workflows/ci.yml/badge.svg)](https://github.com/ai-engineering-toolkit/aiet/actions/workflows/ci.yml)
+[![CI](https://github.com/Faruktahsin/AI-Engineering-Toolkit/actions/workflows/ci.yml/badge.svg)](https://github.com/Faruktahsin/AI-Engineering-Toolkit/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![npm version](https://img.shields.io/badge/npm-v0.1.0--alpha-orange.svg)](https://www.npmjs.com/package/@aiet/core)
-[![Node: >=18.0.0](https://img.shields.io/badge/Node.js-%3E%3D18.0.0-green.svg)](https://nodejs.org)
-[![pnpm: >=9.0.0](https://img.shields.io/badge/pnpm-%3E%3D9.0.0-red.svg)](https://pnpm.io)
+[![npm version](https://img.shields.io/npm/v/@aiet/core.svg)](https://www.npmjs.com/package/@aiet/core)
+[![Node: >=22.0.0](https://img.shields.io/badge/Node.js-%3E%3D22.0.0-green.svg)](https://nodejs.org)
+[![pnpm: >=11.20.0](https://img.shields.io/badge/pnpm-%3E%3D11.20.0-red.svg)](https://pnpm.io)
 
 ---
 
@@ -47,6 +47,21 @@ AIET is organized as a high-performance monorepo of 28 workspace packages:
                                        (Developer CLI: aiet)
 ```
 
+For a detailed deep dive into the monorepo architecture, read the **[Architecture Overview](docs/architecture-overview.md)**.
+
+---
+
+## 📦 Package Ecosystem
+
+| Package | Role | Description |
+| :--- | :--- | :--- |
+| [`@aiet/core`](packages/core) | **Primary SDK Facade** | Single entrypoint combining memory, compiler, governance, and diagnostics |
+| [`@aiet/cli`](packages/cli) | **Developer CLI** | Production CLI command runner (`aiet init`, `aiet doctor`, `aiet connect`) |
+| [`@aiet/mcp-server`](packages/mcp-server) | **MCP Stdio Server** | Model Context Protocol server for Claude Code, Cursor, and Windsurf |
+| [`@aiet/adapter-vercel`](packages/adapter-vercel) | **Vercel AI SDK Adapter** | `AIETMemoryProvider` and context middleware for Vercel AI SDK |
+| [`@aiet/adapter-langgraph`](packages/adapter-langgraph) | **LangGraph Adapter** | LangGraph checkpointer (`createAIETCheckpointer`) and memory saver |
+| [`@aiet/adapter-openai-agents`](packages/adapter-openai-agents) | **OpenAI Agents Adapter** | Function-calling tools (`createAIETAgentTools`) for OpenAI Agents SDK |
+
 ---
 
 ## 🚀 Framework Integration Matrix & Official Examples
@@ -62,12 +77,15 @@ AIET provides official, production-quality example applications demonstrating ho
 
 ---
 
-## 🛠️ CLI Quickstart
+## 🛠️ Quickstart
 
 ### 1. Installation
 
 ```bash
-# Install AIET CLI globally or locally
+# Install core SDK facade
+npm install @aiet/core
+
+# Install AIET CLI globally
 npm install -g @aiet/cli
 ```
 
@@ -118,9 +136,12 @@ console.log(auditLog);
 
 ## 📖 Documentation Suite
 
+- **[Getting Started Guide](docs/getting-started.md)**: Onboarding guide for new AIET users.
+- **[Developer Onboarding](docs/getting-started-developer.md)**: Technical guide for monorepo contributors.
+- **[Architecture Overview](docs/architecture-overview.md)**: Core architectural concepts and package boundaries.
 - **[Developer Examples Guide](docs/examples-guide.md)**: Guide for choosing and running AIET demo apps.
 - **[npm Publishing Strategy](docs/npm-publishing-strategy.md)**: Package matrix and semantic versioning SLA.
-- **[GitHub Release Checklist](docs/github-release-checklist.md)**: Pre-release verification rules.
+- **[Releasing Guide](docs/releasing.md)**: Maintainer guide for releases.
 - **[Contributing Guide](CONTRIBUTING.md)**: Developer setup, PR standards, and conventional commit rules.
 - **[Security Policy](SECURITY.md)**: Local-first zero-egress policies and vulnerability reporting.
 - **[Changelog](CHANGELOG.md)**: Detailed release history.
