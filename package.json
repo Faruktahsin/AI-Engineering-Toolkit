@@ -14,6 +14,7 @@
     "prepare": "husky",
     "build": "pnpm --recursive run build",
     "test": "pnpm --recursive run test",
+    "benchmark": "pnpm --filter @aiet/testing benchmark",
     "lint": "biome check .",
     "format": "biome format --write .",
     "typecheck": "pnpm --recursive run typecheck",

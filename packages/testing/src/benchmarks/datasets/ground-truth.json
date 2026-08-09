@@ -1,0 +1,886 @@
+{
+  "version": "1.1.0",
+  "description": "AIET v0.1.0 Methodologically Hardened Baseline Dataset - 100 Primitives & Ground-Truth Queries",
+  "memories": [
+    {
+      "id": "dir_01KZJ1WXD2PZ0K0ZAE1DDG1DSE",
+      "category": "coding_preferences",
+      "content": "Always specify explicit return types on TypeScript functions and exported methods.",
+      "tags": ["typescript", "style"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "dir_01KZJ1WXD39GN0YJHXEQGZR7ZE",
+      "category": "coding_preferences",
+      "content": "Prefer const assertions and immutable array methods like toSorted and toSpliced.",
+      "tags": ["typescript", "immutability"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "dir_01KZJ1WXD3GWQZTMJQE61EVMCE",
+      "category": "coding_preferences",
+      "content": "Use async await syntax over raw Promise chaining with then and catch.",
+      "tags": ["async", "typescript"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "dir_01KZJ1WXD355HJSX976DVKQ1VJ",
+      "category": "coding_preferences",
+      "content": "Enforce strict null checks and avoid non-null assertion operator !.",
+      "tags": ["safety", "typescript"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "dir_01KZJ1WXD30VHFJCTC6GNBFRPE",
+      "category": "coding_preferences",
+      "content": "Use named exports exclusively; avoid default exports in package modules.",
+      "tags": ["exports", "module"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD3RJCYTXNQ690AFYM0",
+      "category": "coding_preferences",
+      "content": "All public functions must include TSDoc comment blocks detailing parameters.",
+      "tags": ["tsdoc", "comments"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD34FER4B3RGDKXXRD9",
+      "category": "coding_preferences",
+      "content": "Wrap external third-party API calls in isolated wrapper functions.",
+      "tags": ["wrapper", "api"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD3Q2ZAGE93EH0SY320",
+      "category": "coding_preferences",
+      "content": "Core domain packages must have zero external npm runtime dependencies.",
+      "tags": ["dependencies", "core"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD3Y2JQ5C6W5V6VHKHG",
+      "category": "coding_preferences",
+      "content": "Use structured logging with JSON payloads instead of console log calls.",
+      "tags": ["logging", "json"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD3M7MCBHCF6A9ZV119",
+      "category": "coding_preferences",
+      "content": "Error classes must inherit from PAKBError base class with typed error codes.",
+      "tags": ["errors", "types"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "ast_01KZJ1WXD3KPX2AJ74RSSSBERJ",
+      "category": "architecture_constraints",
+      "content": "All core domain logic must remain pure ESM without native C++ binary bindings.",
+      "tags": ["esm", "architecture"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "ast_01KZJ1WXD32EXA34CYHTPKGQRF",
+      "category": "architecture_constraints",
+      "content": "Database storage layer must use SQLite WAL mode with 5000ms busy timeout.",
+      "tags": ["sqlite", "wal"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD3TMPQJYBE5XAPGZJ3",
+      "category": "architecture_constraints",
+      "content": "Public API contracts must follow Semantic Versioning and export facade clients.",
+      "tags": ["semver", "api"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD3F3N1ZNVQ6SEH29MP",
+      "category": "architecture_constraints",
+      "content": "Context compiler pipeline consists of exactly 7 deterministic execution stages.",
+      "tags": ["compiler", "pipeline"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD33CVWMEQRDK3YV3EY",
+      "category": "architecture_constraints",
+      "content": "Store vector embeddings in float32 array blobs inside SQLite database.",
+      "tags": ["vector", "sqlite"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD3ATBBCGEBW39G069K",
+      "category": "architecture_constraints",
+      "content": "Cryptographic hash chains use SHA-256 digest over JCS normalized JSON.",
+      "tags": ["crypto", "jcs"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD3NZK96KJQ8Q3W2SJQ",
+      "category": "architecture_constraints",
+      "content": "Audit log entries are append-only and tamper-evident using hash pointers.",
+      "tags": ["audit", "hash"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD3K9H2TTM8933A00Q8",
+      "category": "architecture_constraints",
+      "content": "Memory consolidation engine performs supersession detection on contradictory facts.",
+      "tags": ["consolidation", "facts"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD3CVSYF15J999BEM8H",
+      "category": "architecture_constraints",
+      "content": "MCP server exposes model context protocol tools over stdio transport.",
+      "tags": ["mcp", "stdio"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD3ADR7PY4NA16NF3NW",
+      "category": "architecture_constraints",
+      "content": "Unified SDK facade provides single point of entry for all AIET modules.",
+      "tags": ["sdk", "facade"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD3N0B979GA8GRH928E",
+      "category": "tooling_preferences",
+      "content": "Use Biome linter and formatter instead of ESLint and Prettier across monorepo.",
+      "tags": ["biome", "lint"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "dir_01KZJ1WXD3MG0HV8E9DBYPFCEN",
+      "category": "tooling_preferences",
+      "content": "Use pnpm package manager with Corepack enforcement for workspace management.",
+      "tags": ["pnpm", "corepack"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "dir_01KZJ1WXD36BEH5P7F91VGM4ZN",
+      "category": "tooling_preferences",
+      "content": "Use tsup bundler for building TypeScript package distribution files.",
+      "tags": ["tsup", "build"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD37JRE5MA2VSJKZ484",
+      "category": "tooling_preferences",
+      "content": "Monorepo root contains turbo json pipeline definitions for caching.",
+      "tags": ["turborepo", "caching"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD3F0VD27A7Z0DV2Z2S",
+      "category": "tooling_preferences",
+      "content": "Use tsx for executing benchmark entrypoint scripts without pre-compilation.",
+      "tags": ["tsx", "benchmark"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD3QPVKWNW5165NDBKH",
+      "category": "tooling_preferences",
+      "content": "GitHub Actions workflow runs automated CI checks on every pull request.",
+      "tags": ["ci", "github"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD3YZ2T9J4NPC0AW4AC",
+      "category": "tooling_preferences",
+      "content": "Use Changesets for managing version bumps and publishing releases to npm.",
+      "tags": ["changesets", "npm"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD3F5PKXEMBZYZBJ38T",
+      "category": "tooling_preferences",
+      "content": "Repository root contains valid Apache 2.0 open-source LICENSE file.",
+      "tags": ["license", "apache"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD35T51RF1JNJ0TJ04R",
+      "category": "tooling_preferences",
+      "content": "Generate baseline benchmark reports in Markdown format under docs benchmarks.",
+      "tags": ["docs", "benchmark"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD3GDHPXNBGY6KGD42A",
+      "category": "tooling_preferences",
+      "content": "Use Vitest as primary unit test runner for all monorepo workspace packages.",
+      "tags": ["vitest", "testing"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD4E73XGSMMQ7P2DCF4",
+      "category": "testing_preferences",
+      "content": "Maintain 100 percent test pass rate across all workspace packages.",
+      "tags": ["vitest", "coverage"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "dir_01KZJ1WXD4KG0N9VYTPWSC4E31",
+      "category": "testing_preferences",
+      "content": "Write isolated integration tests for storage repository CRUD operations.",
+      "tags": ["storage", "integration"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "dir_01KZJ1WXD4K3ZC09KNB53HR0DZ",
+      "category": "testing_preferences",
+      "content": "Include negative scenario tests verifying error code propagation.",
+      "tags": ["negative", "errors"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD46NS7W0RCS64EBNCQ",
+      "category": "testing_preferences",
+      "content": "Test suite includes bit-for-bit reproducibility checks for compiled output.",
+      "tags": ["reproducibility", "compiler"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD4Q9DASKR9KZWT0A44",
+      "category": "testing_preferences",
+      "content": "Use in-memory SQLite database instance for fast unit test execution.",
+      "tags": ["sqlite", "memory"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD4KSJJGFYN4PMK4PYF",
+      "category": "testing_preferences",
+      "content": "Benchmark suite measures retrieval latency, token efficiency, and determinism.",
+      "tags": ["benchmark", "metrics"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD46MRK6CPWQ0TYZMPS",
+      "category": "testing_preferences",
+      "content": "Mock external network API calls during unit test executions.",
+      "tags": ["mocking", "api"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD4734STERDMZYSPQRF",
+      "category": "testing_preferences",
+      "content": "Contradiction detector tests verify preference conflicts and outdated facts.",
+      "tags": ["consolidation", "contradiction"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD4Z5A02MQTWFJCSE3Z",
+      "category": "testing_preferences",
+      "content": "Run performance benchmark harness independently from standard unit tests.",
+      "tags": ["harness", "performance"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD4QE8K0JW7K51YHDCP",
+      "category": "testing_preferences",
+      "content": "Ensure all test fixtures use schema-valid ULID identifiers.",
+      "tags": ["fixtures", "ulid"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD48NYXRR6CW4C96B78",
+      "category": "documentation_preferences",
+      "content": "Use GitHub Flavored Markdown for all README files and technical documentation.",
+      "tags": ["markdown", "docs"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "dir_01KZJ1WXD4NW0RQP1DJMEGV9C5",
+      "category": "documentation_preferences",
+      "content": "Format Mermaid diagrams with strict node ID syntax without unquoted spaces.",
+      "tags": ["mermaid", "diagrams"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD4S0YZWKF72G9MKJSH",
+      "category": "testing_preferences",
+      "content": "Synthetic developer memory primitive #43 specifying rule for testing_preferences in domain module #43.",
+      "tags": ["testing_preferences", "module-43"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD409K3Q05WBJ5E51CT",
+      "category": "documentation_preferences",
+      "content": "Synthetic developer memory primitive #44 specifying rule for documentation_preferences in domain module #44.",
+      "tags": ["documentation_preferences", "module-44"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD4BQXXCX1Y19A5AX47",
+      "category": "project_constraints",
+      "content": "Synthetic developer memory primitive #45 specifying rule for project_constraints in domain module #45.",
+      "tags": ["project_constraints", "module-45"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD49EY0S70SCPRNV7ZC",
+      "category": "user_preferences",
+      "content": "Synthetic developer memory primitive #46 specifying rule for user_preferences in domain module #46.",
+      "tags": ["user_preferences", "module-46"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD4YXC8K2BSDR8GZN5C",
+      "category": "temporal_preference_changes",
+      "content": "Synthetic developer memory primitive #47 specifying rule for temporal_preference_changes in domain module #47.",
+      "tags": ["temporal_preference_changes", "module-47"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD4FDNQ5HTBP5AEK5GM",
+      "category": "contradictory_memories",
+      "content": "Synthetic developer memory primitive #48 specifying rule for contradictory_memories in domain module #48.",
+      "tags": ["contradictory_memories", "module-48"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD4RCBMG40GVMCEYQKY",
+      "category": "irrelevant_distractors",
+      "content": "Synthetic developer memory primitive #49 specifying rule for irrelevant_distractors in domain module #49.",
+      "tags": ["irrelevant_distractors", "module-49"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD4RH8CZV6EYFG53H35",
+      "category": "coding_preferences",
+      "content": "Synthetic developer memory primitive #50 specifying rule for coding_preferences in domain module #50.",
+      "tags": ["coding_preferences", "module-50"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD4HFP1DV8ATGEK591P",
+      "category": "architecture_constraints",
+      "content": "Synthetic developer memory primitive #51 specifying rule for architecture_constraints in domain module #51.",
+      "tags": ["architecture_constraints", "module-51"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD4PX1NEGNSPZT5EH9Y",
+      "category": "tooling_preferences",
+      "content": "Synthetic developer memory primitive #52 specifying rule for tooling_preferences in domain module #52.",
+      "tags": ["tooling_preferences", "module-52"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD4FFYGPRX3E45DN2HF",
+      "category": "testing_preferences",
+      "content": "Synthetic developer memory primitive #53 specifying rule for testing_preferences in domain module #53.",
+      "tags": ["testing_preferences", "module-53"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD4C8CBJD5ZSQM7RNFJ",
+      "category": "documentation_preferences",
+      "content": "Synthetic developer memory primitive #54 specifying rule for documentation_preferences in domain module #54.",
+      "tags": ["documentation_preferences", "module-54"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD4VZ8X7N264NRS5DXH",
+      "category": "project_constraints",
+      "content": "Synthetic developer memory primitive #55 specifying rule for project_constraints in domain module #55.",
+      "tags": ["project_constraints", "module-55"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD47WRA7PJ2DQGQM0ER",
+      "category": "user_preferences",
+      "content": "Synthetic developer memory primitive #56 specifying rule for user_preferences in domain module #56.",
+      "tags": ["user_preferences", "module-56"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD4HBKVPZBFKGP25AYY",
+      "category": "temporal_preference_changes",
+      "content": "Synthetic developer memory primitive #57 specifying rule for temporal_preference_changes in domain module #57.",
+      "tags": ["temporal_preference_changes", "module-57"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD4YNKP8YTKFW5HM9T7",
+      "category": "contradictory_memories",
+      "content": "Synthetic developer memory primitive #58 specifying rule for contradictory_memories in domain module #58.",
+      "tags": ["contradictory_memories", "module-58"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD438CKPABTQK9KVZZA",
+      "category": "irrelevant_distractors",
+      "content": "Synthetic developer memory primitive #59 specifying rule for irrelevant_distractors in domain module #59.",
+      "tags": ["irrelevant_distractors", "module-59"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD4WETB6RJMMDNG491G",
+      "category": "coding_preferences",
+      "content": "Synthetic developer memory primitive #60 specifying rule for coding_preferences in domain module #60.",
+      "tags": ["coding_preferences", "module-60"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD4388WP3317MHFB0R3",
+      "category": "architecture_constraints",
+      "content": "Synthetic developer memory primitive #61 specifying rule for architecture_constraints in domain module #61.",
+      "tags": ["architecture_constraints", "module-61"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD4ZKYE9BJWJRDHMAHY",
+      "category": "tooling_preferences",
+      "content": "Synthetic developer memory primitive #62 specifying rule for tooling_preferences in domain module #62.",
+      "tags": ["tooling_preferences", "module-62"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD4AYQNP3BJ1VGW9HBF",
+      "category": "testing_preferences",
+      "content": "Synthetic developer memory primitive #63 specifying rule for testing_preferences in domain module #63.",
+      "tags": ["testing_preferences", "module-63"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD4AP495RHB6MMXQ4Q5",
+      "category": "documentation_preferences",
+      "content": "Synthetic developer memory primitive #64 specifying rule for documentation_preferences in domain module #64.",
+      "tags": ["documentation_preferences", "module-64"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD47RSWKAQ081DKNMZQ",
+      "category": "project_constraints",
+      "content": "Synthetic developer memory primitive #65 specifying rule for project_constraints in domain module #65.",
+      "tags": ["project_constraints", "module-65"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD5FGNSHHCT7EPXSQE2",
+      "category": "user_preferences",
+      "content": "Synthetic developer memory primitive #66 specifying rule for user_preferences in domain module #66.",
+      "tags": ["user_preferences", "module-66"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD5W582SCQ71TY8G4K2",
+      "category": "temporal_preference_changes",
+      "content": "Synthetic developer memory primitive #67 specifying rule for temporal_preference_changes in domain module #67.",
+      "tags": ["temporal_preference_changes", "module-67"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD5P2H0FSG2ZSVR608G",
+      "category": "contradictory_memories",
+      "content": "Synthetic developer memory primitive #68 specifying rule for contradictory_memories in domain module #68.",
+      "tags": ["contradictory_memories", "module-68"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD5T4X3RBDAAH749BXF",
+      "category": "irrelevant_distractors",
+      "content": "Synthetic developer memory primitive #69 specifying rule for irrelevant_distractors in domain module #69.",
+      "tags": ["irrelevant_distractors", "module-69"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD58YZ32W14EN9QX6JX",
+      "category": "coding_preferences",
+      "content": "Synthetic developer memory primitive #70 specifying rule for coding_preferences in domain module #70.",
+      "tags": ["coding_preferences", "module-70"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD5ST06BQ5DRTZ0NSXR",
+      "category": "architecture_constraints",
+      "content": "Synthetic developer memory primitive #71 specifying rule for architecture_constraints in domain module #71.",
+      "tags": ["architecture_constraints", "module-71"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD5FJC8QEFJT8M5XJ85",
+      "category": "tooling_preferences",
+      "content": "Synthetic developer memory primitive #72 specifying rule for tooling_preferences in domain module #72.",
+      "tags": ["tooling_preferences", "module-72"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD52QVF7VPZTWH6MFMY",
+      "category": "testing_preferences",
+      "content": "Synthetic developer memory primitive #73 specifying rule for testing_preferences in domain module #73.",
+      "tags": ["testing_preferences", "module-73"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD5PM3HMRBHSWPKB24A",
+      "category": "documentation_preferences",
+      "content": "Synthetic developer memory primitive #74 specifying rule for documentation_preferences in domain module #74.",
+      "tags": ["documentation_preferences", "module-74"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD5S32S9RWG3ZBCQ41E",
+      "category": "project_constraints",
+      "content": "Synthetic developer memory primitive #75 specifying rule for project_constraints in domain module #75.",
+      "tags": ["project_constraints", "module-75"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD55KF4PJ0WE8A6AMFY",
+      "category": "user_preferences",
+      "content": "Synthetic developer memory primitive #76 specifying rule for user_preferences in domain module #76.",
+      "tags": ["user_preferences", "module-76"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD50BHW3TT0WARJ4P39",
+      "category": "temporal_preference_changes",
+      "content": "Synthetic developer memory primitive #77 specifying rule for temporal_preference_changes in domain module #77.",
+      "tags": ["temporal_preference_changes", "module-77"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD5Z46TQFPFXM45QZJV",
+      "category": "contradictory_memories",
+      "content": "Synthetic developer memory primitive #78 specifying rule for contradictory_memories in domain module #78.",
+      "tags": ["contradictory_memories", "module-78"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD58Y2NYFQYVRPY37V4",
+      "category": "irrelevant_distractors",
+      "content": "Synthetic developer memory primitive #79 specifying rule for irrelevant_distractors in domain module #79.",
+      "tags": ["irrelevant_distractors", "module-79"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD501YVDJJ239J051EN",
+      "category": "coding_preferences",
+      "content": "Synthetic developer memory primitive #80 specifying rule for coding_preferences in domain module #80.",
+      "tags": ["coding_preferences", "module-80"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD53E3HXV76THSZ32ZS",
+      "category": "architecture_constraints",
+      "content": "Synthetic developer memory primitive #81 specifying rule for architecture_constraints in domain module #81.",
+      "tags": ["architecture_constraints", "module-81"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD5JE5YZMW3S3CRRGNA",
+      "category": "tooling_preferences",
+      "content": "Synthetic developer memory primitive #82 specifying rule for tooling_preferences in domain module #82.",
+      "tags": ["tooling_preferences", "module-82"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD5SNZ5DX8XA55NE7D8",
+      "category": "testing_preferences",
+      "content": "Synthetic developer memory primitive #83 specifying rule for testing_preferences in domain module #83.",
+      "tags": ["testing_preferences", "module-83"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD5TH5FSAVCVQE7FDS6",
+      "category": "documentation_preferences",
+      "content": "Synthetic developer memory primitive #84 specifying rule for documentation_preferences in domain module #84.",
+      "tags": ["documentation_preferences", "module-84"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD5FHBEJY786XZX0NZ5",
+      "category": "project_constraints",
+      "content": "Synthetic developer memory primitive #85 specifying rule for project_constraints in domain module #85.",
+      "tags": ["project_constraints", "module-85"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD54PRYKJWPZEAY799N",
+      "category": "user_preferences",
+      "content": "Synthetic developer memory primitive #86 specifying rule for user_preferences in domain module #86.",
+      "tags": ["user_preferences", "module-86"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD501QARJQBGY1WCAYB",
+      "category": "temporal_preference_changes",
+      "content": "Synthetic developer memory primitive #87 specifying rule for temporal_preference_changes in domain module #87.",
+      "tags": ["temporal_preference_changes", "module-87"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD58CHNTK7PZFANJYVG",
+      "category": "contradictory_memories",
+      "content": "Synthetic developer memory primitive #88 specifying rule for contradictory_memories in domain module #88.",
+      "tags": ["contradictory_memories", "module-88"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD57CMQWBKA5MWMGZ5E",
+      "category": "irrelevant_distractors",
+      "content": "Synthetic developer memory primitive #89 specifying rule for irrelevant_distractors in domain module #89.",
+      "tags": ["irrelevant_distractors", "module-89"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD56NWF94B3ZPDJX5YT",
+      "category": "coding_preferences",
+      "content": "Synthetic developer memory primitive #90 specifying rule for coding_preferences in domain module #90.",
+      "tags": ["coding_preferences", "module-90"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD51037ARTQABTS7DEA",
+      "category": "architecture_constraints",
+      "content": "Synthetic developer memory primitive #91 specifying rule for architecture_constraints in domain module #91.",
+      "tags": ["architecture_constraints", "module-91"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD578YBK0CMSVBQQ836",
+      "category": "tooling_preferences",
+      "content": "Synthetic developer memory primitive #92 specifying rule for tooling_preferences in domain module #92.",
+      "tags": ["tooling_preferences", "module-92"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD5H8CAPQC9VEY4FA3J",
+      "category": "testing_preferences",
+      "content": "Synthetic developer memory primitive #93 specifying rule for testing_preferences in domain module #93.",
+      "tags": ["testing_preferences", "module-93"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD5N88KSPW2DS71TKBQ",
+      "category": "documentation_preferences",
+      "content": "Synthetic developer memory primitive #94 specifying rule for documentation_preferences in domain module #94.",
+      "tags": ["documentation_preferences", "module-94"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD5RNFXCZ5WSBPHWJ5B",
+      "category": "project_constraints",
+      "content": "Synthetic developer memory primitive #95 specifying rule for project_constraints in domain module #95.",
+      "tags": ["project_constraints", "module-95"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD5N5KVRRKZGDWAGT2Z",
+      "category": "user_preferences",
+      "content": "Synthetic developer memory primitive #96 specifying rule for user_preferences in domain module #96.",
+      "tags": ["user_preferences", "module-96"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD5PWT8KCG9DZ93H1HQ",
+      "category": "temporal_preference_changes",
+      "content": "Synthetic developer memory primitive #97 specifying rule for temporal_preference_changes in domain module #97.",
+      "tags": ["temporal_preference_changes", "module-97"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD5MZCNP7AJMW88NECZ",
+      "category": "contradictory_memories",
+      "content": "Synthetic developer memory primitive #98 specifying rule for contradictory_memories in domain module #98.",
+      "tags": ["contradictory_memories", "module-98"],
+      "scope": "global",
+      "entityType": "Directive"
+    },
+    {
+      "id": "ast_01KZJ1WXD5Y2PYCY5041CY0YXX",
+      "category": "irrelevant_distractors",
+      "content": "Synthetic developer memory primitive #99 specifying rule for irrelevant_distractors in domain module #99.",
+      "tags": ["irrelevant_distractors", "module-99"],
+      "scope": "global",
+      "entityType": "Assertion"
+    },
+    {
+      "id": "dir_01KZJ1WXD5828CQ1WZ94BDXDMA",
+      "category": "coding_preferences",
+      "content": "Synthetic developer memory primitive #100 specifying rule for coding_preferences in domain module #100.",
+      "tags": ["coding_preferences", "module-100"],
+      "scope": "global",
+      "entityType": "Directive"
+    }
+  ],
+  "testCases": [
+    {
+      "id": "tc-001",
+      "category": "coding_preferences",
+      "query": "explicit return types TypeScript",
+      "relevantMemoryIds": ["dir_01KZJ1WXD2PZ0K0ZAE1DDG1DSE"]
+    },
+    {
+      "id": "tc-002",
+      "category": "coding_preferences",
+      "query": "strict null checks non-null assertion",
+      "relevantMemoryIds": ["dir_01KZJ1WXD355HJSX976DVKQ1VJ"]
+    },
+    {
+      "id": "tc-003",
+      "category": "coding_preferences",
+      "query": "structured logging JSON payloads",
+      "relevantMemoryIds": ["dir_01KZJ1WXD3Y2JQ5C6W5V6VHKHG"]
+    },
+    {
+      "id": "tc-004",
+      "category": "architecture_constraints",
+      "query": "SQLite WAL mode 5000ms timeout",
+      "relevantMemoryIds": ["ast_01KZJ1WXD32EXA34CYHTPKGQRF"]
+    },
+    {
+      "id": "tc-005",
+      "category": "architecture_constraints",
+      "query": "Cryptographic hash chains SHA-256 JCS",
+      "relevantMemoryIds": ["ast_01KZJ1WXD3ATBBCGEBW39G069K"]
+    },
+    {
+      "id": "tc-006",
+      "category": "architecture_constraints",
+      "query": "MCP server stdio transport tools",
+      "relevantMemoryIds": ["dir_01KZJ1WXD3CVSYF15J999BEM8H"]
+    },
+    {
+      "id": "tc-007",
+      "category": "tooling_preferences",
+      "query": "Biome linter formatter ESLint Prettier",
+      "relevantMemoryIds": ["dir_01KZJ1WXD3N0B979GA8GRH928E"]
+    },
+    {
+      "id": "tc-008",
+      "category": "tooling_preferences",
+      "query": "pnpm package manager Corepack enforcement",
+      "relevantMemoryIds": ["dir_01KZJ1WXD3MG0HV8E9DBYPFCEN"]
+    },
+    {
+      "id": "tc-009",
+      "category": "tooling_preferences",
+      "query": "Changesets version bumps publishing npm",
+      "relevantMemoryIds": ["dir_01KZJ1WXD3YZ2T9J4NPC0AW4AC"]
+    },
+    {
+      "id": "tc-010",
+      "category": "testing_preferences",
+      "query": "100 percent test pass rate workspace",
+      "relevantMemoryIds": ["dir_01KZJ1WXD4E73XGSMMQ7P2DCF4"]
+    },
+    {
+      "id": "tc-011",
+      "category": "testing_preferences",
+      "query": "in-memory SQLite database instance unit test",
+      "relevantMemoryIds": ["dir_01KZJ1WXD4Q9DASKR9KZWT0A44"]
+    },
+    {
+      "id": "tc-012",
+      "category": "documentation_preferences",
+      "query": "Mermaid diagrams strict node ID syntax",
+      "relevantMemoryIds": ["dir_01KZJ1WXD4NW0RQP1DJMEGV9C5"]
+    },
+    {
+      "id": "tc-013",
+      "category": "irrelevant_distractors",
+      "query": "Synthetic developer memory primitive #50",
+      "relevantMemoryIds": ["dir_01KZJ1WXD4RH8CZV6EYFG53H35"]
+    }
+  ]
+}

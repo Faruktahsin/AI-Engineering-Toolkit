@@ -16,19 +16,24 @@
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm && tsc --emitDeclarationOnly",
     "test": "vitest run",
+    "benchmark": "tsx src/benchmarks/run-benchmarks.ts",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist"
   },
   "dependencies": {
     "@aiet/compiler": "workspace:*",
     "@aiet/cli": "workspace:*",
+    "@aiet/consolidation": "workspace:*",
+    "@aiet/core": "workspace:*",
     "@aiet/domain": "workspace:*",
+    "@aiet/governance": "workspace:*",
     "@aiet/schema": "workspace:*",
     "@aiet/storage": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
     "tsup": "^8.2.4",
+    "tsx": "^4.19.0",
     "typescript": "^5.5.4",
     "vitest": "^2.0.5"
   }

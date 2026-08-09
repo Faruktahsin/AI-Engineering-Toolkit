@@ -783,9 +783,18 @@ importers:
       '@aiet/compiler':
         specifier: workspace:*
         version: link:../compiler
+      '@aiet/consolidation':
+        specifier: workspace:*
+        version: link:../consolidation
+      '@aiet/core':
+        specifier: workspace:*
+        version: link:../core
       '@aiet/domain':
         specifier: workspace:*
         version: link:../domain
+      '@aiet/governance':
+        specifier: workspace:*
+        version: link:../governance
       '@aiet/schema':
         specifier: workspace:*
         version: link:../schema
@@ -799,6 +808,9 @@ importers:
       tsup:
         specifier: ^8.2.4
         version: 8.5.1(postcss@8.5.26)(tsx@4.23.9)(typescript@5.9.3)(yaml@2.9.0)
+      tsx:
+        specifier: ^4.19.0
+        version: 4.23.9
       typescript:
         specifier: ^5.5.4
         version: 5.9.3
