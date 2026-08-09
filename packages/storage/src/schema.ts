@@ -1,4 +1,4 @@
-import { real, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { integer, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const primitivesRegistry = sqliteTable("primitives_registry", {
   id: text("id").primaryKey(),
@@ -116,6 +116,9 @@ export const auditLog = sqliteTable("audit_log", {
     .references(() => primitivesRegistry.id, { onDelete: "cascade" }),
   operationType: text("operation_type").notNull(),
   initiator: text("initiator").notNull(),
+  primitiveJcsHash: text("primitive_jcs_hash"),
   previousJcsHash: text("previous_jcs_hash"),
   newJcsHash: text("new_jcs_hash").notNull(),
+  chainVersion: integer("chain_version").notNull().default(0),
+  chainSequence: integer("chain_sequence").notNull().default(0),
 });

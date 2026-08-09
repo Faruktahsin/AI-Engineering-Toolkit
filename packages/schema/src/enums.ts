@@ -1,4 +1,4 @@
-export { PAKBErrorCode } from "@aiet/errors";
+export { AIETErrorCode, PAKBErrorCode } from "@aiet/errors";
 
 export enum SensitivityTier {
   PUBLIC = "public",

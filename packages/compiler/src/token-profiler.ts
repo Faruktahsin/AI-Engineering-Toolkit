@@ -6,7 +6,17 @@ import {
   PreambleBudgetExceededError,
   SensitivityTier,
 } from "@aiet/schema";
-import { get_encoding } from "tiktoken";
+import { type Tiktoken, get_encoding } from "tiktoken";
+
+// Loading the cl100k vocabulary is expensive. The compiler profiles many
+// primitives per pipeline run, so reuse one process-local encoder instead of
+// constructing and freeing it for every primitive.
+let cl100kEncoding: Tiktoken | undefined;
+
+function getCl100kEncoding(): Tiktoken {
+  cl100kEncoding ??= get_encoding("cl100k_base");
+  return cl100kEncoding;
+}
 
 export enum PriorityTier {
   TIER_0_ALWAYS_ON = "tier0_always_on",
@@ -44,13 +54,7 @@ export function profileTokens(text: string): number {
   if (typeof text !== "string" || text.length === 0) {
     return 0;
   }
-  const enc = get_encoding("cl100k_base");
-  try {
-    const tokens = enc.encode(text);
-    return tokens.length;
-  } finally {
-    enc.free();
-  }
+  return getCl100kEncoding().encode(text).length;
 }
 
 /**
@@ -60,17 +64,13 @@ export function profileBatch(texts: readonly string[]): number[] {
   if (!Array.isArray(texts) || texts.length === 0) {
     return [];
   }
-  const enc = get_encoding("cl100k_base");
-  try {
-    return texts.map((text) => {
-      if (typeof text !== "string" || text.length === 0) {
-        return 0;
-      }
-      return enc.encode(text).length;
-    });
-  } finally {
-    enc.free();
-  }
+  const enc = getCl100kEncoding();
+  return texts.map((text) => {
+    if (typeof text !== "string" || text.length === 0) {
+      return 0;
+    }
+    return enc.encode(text).length;
+  });
 }
 
 /**

@@ -38,14 +38,15 @@ export class ConsolidationEngine {
 
     // 2. Build DecisionResult for Governance Gate
     const decisionResult: DecisionResult = {
+      // The decision engine has no ARCHIVE operation. An archive without a target
+      // is therefore staged as a creation proposal for the lineage snapshot;
+      // target-bound consolidation actions retain their mutation semantics.
       decision:
-        input.action === "SUPERSEDE"
-          ? "UPDATE"
-          : input.action === "ARCHIVE"
+        input.action === "COEXIST" || !input.targetPrimitiveId
+          ? "CREATE"
+          : input.action === "SUPERSEDE" || input.action === "ARCHIVE"
             ? "UPDATE"
-            : input.action === "COEXIST"
-              ? "CREATE"
-              : "MERGE",
+            : "MERGE",
       target_primitive_id: input.targetPrimitiveId,
       importance_score: 0.8,
       confidence_score: input.confidence,
