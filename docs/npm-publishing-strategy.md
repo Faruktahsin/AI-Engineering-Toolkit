@@ -19,7 +19,6 @@ The **AI Engineering Toolkit (AIET)** is structured as a pnpm monorepo of 28 wor
 | `@aiet/domain` | Business domain rules, sanitization, validation, ULID generation | `public` | `1.0.0` |
 | `@aiet/storage` | SQLite WAL local database engine, FTS5 BM25 search & RRF retrieval | `public` | `1.0.0` |
 | `@aiet/compiler` | Context compilation pipeline & deterministic budget fitting | `public` | `1.0.0` |
-| `@aiet/compiler-cli` | Standalone context compiler CLI (`aiet-compile`) | `public` | `1.0.0` |
 | `@aiet/decision-engine` | Scoring & decision rules (CREATE, UPDATE, MERGE, IGNORE) | `public` | `1.0.0` |
 | `@aiet/governance` | Proposal approval workflows, audit log ledger, privacy policies | `public` | `1.0.0` |
 | `@aiet/consolidation` | Duplicate detection, contradiction detection, memory lineage | `public` | `1.0.0` |
@@ -43,15 +42,7 @@ The **AI Engineering Toolkit (AIET)** is structured as a pnpm monorepo of 28 wor
 | :--- | :--- | :--- | :---: |
 | `@aiet/pakb` | **Backward Compatibility Alias**: Re-exports `@aiet/core` to prevent breaking legacy installations | `public` | `1.0.0` |
 
-### Category 3: Internal Workspace Packages — Not published to npm (`"private": true`)
-
-| Package Path | Purpose | Access |
-| :--- | :--- | :---: |
-| `apps/docs` | AIET Documentation Site | `private` |
-| `apps/visualizer` | PAKB Knowledge Graph Visualizer Web Application | `private` |
-| `apps/mcp-server` | Internal Standalone MCP Development Server | `private` |
-
-### Category 4: Official Example Applications — Not published to npm (`"private": true`)
+### Category 3: Official Example Applications — Not published to npm (`"private": true`)
 
 | Application Path | Target Integration & Purpose | Access |
 | :--- | :--- | :---: |

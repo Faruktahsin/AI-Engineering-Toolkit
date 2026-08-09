@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { ContradictionDetector } from "@aiet/consolidation";
-import type { AnyPrimitive } from "@aiet/schema";
+import type { AnyPrimitive, AssertionPrimitive, DirectivePrimitive } from "@aiet/schema";
 import { describe, expect, it } from "vitest";
 
 interface Scenario {
@@ -13,119 +13,150 @@ interface Scenario {
   readonly description: string;
 }
 
-function loadScenarios(): Scenario[] {
+interface Dataset {
+  readonly supported_rule_controls: Scenario[];
+  readonly generalization_challenges: Scenario[];
+}
+
+function loadScenarios(): Dataset {
   const fixturePath = path.resolve(__dirname, "../fixtures/consolidation-scenarios.json");
   const raw = fs.readFileSync(fixturePath, "utf8");
-  return JSON.parse(raw) as Scenario[];
+  return JSON.parse(raw) as Dataset;
 }
 
 function preparePrimitive(data: Record<string, unknown>): AnyPrimitive {
   const now = new Date().toISOString().replace(/\.\d{3}Z$/, "Z");
-  return {
-    schema_version: "1.0.0",
-    created_at: now,
+
+  // Safe typed adapter that matches actual known primitive types
+  const base = {
+    id: typeof data.id === "string" ? data.id : "test_id",
+    schema_version: "1.0.0" as const,
+    created_at: typeof data.created_at === "string" ? data.created_at : now,
     updated_at: now,
     last_verified: now,
-    sensitivity: "public",
-    volatility: "low",
-    activation: "always_on",
+    sensitivity: "public" as const,
+    volatility: "low" as const,
+    activation: "always_on" as const,
+    tags: [],
+    metadata: {},
+  };
+
+  if ("statement" in data) {
+    return {
+      ...base,
+      type: "directive" as const,
+      statement: String(data.statement),
+      domain: "domain" in data ? String(data.domain) : "general",
+    } satisfies DirectivePrimitive;
+  }
+
+  if ("claim" in data) {
+    return {
+      ...base,
+      type: "assertion" as const,
+      claim: String(data.claim),
+      confidence: 1.0,
+      evidence: [],
+    } satisfies AssertionPrimitive;
+  }
+
+  if ("name" in data) {
+    return {
+      ...base,
+      type: "entity" as const,
+      name: String(data.name),
+      summary: "summary" in data ? String(data.summary) : "",
+    } as unknown as AnyPrimitive;
+  }
+
+  // Fallback for generalization challenges
+  return {
+    ...base,
     ...data,
   } as unknown as AnyPrimitive;
 }
 
-describe("P1.3 Consolidation Generalization & Contradiction Benchmark (36 Scenarios)", () => {
-  it("should evaluate generalization benchmark dataset and compute confusion matrix (TP, FP, FN, TN, Precision, Recall)", () => {
-    const scenarios = loadScenarios();
-    expect(scenarios.length).toBeGreaterThanOrEqual(35);
+function evaluateSubset(name: string, scenarios: Scenario[]) {
+  const detector = new ContradictionDetector();
 
-    const detector = new ContradictionDetector();
+  let tp = 0;
+  let fp = 0;
+  let fn = 0;
+  let tn = 0;
 
-    let tp = 0;
-    let fp = 0;
-    let fn = 0;
-    let tn = 0;
+  for (const scenario of scenarios) {
+    const p1 = preparePrimitive(scenario.primitive_a);
+    const p2 = preparePrimitive(scenario.primitive_b);
 
-    const categoryStats: Record<
-      string,
-      { total: number; tp: number; fp: number; fn: number; tn: number }
-    > = {};
+    const detected = detector.findContradictions([p1, p2]).length > 0;
+    const expected = scenario.expected_contradiction;
 
-    for (const scenario of scenarios) {
-      const p1 = preparePrimitive(scenario.primitive_a);
-      const p2 = preparePrimitive(scenario.primitive_b);
-
-      const detected = detector.findContradictions([p1, p2]).length > 0;
-      const expected = scenario.expected_contradiction;
-
-      let cat = categoryStats[scenario.category];
-      if (!cat) {
-        cat = { total: 0, tp: 0, fp: 0, fn: 0, tn: 0 };
-        categoryStats[scenario.category] = cat;
-      }
-
-      cat.total++;
-
-      if (expected && detected) {
-        tp++;
-        cat.tp++;
-      } else if (!expected && detected) {
-        fp++;
-        cat.fp++;
-      } else if (expected && !detected) {
-        fn++;
-        cat.fn++;
-      } else {
-        tn++;
-        cat.tn++;
-      }
+    if (expected && detected) {
+      tp++;
+    } else if (!expected && detected) {
+      fp++;
+      console.error(
+        `FP detected in ${scenario.id}: expected ${expected}, got ${detected}. p1=${scenario.primitive_a.statement}, p2=${scenario.primitive_b.statement}`,
+      );
+    } else if (expected && !detected) {
+      fn++;
+      console.error(
+        `FN detected in ${scenario.id}: expected ${expected}, got ${detected}. p1=${scenario.primitive_a.statement}, p2=${scenario.primitive_b.statement}`,
+      );
+    } else {
+      tn++;
     }
+  }
 
-    const total = scenarios.length;
-    const precision = tp + fp > 0 ? tp / (tp + fp) : 1;
-    const recall = tp + fn > 0 ? tp / (tp + fn) : 0;
-    const accuracy = (tp + tn) / total;
-    const f1Score = precision + recall > 0 ? (2 * precision * recall) / (precision + recall) : 0;
+  const total = scenarios.length;
+  const precision = tp + fp > 0 ? tp / (tp + fp) : 1;
+  const recall = tp + fn > 0 ? tp / (tp + fn) : 0;
+  const accuracy = total > 0 ? (tp + tn) / total : 1;
+  const f1Score = precision + recall > 0 ? (2 * precision * recall) / (precision + recall) : 0;
 
-    console.log("\n=================================================================");
-    console.log("  P1.3 CONSOLIDATION GENERALIZATION BENCHMARK RESULTS (36 SCENARIOS)  ");
-    console.log("=================================================================");
-    console.table({
-      "Total Scenarios": total,
-      "True Positives (TP)": tp,
-      "False Positives (FP)": fp,
-      "False Negatives (FN)": fn,
-      "True Negatives (TN)": tn,
-      Precision: `${(precision * 100).toFixed(1)}%`,
-      Recall: `${(recall * 100).toFixed(1)}%`,
-      Accuracy: `${(accuracy * 100).toFixed(1)}%`,
-      "F1-Score": f1Score.toFixed(3),
-    });
+  console.log("\n=================================================================");
+  console.log(`  P1.3 BENCHMARK RESULTS: ${name.toUpperCase()} (${total} SCENARIOS)  `);
+  console.log("=================================================================");
+  console.table({
+    "Total Scenarios": total,
+    "True Positives (TP)": tp,
+    "False Positives (FP)": fp,
+    "False Negatives (FN)": fn,
+    "True Negatives (TN)": tn,
+    Precision: `${(precision * 100).toFixed(1)}%`,
+    Recall: `${(recall * 100).toFixed(1)}%`,
+    Accuracy: `${(accuracy * 100).toFixed(1)}%`,
+    "F1-Score": f1Score.toFixed(3),
+  });
 
-    console.log("\n--- Category Breakdown ---");
-    console.table(
-      Object.entries(categoryStats).reduce(
-        (acc, [cat, stats]) => {
-          const catPrecision = stats.tp + stats.fp > 0 ? stats.tp / (stats.tp + stats.fp) : 1;
-          const catRecall = stats.tp + stats.fn > 0 ? stats.tp / (stats.tp + stats.fn) : 0;
-          acc[cat] = {
-            Total: stats.total,
-            TP: stats.tp,
-            FP: stats.fp,
-            FN: stats.fn,
-            TN: stats.tn,
-            Precision: `${(catPrecision * 100).toFixed(0)}%`,
-            Recall: `${(catRecall * 100).toFixed(0)}%`,
-          };
-          return acc;
-        },
-        {} as Record<string, Record<string, string | number>>,
-      ),
+  return { tp, fp, fn, tn, total };
+}
+
+describe("P1.3 Consolidation Generalization & Contradiction Benchmark", () => {
+  it("should evaluate generalization benchmark dataset in explicit subsets", () => {
+    const dataset = loadScenarios();
+
+    // Evaluate Supported Rule Controls
+    const controls = evaluateSubset("Supported Rule Controls", dataset.supported_rule_controls);
+
+    // Assert durable baseline for supported rules
+    expect(controls.total).toBeGreaterThanOrEqual(5);
+    expect(controls.tp).toBeGreaterThan(0); // Must demonstrate non-zero TP capability
+    expect(controls.fp).toBe(0); // Must maintain 100% precision
+    expect(controls.fn).toBe(0); // For perfectly matched known rules, recall should be perfect
+    expect(controls.tn).toBe(2);
+
+    // Evaluate Generalization Challenges
+    const challenges = evaluateSubset(
+      "Generalization Challenges",
+      dataset.generalization_challenges,
     );
-    console.log("=================================================================\n");
 
-    // Baseline validation assertion: guarantee zero False Positives (zero unvetted mutations)
-    expect(fp).toBe(0);
-    // Guarantee minimum dataset evaluation coverage
-    expect(total).toBe(36);
+    // Assert durable baseline for future algorithm improvements
+    expect(challenges.total).toBe(36);
+    expect(challenges.fp).toBe(0); // Zero unvetted mutations on realistic data
+    // Currently recall on natural language challenges is very low; explicitly document this baseline
+    expect(challenges.fn).toBe(20);
+    expect(challenges.tn).toBe(16);
   });
 });

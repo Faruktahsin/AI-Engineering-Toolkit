@@ -1,592 +1,634 @@
-[
-  {
-    "id": "scen_001",
-    "category": "unscoped_global_preference_conflict",
-    "primitive_a": {
-      "id": "dir_01",
-      "statement": "Prefer TypeScript strict mode and pure functional helpers",
-      "domain": "coding_style"
-    },
-    "primitive_b": {
-      "id": "dir_02",
-      "statement": "Avoid TypeScript strict mode and prefer loose JavaScript types",
-      "domain": "coding_style"
-    },
-    "expected_contradiction": true,
-    "description": "Global style preference contradiction on TS strict mode"
-  },
-  {
-    "id": "scen_002",
-    "category": "unscoped_global_preference_conflict",
-    "primitive_a": {
-      "id": "dir_03",
-      "statement": "Use 2 spaces for code indentation",
-      "domain": "formatting"
-    },
-    "primitive_b": {
-      "id": "dir_04",
-      "statement": "Use 4 spaces for code indentation",
-      "domain": "formatting"
-    },
-    "expected_contradiction": true,
-    "description": "Global formatting conflict between 2 and 4 spaces"
-  },
-  {
-    "id": "scen_003",
-    "category": "unscoped_global_preference_conflict",
-    "primitive_a": {
-      "id": "dir_05",
-      "statement": "Use pnpm package manager exclusively for monorepo dependencies",
-      "domain": "tooling"
-    },
-    "primitive_b": {
-      "id": "dir_06",
-      "statement": "Do not use pnpm package manager, use yarn v1 instead",
-      "domain": "tooling"
-    },
-    "expected_contradiction": true,
-    "description": "Package manager preference conflict"
-  },
-  {
-    "id": "scen_004",
-    "category": "unscoped_global_preference_conflict",
-    "primitive_a": {
-      "id": "dir_07",
-      "statement": "Use single quotes for JavaScript string literals",
-      "domain": "formatting"
-    },
-    "primitive_b": {
-      "id": "dir_08",
-      "statement": "Use double quotes for JavaScript string literals",
-      "domain": "formatting"
-    },
-    "expected_contradiction": true,
-    "description": "String literal quote style conflict"
-  },
-  {
-    "id": "scen_005",
-    "category": "same_scope_conflict",
-    "primitive_a": {
-      "id": "dir_09",
-      "statement": "Use Tailwind CSS for styling user interface components",
-      "domain": "frontend",
-      "exemption_scope": "client_web"
-    },
-    "primitive_b": {
-      "id": "dir_10",
-      "statement": "Do not use Tailwind CSS for styling, use Vanilla CSS Modules instead",
-      "domain": "frontend",
-      "exemption_scope": "client_web"
-    },
-    "expected_contradiction": true,
-    "description": "Same scope (client_web) styling framework conflict"
-  },
-  {
-    "id": "scen_006",
-    "category": "same_scope_conflict",
-    "primitive_a": {
-      "id": "dir_11",
-      "statement": "Use React Query for client-side data fetching and caching",
-      "domain": "state_management",
-      "exemption_scope": "dashboard_app"
-    },
-    "primitive_b": {
-      "id": "dir_12",
-      "statement": "Do not use React Query, use SWR for client-side data fetching",
-      "domain": "state_management",
-      "exemption_scope": "dashboard_app"
-    },
-    "expected_contradiction": true,
-    "description": "Same scope data fetching library conflict"
-  },
-  {
-    "id": "scen_007",
-    "category": "same_scope_conflict",
-    "primitive_a": {
-      "id": "ass_13",
-      "claim": "Database connection pool max size is set to 20 connections",
-      "source": "backend_config"
-    },
-    "primitive_b": {
-      "id": "ass_14",
-      "claim": "Database connection pool max size is set to 50 connections",
-      "source": "backend_config"
-    },
-    "expected_contradiction": true,
-    "description": "Same source assertion numeric conflict"
-  },
-  {
-    "id": "scen_008",
-    "category": "same_scope_conflict",
-    "primitive_a": {
-      "id": "dir_15",
-      "statement": "Enforce strict CSP header with zero inline script execution",
-      "domain": "security",
-      "exemption_scope": "public_web"
-    },
-    "primitive_b": {
-      "id": "dir_16",
-      "statement": "Allow inline script execution in CSP headers for legacy widgets",
-      "domain": "security",
-      "exemption_scope": "public_web"
-    },
-    "expected_contradiction": true,
-    "description": "Same scope security header policy conflict"
-  },
-  {
-    "id": "scen_009",
-    "category": "different_scope_non_conflict",
-    "primitive_a": {
-      "id": "dir_17",
-      "statement": "Use PostgreSQL for relational data storage",
-      "domain": "storage",
-      "exemption_scope": "server_backend"
-    },
-    "primitive_b": {
-      "id": "dir_18",
-      "statement": "Use IndexedDB for local offline data storage",
-      "domain": "storage",
-      "exemption_scope": "browser_extension"
-    },
-    "expected_contradiction": false,
-    "description": "Different scopes (server_backend vs browser_extension) - non-conflict"
-  },
-  {
-    "id": "scen_010",
-    "category": "different_scope_non_conflict",
-    "primitive_a": {
-      "id": "dir_19",
-      "statement": "Use Swift for iOS native mobile UI rendering",
-      "domain": "mobile",
-      "exemption_scope": "ios_app"
-    },
-    "primitive_b": {
-      "id": "dir_20",
-      "statement": "Use Kotlin for Android native mobile UI rendering",
-      "domain": "mobile",
-      "exemption_scope": "android_app"
-    },
-    "expected_contradiction": false,
-    "description": "Different mobile target platforms - non-conflict"
-  },
-  {
-    "id": "scen_011",
-    "category": "different_scope_non_conflict",
-    "primitive_a": {
-      "id": "ass_21",
-      "claim": "Maximum request payload size limit is 10MB",
-      "source": "api_gateway"
-    },
-    "primitive_b": {
-      "id": "ass_22",
-      "claim": "Maximum request payload size limit is 500KB",
-      "source": "webhook_receiver"
-    },
-    "expected_contradiction": false,
-    "description": "Different service components - non-conflict"
-  },
-  {
-    "id": "scen_012",
-    "category": "different_scope_non_conflict",
-    "primitive_a": {
-      "id": "dir_23",
-      "statement": "Log all HTTP requests in verbose DEBUG level",
-      "domain": "logging",
-      "exemption_scope": "development"
-    },
-    "primitive_b": {
-      "id": "dir_24",
-      "statement": "Log only WARN and ERROR levels",
-      "domain": "logging",
-      "exemption_scope": "production"
-    },
-    "expected_contradiction": false,
-    "description": "Environment scope separation (development vs production) - non-conflict"
-  },
-  {
-    "id": "scen_013",
-    "category": "same_different_explicit_domains",
-    "primitive_a": {
-      "id": "dir_25",
-      "statement": "Enforce 100% automated test coverage for core business logic",
-      "domain": "testing"
-    },
-    "primitive_b": {
-      "id": "dir_26",
-      "statement": "Scan dependencies for known CVE security vulnerabilities before build",
-      "domain": "security"
-    },
-    "expected_contradiction": false,
-    "description": "Different domains (testing vs security) - complementary rules"
-  },
-  {
-    "id": "scen_014",
-    "category": "same_different_explicit_domains",
-    "primitive_a": {
-      "id": "dir_27",
-      "statement": "Compress all static image assets to WebP format",
-      "domain": "performance"
-    },
-    "primitive_b": {
-      "id": "dir_28",
-      "statement": "Do not compress static image assets to WebP, preserve PNG source",
-      "domain": "performance"
-    },
-    "expected_contradiction": true,
-    "description": "Same domain (performance) contradiction"
-  },
-  {
-    "id": "scen_015",
-    "category": "same_different_explicit_domains",
-    "primitive_a": {
-      "id": "dir_29",
-      "statement": "Use REST APIs for external third-party integrations",
-      "domain": "networking"
-    },
-    "primitive_b": {
-      "id": "dir_30",
-      "statement": "Use GraphQL queries for internal dashboard data fetching",
-      "domain": "data_access"
-    },
-    "expected_contradiction": false,
-    "description": "Different API integration domains - non-conflict"
-  },
-  {
-    "id": "scen_016",
-    "category": "same_different_explicit_domains",
-    "primitive_a": {
-      "id": "dir_31",
-      "statement": "Require multi-factor authentication (MFA) for admin dashboard logins",
-      "domain": "security"
-    },
-    "primitive_b": {
-      "id": "dir_32",
-      "statement": "Disable multi-factor authentication (MFA) requirement for admin logins",
-      "domain": "security"
-    },
-    "expected_contradiction": true,
-    "description": "Same domain (security) MFA requirement conflict"
-  },
-  {
-    "id": "scen_017",
-    "category": "multi_word_values",
-    "primitive_a": {
-      "id": "dir_33",
-      "statement": "Always log structured JSON entries with ISO timestamps and trace correlation identifiers",
-      "domain": "logging"
-    },
-    "primitive_b": {
-      "id": "dir_34",
-      "statement": "Never log structured JSON entries with trace correlation identifiers",
-      "domain": "logging"
-    },
-    "expected_contradiction": true,
-    "description": "Multi-word log format requirement contradiction"
-  },
-  {
-    "id": "scen_018",
-    "category": "multi_word_values",
-    "primitive_a": {
-      "id": "dir_35",
-      "statement": "Use atomic file write operations with temporary file rename strategy",
-      "domain": "filesystem"
-    },
-    "primitive_b": {
-      "id": "dir_36",
-      "statement": "Do not use atomic file write operations, write directly to destination path",
-      "domain": "filesystem"
-    },
-    "expected_contradiction": true,
-    "description": "Multi-word filesystem write strategy contradiction"
-  },
-  {
-    "id": "scen_019",
-    "category": "multi_word_values",
-    "primitive_a": {
-      "id": "ass_37",
-      "claim": "All API endpoints return JSON payloads wrapped in standard response envelope with status code",
-      "source": "api_spec"
-    },
-    "primitive_b": {
-      "id": "ass_38",
-      "claim": "API endpoints return unwrapped raw domain objects without standard response envelope",
-      "source": "api_spec"
-    },
-    "expected_contradiction": true,
-    "description": "Multi-word API response format assertion conflict"
-  },
-  {
-    "id": "scen_020",
-    "category": "multi_word_values",
-    "primitive_a": {
-      "id": "dir_39",
-      "statement": "Cache compiled preamble artifacts in SQLite database with WAL journal mode enabled",
-      "domain": "caching"
-    },
-    "primitive_b": {
-      "id": "dir_40",
-      "statement": "Cache compiled preamble artifacts in in-memory LRU cache store",
-      "domain": "caching"
-    },
-    "expected_contradiction": false,
-    "description": "Multi-word different caching implementation choices (SQLite vs LRU) - non-conflict"
-  },
-  {
-    "id": "scen_021",
-    "category": "concise_technical_assertions",
-    "primitive_a": {
-      "id": "ass_41",
-      "claim": "SQLite WAL mode is enabled",
-      "source": "storage_engine"
-    },
-    "primitive_b": {
-      "id": "ass_42",
-      "claim": "SQLite WAL mode is disabled",
-      "source": "storage_engine"
-    },
-    "expected_contradiction": true,
-    "description": "Concise technical assertion contradiction on WAL mode"
-  },
-  {
-    "id": "scen_022",
-    "category": "concise_technical_assertions",
-    "primitive_a": {
-      "id": "ass_43",
-      "claim": "FTS5 diacritics removal is active",
-      "source": "fts_engine"
-    },
-    "primitive_b": {
-      "id": "ass_44",
-      "claim": "FTS5 diacritics removal is inactive",
-      "source": "fts_engine"
-    },
-    "expected_contradiction": true,
-    "description": "Concise technical assertion contradiction on FTS5 diacritics"
-  },
-  {
-    "id": "scen_023",
-    "category": "concise_technical_assertions",
-    "primitive_a": {
-      "id": "ass_45",
-      "claim": "HTTP keep-alive timeout is set to 5 seconds",
-      "source": "http_server"
-    },
-    "primitive_b": {
-      "id": "ass_46",
-      "claim": "HTTP keep-alive timeout is set to 30 seconds",
-      "source": "http_server"
-    },
-    "expected_contradiction": true,
-    "description": "Concise technical timeout value mismatch"
-  },
-  {
-    "id": "scen_024",
-    "category": "concise_technical_assertions",
-    "primitive_a": {
-      "id": "ass_47",
-      "claim": "Database port is set to 5432",
-      "source": "db_config"
-    },
-    "primitive_b": {
-      "id": "ass_48",
-      "claim": "Redis port is set to 6379",
-      "source": "cache_config"
-    },
-    "expected_contradiction": false,
-    "description": "Concise technical non-conflicting port configs for different services"
-  },
-  {
-    "id": "scen_025",
-    "category": "acronym_heavy_assertions",
-    "primitive_a": {
-      "id": "ass_49",
-      "claim": "Enforce JCS SHA-256 HMAC for JWT signature validation",
-      "source": "auth_subsystem"
-    },
-    "primitive_b": {
-      "id": "ass_50",
-      "claim": "Disable JCS SHA-256 HMAC for JWT signature validation",
-      "source": "auth_subsystem"
-    },
-    "expected_contradiction": true,
-    "description": "Acronym-heavy (JCS SHA-256 HMAC JWT) contradiction"
-  },
-  {
-    "id": "scen_026",
-    "category": "acronym_heavy_assertions",
-    "primitive_a": {
-      "id": "ass_51",
-      "claim": "Require mTLS authentication for gRPC microservice transport",
-      "source": "mesh_config"
-    },
-    "primitive_b": {
-      "id": "ass_52",
-      "claim": "Disable mTLS authentication for gRPC microservice transport",
-      "source": "mesh_config"
-    },
-    "expected_contradiction": true,
-    "description": "Acronym-heavy (mTLS gRPC) contradiction"
-  },
-  {
-    "id": "scen_027",
-    "category": "acronym_heavy_assertions",
-    "primitive_a": {
-      "id": "ass_53",
-      "claim": "Use AES-256-GCM encryption for stored PII attributes",
-      "source": "crypto_module"
-    },
-    "primitive_b": {
-      "id": "ass_54",
-      "claim": "Use ChaCha20-Poly1305 encryption for stored PII attributes",
-      "source": "crypto_module"
-    },
-    "expected_contradiction": true,
-    "description": "Acronym-heavy cipher algorithm choice contradiction"
-  },
-  {
-    "id": "scen_028",
-    "category": "acronym_heavy_assertions",
-    "primitive_a": {
-      "id": "ass_55",
-      "claim": "Use CORS headers for REST API endpoints",
-      "source": "gateway"
-    },
-    "primitive_b": {
-      "id": "ass_56",
-      "claim": "Use RBAC authorization policies for MCP tool execution",
-      "source": "security_policy"
-    },
-    "expected_contradiction": false,
-    "description": "Acronym-heavy non-conflicting security assertions (CORS REST vs RBAC MCP)"
-  },
-  {
-    "id": "scen_029",
-    "category": "realistic_non_conflicting_distractors",
-    "primitive_a": {
-      "id": "dir_57",
-      "statement": "Use Vitest for executing fast Node.js unit tests",
-      "domain": "testing"
-    },
-    "primitive_b": {
-      "id": "dir_58",
-      "statement": "Use Biome for code linting and formatting verification",
-      "domain": "code_quality"
-    },
-    "expected_contradiction": false,
-    "description": "Realistic non-conflicting developer tools (Vitest vs Biome)"
-  },
-  {
-    "id": "scen_030",
-    "category": "realistic_non_conflicting_distractors",
-    "primitive_a": {
-      "id": "ass_59",
-      "claim": "Node.js >= 22.0.0 is required runtime version",
-      "source": "package_json"
-    },
-    "primitive_b": {
-      "id": "ass_60",
-      "claim": "pnpm >= 11.20.0 is required package manager version",
-      "source": "package_json"
-    },
-    "expected_contradiction": false,
-    "description": "Realistic non-conflicting runtime version requirements"
-  },
-  {
-    "id": "scen_031",
-    "category": "realistic_non_conflicting_distractors",
-    "primitive_a": {
-      "id": "dir_61",
-      "statement": "Store application database files in local .aiet directory",
-      "domain": "storage"
-    },
-    "primitive_b": {
-      "id": "dir_62",
-      "statement": "Store compiled prompt artifacts in root workspace outputs folder",
-      "domain": "compiler"
-    },
-    "expected_contradiction": false,
-    "description": "Realistic non-conflicting output paths"
-  },
-  {
-    "id": "scen_032",
-    "category": "realistic_non_conflicting_distractors",
-    "primitive_a": {
-      "id": "ent_63",
-      "name": "Customer Support Agent",
-      "type": "agent",
-      "status": "active"
-    },
-    "primitive_b": {
-      "id": "ent_64",
-      "name": "Knowledge Extraction Engine",
-      "type": "subsystem",
-      "status": "active"
-    },
-    "expected_contradiction": false,
-    "description": "Realistic non-conflicting entity definitions"
-  },
-  {
-    "id": "scen_033",
-    "category": "realistic_non_conflicting_distractors",
-    "primitive_a": {
-      "id": "dir_65",
-      "statement": "Support dark mode UI theme preferences in visualizer application",
-      "domain": "ui_theme"
-    },
-    "primitive_b": {
-      "id": "dir_66",
-      "statement": "Support light mode UI theme preferences in visualizer application",
-      "domain": "ui_theme"
-    },
-    "expected_contradiction": false,
-    "description": "Supporting both dark and light modes is non-conflicting UI capability"
-  },
-  {
-    "id": "scen_034",
-    "category": "realistic_non_conflicting_distractors",
-    "primitive_a": {
-      "id": "dir_67",
-      "statement": "Emit structured telemetry events to local log file",
-      "domain": "observability"
-    },
-    "primitive_b": {
-      "id": "dir_68",
-      "statement": "Emit diagnostic metrics to stdout in development mode",
-      "domain": "observability"
-    },
-    "expected_contradiction": false,
-    "description": "Realistic non-conflicting observability outputs"
-  },
-  {
-    "id": "scen_035",
-    "category": "realistic_non_conflicting_distractors",
-    "primitive_a": {
-      "id": "ass_69",
-      "claim": "Apache-2.0 open-source software license applies to all core packages",
-      "source": "license_file"
-    },
-    "primitive_b": {
-      "id": "ass_70",
-      "claim": "MIT software license applies to example applications",
-      "source": "license_file"
-    },
-    "expected_contradiction": false,
-    "description": "Dual licensing for different repository components - non-conflicting"
-  },
-  {
-    "id": "scen_036",
-    "category": "unscoped_global_preference_conflict",
-    "primitive_a": {
-      "id": "dir_71",
-      "statement": "Always prefer arrow function syntax for anonymous callbacks",
-      "domain": "coding_style"
-    },
-    "primitive_b": {
-      "id": "dir_72",
-      "statement": "Never use arrow function syntax, use function keywords for callbacks",
-      "domain": "coding_style"
-    },
-    "expected_contradiction": true,
-    "description": "Function syntax preference contradiction"
-  }
-]
+{
+  "supported_rule_controls": [
+    {
+      "id": "sup_001",
+      "category": "preference_conflict",
+      "primitive_a": {
+        "id": "p_01",
+        "statement": "Developer prefers TypeScript",
+        "domain": "coding"
+      },
+      "primitive_b": {
+        "id": "p_02",
+        "statement": "Developer prefers JavaScript",
+        "domain": "coding"
+      },
+      "expected_contradiction": true,
+      "description": "Direct preference conflict on same subject"
+    },
+    {
+      "id": "sup_002",
+      "category": "attribute_conflict",
+      "primitive_a": {
+        "id": "p_03",
+        "statement": "backend-api uses express"
+      },
+      "primitive_b": {
+        "id": "p_04",
+        "statement": "backend-api uses fastify"
+      },
+      "expected_contradiction": true,
+      "description": "Direct attribute conflict on same subject"
+    },
+    {
+      "id": "sup_003",
+      "category": "outdated_fact",
+      "primitive_a": {
+        "id": "p_05",
+        "statement": "backend application uses postgres",
+        "created_at": "2023-01-01T00:00:00Z"
+      },
+      "primitive_b": {
+        "id": "p_06",
+        "statement": "backend application uses mysql",
+        "created_at": "2023-06-01T00:00:00Z"
+      },
+      "expected_contradiction": true,
+      "description": "Outdated fact due to time difference and overlapping subject"
+    },
+    {
+      "id": "sup_004",
+      "category": "different_subject_preference",
+      "primitive_a": {
+        "id": "p_07",
+        "statement": "BackendTeam prefers Java"
+      },
+      "primitive_b": {
+        "id": "p_08",
+        "statement": "FrontendTeam prefers Java"
+      },
+      "expected_contradiction": false,
+      "description": "Different subjects do not contradict"
+    },
+    {
+      "id": "sup_005",
+      "category": "different_context_preference",
+      "primitive_a": {
+        "id": "p_09",
+        "statement": "Developer prefers Python for data science",
+        "domain": "data_science"
+      },
+      "primitive_b": {
+        "id": "p_10",
+        "statement": "Developer prefers TypeScript for frontend",
+        "domain": "frontend"
+      },
+      "expected_contradiction": false,
+      "description": "Same subject but different contexts do not contradict"
+    }
+  ],
+  "generalization_challenges": [
+    {
+      "id": "scen_001",
+      "category": "unscoped_global_preference_conflict",
+      "primitive_a": {
+        "id": "dir_01",
+        "statement": "Prefer TypeScript strict mode and pure functional helpers",
+        "domain": "coding_style"
+      },
+      "primitive_b": {
+        "id": "dir_02",
+        "statement": "Avoid TypeScript strict mode and prefer loose JavaScript types",
+        "domain": "coding_style"
+      },
+      "expected_contradiction": true,
+      "description": "Global style preference contradiction on TS strict mode"
+    },
+    {
+      "id": "scen_002",
+      "category": "unscoped_global_preference_conflict",
+      "primitive_a": {
+        "id": "dir_03",
+        "statement": "Use 2 spaces for code indentation",
+        "domain": "formatting"
+      },
+      "primitive_b": {
+        "id": "dir_04",
+        "statement": "Use 4 spaces for code indentation",
+        "domain": "formatting"
+      },
+      "expected_contradiction": true,
+      "description": "Global formatting conflict between 2 and 4 spaces"
+    },
+    {
+      "id": "scen_003",
+      "category": "unscoped_global_preference_conflict",
+      "primitive_a": {
+        "id": "dir_05",
+        "statement": "Use pnpm package manager exclusively for monorepo dependencies",
+        "domain": "tooling"
+      },
+      "primitive_b": {
+        "id": "dir_06",
+        "statement": "Do not use pnpm package manager, use yarn v1 instead",
+        "domain": "tooling"
+      },
+      "expected_contradiction": true,
+      "description": "Package manager preference conflict"
+    },
+    {
+      "id": "scen_004",
+      "category": "unscoped_global_preference_conflict",
+      "primitive_a": {
+        "id": "dir_07",
+        "statement": "Use single quotes for JavaScript string literals",
+        "domain": "formatting"
+      },
+      "primitive_b": {
+        "id": "dir_08",
+        "statement": "Use double quotes for JavaScript string literals",
+        "domain": "formatting"
+      },
+      "expected_contradiction": true,
+      "description": "String literal quote style conflict"
+    },
+    {
+      "id": "scen_005",
+      "category": "same_scope_conflict",
+      "primitive_a": {
+        "id": "dir_09",
+        "statement": "Use Tailwind CSS for styling user interface components",
+        "domain": "frontend"
+      },
+      "primitive_b": {
+        "id": "dir_10",
+        "statement": "Do not use Tailwind CSS for styling, use Vanilla CSS Modules instead",
+        "domain": "frontend"
+      },
+      "expected_contradiction": true,
+      "description": "Same scope (client_web) styling framework conflict"
+    },
+    {
+      "id": "scen_006",
+      "category": "same_scope_conflict",
+      "primitive_a": {
+        "id": "dir_11",
+        "statement": "Use React Query for client-side data fetching and caching",
+        "domain": "state_management"
+      },
+      "primitive_b": {
+        "id": "dir_12",
+        "statement": "Do not use React Query, use SWR for client-side data fetching",
+        "domain": "state_management"
+      },
+      "expected_contradiction": true,
+      "description": "Same scope data fetching library conflict"
+    },
+    {
+      "id": "scen_007",
+      "category": "same_scope_conflict",
+      "primitive_a": {
+        "id": "ass_13",
+        "claim": "Database connection pool max size is set to 20 connections"
+      },
+      "primitive_b": {
+        "id": "ass_14",
+        "claim": "Database connection pool max size is set to 50 connections"
+      },
+      "expected_contradiction": true,
+      "description": "Same source assertion numeric conflict"
+    },
+    {
+      "id": "scen_008",
+      "category": "same_scope_conflict",
+      "primitive_a": {
+        "id": "dir_15",
+        "statement": "Enforce strict CSP header with zero inline script execution",
+        "domain": "security"
+      },
+      "primitive_b": {
+        "id": "dir_16",
+        "statement": "Allow inline script execution in CSP headers for legacy widgets",
+        "domain": "security"
+      },
+      "expected_contradiction": true,
+      "description": "Same scope security header policy conflict"
+    },
+    {
+      "id": "scen_009",
+      "category": "different_scope_non_conflict",
+      "primitive_a": {
+        "id": "dir_17",
+        "statement": "Use PostgreSQL for relational data storage",
+        "domain": "storage"
+      },
+      "primitive_b": {
+        "id": "dir_18",
+        "statement": "Use IndexedDB for local offline data storage",
+        "domain": "storage"
+      },
+      "expected_contradiction": false,
+      "description": "Different scopes (server_backend vs browser_extension) - non-conflict"
+    },
+    {
+      "id": "scen_010",
+      "category": "different_scope_non_conflict",
+      "primitive_a": {
+        "id": "dir_19",
+        "statement": "Use Swift for iOS native mobile UI rendering",
+        "domain": "mobile"
+      },
+      "primitive_b": {
+        "id": "dir_20",
+        "statement": "Use Kotlin for Android native mobile UI rendering",
+        "domain": "mobile"
+      },
+      "expected_contradiction": false,
+      "description": "Different mobile target platforms - non-conflict"
+    },
+    {
+      "id": "scen_011",
+      "category": "different_scope_non_conflict",
+      "primitive_a": {
+        "id": "ass_21",
+        "claim": "Maximum request payload size limit is 10MB"
+      },
+      "primitive_b": {
+        "id": "ass_22",
+        "claim": "Maximum request payload size limit is 500KB"
+      },
+      "expected_contradiction": false,
+      "description": "Different service components - non-conflict"
+    },
+    {
+      "id": "scen_012",
+      "category": "different_scope_non_conflict",
+      "primitive_a": {
+        "id": "dir_23",
+        "statement": "Log all HTTP requests in verbose DEBUG level",
+        "domain": "logging"
+      },
+      "primitive_b": {
+        "id": "dir_24",
+        "statement": "Log only WARN and ERROR levels",
+        "domain": "logging"
+      },
+      "expected_contradiction": false,
+      "description": "Environment scope separation (development vs production) - non-conflict"
+    },
+    {
+      "id": "scen_013",
+      "category": "same_different_explicit_domains",
+      "primitive_a": {
+        "id": "dir_25",
+        "statement": "Enforce 100% automated test coverage for core business logic",
+        "domain": "testing"
+      },
+      "primitive_b": {
+        "id": "dir_26",
+        "statement": "Scan dependencies for known CVE security vulnerabilities before build",
+        "domain": "security"
+      },
+      "expected_contradiction": false,
+      "description": "Different domains (testing vs security) - complementary rules"
+    },
+    {
+      "id": "scen_014",
+      "category": "same_different_explicit_domains",
+      "primitive_a": {
+        "id": "dir_27",
+        "statement": "Compress all static image assets to WebP format",
+        "domain": "performance"
+      },
+      "primitive_b": {
+        "id": "dir_28",
+        "statement": "Do not compress static image assets to WebP, preserve PNG source",
+        "domain": "performance"
+      },
+      "expected_contradiction": true,
+      "description": "Same domain (performance) contradiction"
+    },
+    {
+      "id": "scen_015",
+      "category": "same_different_explicit_domains",
+      "primitive_a": {
+        "id": "dir_29",
+        "statement": "Use REST APIs for external third-party integrations",
+        "domain": "networking"
+      },
+      "primitive_b": {
+        "id": "dir_30",
+        "statement": "Use GraphQL queries for internal dashboard data fetching",
+        "domain": "data_access"
+      },
+      "expected_contradiction": false,
+      "description": "Different API integration domains - non-conflict"
+    },
+    {
+      "id": "scen_016",
+      "category": "same_different_explicit_domains",
+      "primitive_a": {
+        "id": "dir_31",
+        "statement": "Require multi-factor authentication (MFA) for admin dashboard logins",
+        "domain": "security"
+      },
+      "primitive_b": {
+        "id": "dir_32",
+        "statement": "Disable multi-factor authentication (MFA) requirement for admin logins",
+        "domain": "security"
+      },
+      "expected_contradiction": true,
+      "description": "Same domain (security) MFA requirement conflict"
+    },
+    {
+      "id": "scen_017",
+      "category": "multi_word_values",
+      "primitive_a": {
+        "id": "dir_33",
+        "statement": "Always log structured JSON entries with ISO timestamps and trace correlation identifiers",
+        "domain": "logging"
+      },
+      "primitive_b": {
+        "id": "dir_34",
+        "statement": "Never log structured JSON entries with trace correlation identifiers",
+        "domain": "logging"
+      },
+      "expected_contradiction": true,
+      "description": "Multi-word log format requirement contradiction"
+    },
+    {
+      "id": "scen_018",
+      "category": "multi_word_values",
+      "primitive_a": {
+        "id": "dir_35",
+        "statement": "Use atomic file write operations with temporary file rename strategy",
+        "domain": "filesystem"
+      },
+      "primitive_b": {
+        "id": "dir_36",
+        "statement": "Do not use atomic file write operations, write directly to destination path",
+        "domain": "filesystem"
+      },
+      "expected_contradiction": true,
+      "description": "Multi-word filesystem write strategy contradiction"
+    },
+    {
+      "id": "scen_019",
+      "category": "multi_word_values",
+      "primitive_a": {
+        "id": "ass_37",
+        "claim": "All API endpoints return JSON payloads wrapped in standard response envelope with status code"
+      },
+      "primitive_b": {
+        "id": "ass_38",
+        "claim": "API endpoints return unwrapped raw domain objects without standard response envelope"
+      },
+      "expected_contradiction": true,
+      "description": "Multi-word API response format assertion conflict"
+    },
+    {
+      "id": "scen_020",
+      "category": "multi_word_values",
+      "primitive_a": {
+        "id": "dir_39",
+        "statement": "Cache compiled preamble artifacts in SQLite database with WAL journal mode enabled",
+        "domain": "caching"
+      },
+      "primitive_b": {
+        "id": "dir_40",
+        "statement": "Cache compiled preamble artifacts in in-memory LRU cache store",
+        "domain": "caching"
+      },
+      "expected_contradiction": false,
+      "description": "Multi-word different caching implementation choices (SQLite vs LRU) - non-conflict"
+    },
+    {
+      "id": "scen_021",
+      "category": "concise_technical_assertions",
+      "primitive_a": {
+        "id": "ass_41",
+        "claim": "SQLite WAL mode is enabled"
+      },
+      "primitive_b": {
+        "id": "ass_42",
+        "claim": "SQLite WAL mode is disabled"
+      },
+      "expected_contradiction": true,
+      "description": "Concise technical assertion contradiction on WAL mode"
+    },
+    {
+      "id": "scen_022",
+      "category": "concise_technical_assertions",
+      "primitive_a": {
+        "id": "ass_43",
+        "claim": "FTS5 diacritics removal is active"
+      },
+      "primitive_b": {
+        "id": "ass_44",
+        "claim": "FTS5 diacritics removal is inactive"
+      },
+      "expected_contradiction": true,
+      "description": "Concise technical assertion contradiction on FTS5 diacritics"
+    },
+    {
+      "id": "scen_023",
+      "category": "concise_technical_assertions",
+      "primitive_a": {
+        "id": "ass_45",
+        "claim": "HTTP keep-alive timeout is set to 5 seconds"
+      },
+      "primitive_b": {
+        "id": "ass_46",
+        "claim": "HTTP keep-alive timeout is set to 30 seconds"
+      },
+      "expected_contradiction": true,
+      "description": "Concise technical timeout value mismatch"
+    },
+    {
+      "id": "scen_024",
+      "category": "concise_technical_assertions",
+      "primitive_a": {
+        "id": "ass_47",
+        "claim": "Database port is set to 5432"
+      },
+      "primitive_b": {
+        "id": "ass_48",
+        "claim": "Redis port is set to 6379"
+      },
+      "expected_contradiction": false,
+      "description": "Concise technical non-conflicting port configs for different services"
+    },
+    {
+      "id": "scen_025",
+      "category": "acronym_heavy_assertions",
+      "primitive_a": {
+        "id": "ass_49",
+        "claim": "Enforce JCS SHA-256 HMAC for JWT signature validation"
+      },
+      "primitive_b": {
+        "id": "ass_50",
+        "claim": "Disable JCS SHA-256 HMAC for JWT signature validation"
+      },
+      "expected_contradiction": true,
+      "description": "Acronym-heavy (JCS SHA-256 HMAC JWT) contradiction"
+    },
+    {
+      "id": "scen_026",
+      "category": "acronym_heavy_assertions",
+      "primitive_a": {
+        "id": "ass_51",
+        "claim": "Require mTLS authentication for gRPC microservice transport"
+      },
+      "primitive_b": {
+        "id": "ass_52",
+        "claim": "Disable mTLS authentication for gRPC microservice transport"
+      },
+      "expected_contradiction": true,
+      "description": "Acronym-heavy (mTLS gRPC) contradiction"
+    },
+    {
+      "id": "scen_027",
+      "category": "acronym_heavy_assertions",
+      "primitive_a": {
+        "id": "ass_53",
+        "claim": "Use AES-256-GCM encryption for stored PII attributes"
+      },
+      "primitive_b": {
+        "id": "ass_54",
+        "claim": "Use ChaCha20-Poly1305 encryption for stored PII attributes"
+      },
+      "expected_contradiction": true,
+      "description": "Acronym-heavy cipher algorithm choice contradiction"
+    },
+    {
+      "id": "scen_028",
+      "category": "acronym_heavy_assertions",
+      "primitive_a": {
+        "id": "ass_55",
+        "claim": "Use CORS headers for REST API endpoints"
+      },
+      "primitive_b": {
+        "id": "ass_56",
+        "claim": "Use RBAC authorization policies for MCP tool execution"
+      },
+      "expected_contradiction": false,
+      "description": "Acronym-heavy non-conflicting security assertions (CORS REST vs RBAC MCP)"
+    },
+    {
+      "id": "scen_029",
+      "category": "realistic_non_conflicting_distractors",
+      "primitive_a": {
+        "id": "dir_57",
+        "statement": "Use Vitest for executing fast Node.js unit tests",
+        "domain": "testing"
+      },
+      "primitive_b": {
+        "id": "dir_58",
+        "statement": "Use Biome for code linting and formatting verification",
+        "domain": "code_quality"
+      },
+      "expected_contradiction": false,
+      "description": "Realistic non-conflicting developer tools (Vitest vs Biome)"
+    },
+    {
+      "id": "scen_030",
+      "category": "realistic_non_conflicting_distractors",
+      "primitive_a": {
+        "id": "ass_59",
+        "claim": "Node.js >= 22.0.0 is required runtime version"
+      },
+      "primitive_b": {
+        "id": "ass_60",
+        "claim": "pnpm >= 11.20.0 is required package manager version"
+      },
+      "expected_contradiction": false,
+      "description": "Realistic non-conflicting runtime version requirements"
+    },
+    {
+      "id": "scen_031",
+      "category": "realistic_non_conflicting_distractors",
+      "primitive_a": {
+        "id": "dir_61",
+        "statement": "Store application database files in local .aiet directory",
+        "domain": "storage"
+      },
+      "primitive_b": {
+        "id": "dir_62",
+        "statement": "Store compiled prompt artifacts in root workspace outputs folder",
+        "domain": "compiler"
+      },
+      "expected_contradiction": false,
+      "description": "Realistic non-conflicting output paths"
+    },
+    {
+      "id": "scen_032",
+      "category": "realistic_non_conflicting_distractors",
+      "primitive_a": {
+        "id": "ent_63",
+        "name": "Customer Support Agent",
+        "type": "agent",
+        "status": "active"
+      },
+      "primitive_b": {
+        "id": "ent_64",
+        "name": "Knowledge Extraction Engine",
+        "type": "subsystem",
+        "status": "active"
+      },
+      "expected_contradiction": false,
+      "description": "Realistic non-conflicting entity definitions"
+    },
+    {
+      "id": "scen_033",
+      "category": "realistic_non_conflicting_distractors",
+      "primitive_a": {
+        "id": "dir_65",
+        "statement": "Support dark mode UI theme preferences in visualizer application",
+        "domain": "ui_theme"
+      },
+      "primitive_b": {
+        "id": "dir_66",
+        "statement": "Support light mode UI theme preferences in visualizer application",
+        "domain": "ui_theme"
+      },
+      "expected_contradiction": false,
+      "description": "Supporting both dark and light modes is non-conflicting UI capability"
+    },
+    {
+      "id": "scen_034",
+      "category": "realistic_non_conflicting_distractors",
+      "primitive_a": {
+        "id": "dir_67",
+        "statement": "Emit structured telemetry events to local log file",
+        "domain": "observability"
+      },
+      "primitive_b": {
+        "id": "dir_68",
+        "statement": "Emit diagnostic metrics to stdout in development mode",
+        "domain": "observability"
+      },
+      "expected_contradiction": false,
+      "description": "Realistic non-conflicting observability outputs"
+    },
+    {
+      "id": "scen_035",
+      "category": "realistic_non_conflicting_distractors",
+      "primitive_a": {
+        "id": "ass_69",
+        "claim": "Apache-2.0 open-source software license applies to all core packages"
+      },
+      "primitive_b": {
+        "id": "ass_70",
+        "claim": "MIT software license applies to example applications"
+      },
+      "expected_contradiction": false,
+      "description": "Dual licensing for different repository components - non-conflicting"
+    },
+    {
+      "id": "scen_036",
+      "category": "unscoped_global_preference_conflict",
+      "primitive_a": {
+        "id": "dir_71",
+        "statement": "Always prefer arrow function syntax for anonymous callbacks",
+        "domain": "coding_style"
+      },
+      "primitive_b": {
+        "id": "dir_72",
+        "statement": "Never use arrow function syntax, use function keywords for callbacks",
+        "domain": "coding_style"
+      },
+      "expected_contradiction": true,
+      "description": "Function syntax preference contradiction"
+    }
+  ]
+}
