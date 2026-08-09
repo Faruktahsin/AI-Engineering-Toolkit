@@ -20,7 +20,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "canonicalize": "^2.0.0"
+    "canonicalize": "^3.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

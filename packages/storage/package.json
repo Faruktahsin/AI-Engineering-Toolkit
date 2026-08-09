@@ -24,7 +24,7 @@
     "@aiet/embeddings": "workspace:*",
     "@aiet/schema": "workspace:*",
     "better-sqlite3": "^11.1.2",
-    "canonicalize": "^2.0.0",
+    "canonicalize": "^3.0.0",
     "drizzle-orm": "^0.45.2",
     "ulid": "^2.3.0"
   },
