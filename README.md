@@ -14,6 +14,8 @@
 
 **AI-Engineering-Toolkit (`AIET`)** is a production-grade infrastructure framework designed for software engineers building stateful, persistent-memory AI agents.
 
+AIET is **local-first by default; use of external embedding providers is explicit opt-in and may transmit data to that provider.**
+
 AIET solves the challenges of unstructured prompt context, context overflows, memory fragmentation, and unvetted autonomous agent mutations by providing:
 
 - **5 Standardized Memory Primitives**: (`Entity`, `Directive`, `Assertion`, `Event`, `Relation`) with strict Zod & JSON Schemas.
@@ -28,7 +30,7 @@ AIET solves the challenges of unstructured prompt context, context overflows, me
 
 ## 🏛️ Architecture Overview
 
-AIET is organized as a high-performance monorepo of 28 workspace packages:
+AIET is organized as a high-performance monorepo of 28 workspace projects (24 publishable workspace packages plus 4 official example applications):
 
 ```
                                   +------------------------------------+
@@ -38,7 +40,7 @@ AIET is organized as a high-performance monorepo of 28 workspace packages:
                                                     |
          +-----------------+----------------+-------+--------+------------------+
          |                 |                |                |                  |
-   @aiet/memory     @aiet/compiler   @aiet/governance  @aiet/consolidation  @aiet/mcp-server
+   @aiet/storage    @aiet/compiler   @aiet/governance  @aiet/consolidation  @aiet/mcp-server
   (SQLite & RRF)   (Context Engine)  (Audit Ledger)   (De-duplication)   (MCP Stdio Server)
          |                 |                |                |                  |
          +-----------------+----------------+----------------+------------------+
