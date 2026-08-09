@@ -2,6 +2,12 @@ import type { AnyPrimitive } from "@aiet/schema";
 import { ulid } from "ulid";
 import type { ContradictionDetectionResult } from "./types";
 
+interface PreferenceStatement {
+  readonly subject: string;
+  readonly value: string;
+  readonly context: string | null;
+}
+
 export class ContradictionDetector {
   public findContradictions(primitives: readonly AnyPrimitive[]): ContradictionDetectionResult[] {
     const results: ContradictionDetectionResult[] = [];
@@ -32,18 +38,24 @@ export class ContradictionDetector {
 
     if (!t1 || !t2) return null;
 
-    // Rule 1: Preference Conflicts ("prefers X" vs "prefers Y")
-    const prefRegex = /(?:prefers?|preference for|favorite)\s+([a-z0-9_#-]+)/i;
-    const match1 = t1.match(prefRegex);
-    const match2 = t2.match(prefRegex);
+    // Rule 1: Preference conflicts must refer to the same subject and decision scope.
+    // A user can prefer different tools for different jobs without a contradiction.
+    const preference1 = this.parsePreference(t1);
+    const preference2 = this.parsePreference(t2);
 
-    if (match1 && match2 && match1[1] && match2[1] && match1[1] !== match2[1]) {
+    if (
+      preference1 &&
+      preference2 &&
+      preference1.subject === preference2.subject &&
+      preference1.value !== preference2.value &&
+      this.hasSharedPreferenceScope(p1, p2, preference1, preference2)
+    ) {
       return {
         contradiction_id: `cnt_${ulid().toUpperCase()}`,
         primitive_a: p1,
         primitive_b: p2,
         conflict_type: "PREFERENCE_CONFLICT",
-        reasoning: `Conflicting user preferences detected: '${match1[1]}' vs '${match2[1]}'.`,
+        reasoning: `Conflicting ${preference1.subject} preferences detected in the same scope: '${preference1.value}' vs '${preference2.value}'.`,
       };
     }
 
@@ -90,9 +102,72 @@ export class ContradictionDetector {
   }
 
   private hasOverlappingSubject(t1: string, t2: string): boolean {
-    const tokens1 = new Set(t1.split(/\s+/).filter((w) => w.length > 4));
-    const tokens2 = t2.split(/\s+/).filter((w) => w.length > 4);
-    return tokens2.some((token) => tokens1.has(token));
+    const tokens1 = this.subjectTokens(t1);
+    const tokens2 = this.subjectTokens(t2);
+    let sharedTokens = 0;
+
+    for (const token of tokens2) {
+      if (tokens1.has(token)) sharedTokens++;
+      if (sharedTokens >= 2) return true;
+    }
+
+    return false;
+  }
+
+  private subjectTokens(text: string): Set<string> {
+    const genericTokens = new Set([
+      "assertion",
+      "claim",
+      "current",
+      "fact",
+      "implementation",
+      "prefers",
+      "preference",
+      "setting",
+      "system",
+      "user",
+    ]);
+
+    return new Set(
+      text
+        .split(/[^a-z0-9_#-]+/i)
+        .map((token) => token.toLowerCase())
+        .filter((token) => token.length > 3 && !genericTokens.has(token)),
+    );
+  }
+
+  private parsePreference(text: string): PreferenceStatement | null {
+    const match = text.match(
+      /^\s*([a-z0-9 _#-]+?)\s+(?:prefers?|preference for|favorite)\s+(.+?)[.!?]?\s*$/i,
+    );
+
+    if (!match?.[1] || !match[2]) return null;
+
+    const [value, context] = match[2].split(/\s+for\s+/i, 2);
+    if (!value) return null;
+
+    return {
+      subject: this.normalizeScope(match[1]),
+      value: this.normalizeScope(value),
+      context: context ? this.normalizeScope(context) : null,
+    };
+  }
+
+  private hasSharedPreferenceScope(
+    p1: AnyPrimitive,
+    p2: AnyPrimitive,
+    preference1: PreferenceStatement,
+    preference2: PreferenceStatement,
+  ): boolean {
+    if (preference1.context && preference1.context === preference2.context) return true;
+
+    const domain1 = "domain" in p1 && typeof p1.domain === "string" ? p1.domain : null;
+    const domain2 = "domain" in p2 && typeof p2.domain === "string" ? p2.domain : null;
+    return domain1 !== null && domain1 === domain2;
+  }
+
+  private normalizeScope(value: string): string {
+    return value.trim().toLowerCase().replace(/\s+/g, " ");
   }
 
   private extractText(primitive: AnyPrimitive): string {

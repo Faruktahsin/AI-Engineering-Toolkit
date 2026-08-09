@@ -122,7 +122,7 @@ describe("@aiet/consolidation Integration Suite", () => {
         sensitivity: SensitivityTier.PUBLIC,
         volatility: VolatilityRating.LOW,
         activation: ActivationClass.ALWAYS_ON,
-        claim: "User prefers Python for AI projects",
+        claim: "User prefers Python for backend services",
         evidence_type: EvidenceType.STATED,
         type: AssertionType.FACT,
       };
@@ -130,6 +130,30 @@ describe("@aiet/consolidation Integration Suite", () => {
       const contradictions = contradictionDetector.findContradictions([ast1, ast2]);
       expect(contradictions).toHaveLength(1);
       expect(contradictions[0]?.conflict_type).toBe("PREFERENCE_CONFLICT");
+    });
+
+    it("should not treat preferences from different decision scopes as conflicts", () => {
+      const ast1 = {
+        schema_version: "1.0.0",
+        id: generateULID("assertion"),
+        created_at: "2026-08-05T12:00:00Z",
+        updated_at: "2026-08-05T12:00:00Z",
+        last_verified: "2026-08-05T12:00:00Z",
+        sensitivity: SensitivityTier.PUBLIC,
+        volatility: VolatilityRating.LOW,
+        activation: ActivationClass.ALWAYS_ON,
+        claim: "User prefers Vitest for testing framework",
+        evidence_type: EvidenceType.STATED,
+        type: AssertionType.FACT,
+      };
+
+      const ast2 = {
+        ...ast1,
+        id: generateULID("assertion"),
+        claim: "User prefers pnpm for package manager",
+      };
+
+      expect(contradictionDetector.findContradictions([ast1, ast2])).toHaveLength(0);
     });
   });
 

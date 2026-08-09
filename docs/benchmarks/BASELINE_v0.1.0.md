@@ -3,11 +3,11 @@
 ## 1. Environment Metadata & Benchmark Configuration
 
 - **Benchmark Infrastructure Version**: `0.1.0-alpha`
-- **AIET Commit SHA**: `8ff192e`
+- **AIET Commit SHA**: `20a1cf1`
 - **Node.js Version**: `v22.23.2`
 - **pnpm Version**: `11.20.0`
 - **Platform / Architecture**: `darwin (arm64)`
-- **Benchmark Timestamp**: `2026-08-09T11:01:44.734Z`
+- **Benchmark Timestamp**: `2026-08-09T19:13:36.734Z`
 - **Dataset Version**: `1.1.0`
 - **Seeded Corpus Size**: `100` primitives
 - **Evaluated Query Count**: `13` ground-truth queries
@@ -23,9 +23,9 @@
 
 | Strategy | Model / Provider Info | Precision@1 | Precision@3 | Recall@3 | MRR | nDCG@3 | Mean Latency | p95 Latency | Quality Claim Valid? |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **BM25_Lexical** | SQLite FTS5 (Lexical Only) | `0.0769` | `0.0256` | `0.0769` | `0.0769` | `0.0769` | `0.074ms` | `0.193ms` | ✅ YES |
-| **Mock_Vector_Structural_Only** | Deterministic Seed Vector (Structural Mechanics Only) | `0` | `0` | `0` | `0` | `0` | `0.013ms` | `0.06ms` | ⚠️ NO (Structural Only) |
-| **Hybrid_RRF** | Reciprocal Rank Fusion (k=60) | `0.0769` | `0.0256` | `0.0769` | `0.0769` | `0.0769` | `0.074ms` | `0.223ms` | ✅ YES |
+| **BM25_Lexical** | SQLite FTS5 (Lexical Only) | `0.0769` | `0.0256` | `0.0769` | `0.0769` | `0.0769` | `0.096ms` | `0.329ms` | ✅ YES |
+| **Mock_Vector_Structural_Only** | Deterministic Seed Vector (Structural Mechanics Only) | `0` | `0` | `0` | `0` | `0` | `0.017ms` | `0.089ms` | ⚠️ NO (Structural Only) |
+| **Hybrid_RRF** | Reciprocal Rank Fusion (k=60) | `0.0769` | `0.0256` | `0.0769` | `0.0769` | `0.0769` | `0.071ms` | `0.191ms` | ✅ YES |
 
 ### B. Context Compiler Token Efficiency & Budget Matrix
 
@@ -42,8 +42,8 @@ Workload Stress Scale: **~6,500 raw input tokens** evaluated against 500, 1000, 
 
 | Test Scope | Executions | Identical SHA-256 Hashes | Match Rate (%) | Aggregate Output Fingerprint |
 | :--- | :---: | :---: | :---: | :--- |
-| **In-Process Sequential** | `25` | `25` | `100%` | `949795772732559dfefca14443814e08a6aee7002f35548a56dba69613d4d69a` |
-| **Cross-Instance Isolated (In-Memory Pipeline)** | `10` | `10` | `100%` | `949795772732559dfefca14443814e08a6aee7002f35548a56dba69613d4d69a` |
+| **In-Process Sequential** | `25` | `25` | `100%` | `3ef08beb893cfb59be6772e452eabc3cfb527cc9d27d7e9c3cb90d1ba1570432` |
+| **Cross-Instance Isolated (In-Memory Pipeline)** | `10` | `10` | `100%` | `3ef08beb893cfb59be6772e452eabc3cfb527cc9d27d7e9c3cb90d1ba1570432` |
 
 *Observed Determinism*: **100% observed reproducibility across 25 in-process and 10 cross-process executions under identical input state and compiler configuration.**
 
@@ -55,12 +55,12 @@ Workload Stress Scale: **~6,500 raw input tokens** evaluated against 500, 1000, 
 | **Evaluated Pairwise Comparisons** | `780` | $\frac{N(N-1)}{2}$ | Completed |
 | **Ground-Truth Conflict Pairs** | `15` | Intended Contradiction Pairs | Ground Truth |
 | **True Positives (TP)** | `15` | Detected Ground-Truth Pairs | Correct Detection |
-| **False Positives (FP)** | `188` | Cross-Domain Regex Matches | Over-Detection |
+| **False Positives (FP)** | `0` | Non-Ground-Truth Detections | `Correct Non-Match` |
 | **False Negatives (FN)** | `0` | Missed Ground-Truth Pairs | None Missed |
-| **True Negatives (TN)** | `577` | Correct Unflagged Control Pairs | Correct Non-Match |
-| **Supersession Recall** | `100%` | $\frac{TP}{TP + FN}$ | ✅ 100% Coverage |
-| **Supersession Precision** | `7.39%` | $\frac{TP}{TP + FP}$ | ⚠️ Unconstrained Regex Scope |
-| **Pairwise Accuracy** | `75.9%` | $\frac{TP + TN}{\text{Total Pairs}}$ | Completed |
+| **True Negatives (TN)** | `765` | Correct Unflagged Control Pairs | Correct Non-Match |
+| **Supersession Recall** | `100%` | $\frac{TP}{TP + FN}$ | `✅ Full Coverage` |
+| **Supersession Precision** | `100%` | $\frac{TP}{TP + FP}$ | `✅ Strong Within Synthetic Scope` |
+| **Pairwise Accuracy** | `100%` | $\frac{TP + TN}{\text{Total Pairs}}$ | Completed |
 
 ---
 
@@ -69,12 +69,12 @@ Workload Stress Scale: **~6,500 raw input tokens** evaluated against 500, 1000, 
 1. **Synthetic Vector Scope**: Mock vector embeddings test SQLite vector index storage mechanics and RRF score calculation, but do not measure real semantic embedding recall. Real vector quality benchmarks require precomputed semantic embeddings or local ONNX embedding models.
 2. **Ranking vs Network Latency**: Benchmark metrics strictly capture SQLite query execution and in-memory scoring latency. Network latency from remote embedding providers (e.g. OpenAI API) is intentionally excluded from ranking algorithm latency metrics.
 3. **Determinism Boundary**: Bit-for-bit determinism applies strictly to the 7-stage context compiler pipeline and fitted Tier 0 primitives. External non-deterministic LLM text generation is outside the deterministic compiler boundary.
-4. **Consolidation Precision Boundary**: In this benchmark scope, the rule-based preference detector matches `"prefers X"` vs `"prefers Y"` patterns across all pairs in the dataset, producing pairwise false positives across independent domains. Ground-truth recall remains 100% ($TP = 15, FN = 0$).
+4. **Consolidation Precision Boundary**: The detector now requires a shared subject and decision scope (or explicit primitive domain) for preference conflicts, and at least two discriminative subject tokens for historical assertions. The synthetic dataset verifies this rule boundary; it does not replace semantic contradiction evaluation across arbitrary natural language.
 
 ---
 
 ## 4. FUTURE BENCHMARK ROADMAP
 
 1. **Local ONNX Semantic Embedding Benchmark**: Evaluate local embedding model inference latency (e.g. `all-MiniLM-L6-v2`) alongside SQLite vector retrieval precision.
-2. **Domain-Scoped Contradiction Filtering**: Enhance consolidation detector rules to filter cross-domain preference pairs before evaluation.
+2. **Semantic Contradiction Evaluation**: Add a heterogeneous natural-language dataset to measure whether scope-aware rules generalize beyond the current synthetic conflicts.
 3. **Multi-Agent Concurrent Query Benchmark**: Measure SQLite WAL mode concurrency and lock contention under multi-agent parallel read/write workloads.

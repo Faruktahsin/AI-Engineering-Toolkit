@@ -82,11 +82,11 @@ ${compiler.tokenBudgetMatrix
 | **Evaluated Pairwise Comparisons** | \`${consolidation.totalPairsEvaluated}\` | $\\frac{N(N-1)}{2}$ | Completed |
 | **Ground-Truth Conflict Pairs** | \`${consolidation.groundTruthConflictPairsCount}\` | Intended Contradiction Pairs | Ground Truth |
 | **True Positives (TP)** | \`${consolidation.truePositives}\` | Detected Ground-Truth Pairs | Correct Detection |
-| **False Positives (FP)** | \`${consolidation.falsePositives}\` | Cross-Domain Regex Matches | Over-Detection |
+| **False Positives (FP)** | \`${consolidation.falsePositives}\` | Non-Ground-Truth Detections | \`${consolidation.falsePositives === 0 ? "Correct Non-Match" : "Over-Detection"}\` |
 | **False Negatives (FN)** | \`${consolidation.falseNegatives}\` | Missed Ground-Truth Pairs | None Missed |
 | **True Negatives (TN)** | \`${consolidation.trueNegatives}\` | Correct Unflagged Control Pairs | Correct Non-Match |
-| **Supersession Recall** | \`${consolidation.recallPercent}%\` | $\\frac{TP}{TP + FN}$ | ✅ 100% Coverage |
-| **Supersession Precision** | \`${consolidation.precisionPercent}%\` | $\\frac{TP}{TP + FP}$ | ⚠️ Unconstrained Regex Scope |
+| **Supersession Recall** | \`${consolidation.recallPercent}%\` | $\\frac{TP}{TP + FN}$ | \`${consolidation.recallPercent === 100 ? "✅ Full Coverage" : "⚠️ Incomplete Coverage"}\` |
+| **Supersession Precision** | \`${consolidation.precisionPercent}%\` | $\\frac{TP}{TP + FP}$ | \`${consolidation.precisionPercent >= 90 ? "✅ Strong Within Synthetic Scope" : "⚠️ Needs Scope Refinement"}\` |
 | **Pairwise Accuracy** | \`${consolidation.accuracyPercent}%\` | $\\frac{TP + TN}{\\text{Total Pairs}}$ | Completed |
 
 ---
@@ -96,14 +96,14 @@ ${compiler.tokenBudgetMatrix
 1. **Synthetic Vector Scope**: Mock vector embeddings test SQLite vector index storage mechanics and RRF score calculation, but do not measure real semantic embedding recall. Real vector quality benchmarks require precomputed semantic embeddings or local ONNX embedding models.
 2. **Ranking vs Network Latency**: Benchmark metrics strictly capture SQLite query execution and in-memory scoring latency. Network latency from remote embedding providers (e.g. OpenAI API) is intentionally excluded from ranking algorithm latency metrics.
 3. **Determinism Boundary**: Bit-for-bit determinism applies strictly to the 7-stage context compiler pipeline and fitted Tier 0 primitives. External non-deterministic LLM text generation is outside the deterministic compiler boundary.
-4. **Consolidation Precision Boundary**: In this benchmark scope, the rule-based preference detector matches \`"prefers X"\` vs \`"prefers Y"\` patterns across all pairs in the dataset, producing pairwise false positives across independent domains. Ground-truth recall remains 100% ($TP = 15, FN = 0$).
+4. **Consolidation Precision Boundary**: The detector now requires a shared subject and decision scope (or explicit primitive domain) for preference conflicts, and at least two discriminative subject tokens for historical assertions. The synthetic dataset verifies this rule boundary; it does not replace semantic contradiction evaluation across arbitrary natural language.
 
 ---
 
 ## 4. FUTURE BENCHMARK ROADMAP
 
 1. **Local ONNX Semantic Embedding Benchmark**: Evaluate local embedding model inference latency (e.g. \`all-MiniLM-L6-v2\`) alongside SQLite vector retrieval precision.
-2. **Domain-Scoped Contradiction Filtering**: Enhance consolidation detector rules to filter cross-domain preference pairs before evaluation.
+2. **Semantic Contradiction Evaluation**: Add a heterogeneous natural-language dataset to measure whether scope-aware rules generalize beyond the current synthetic conflicts.
 3. **Multi-Agent Concurrent Query Benchmark**: Measure SQLite WAL mode concurrency and lock contention under multi-agent parallel read/write workloads.
 `;
 }
