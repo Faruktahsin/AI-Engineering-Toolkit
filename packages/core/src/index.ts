@@ -6,7 +6,9 @@ export * from "@aiet/domain";
 export {
   calculateJCSHash,
   createDatabaseConnection,
+  AIETStorageRepository,
   PAKBStorageRepository,
+  type AIETStorageOptions,
   type FTS5SearchResult,
   type GraphEdge,
   type GraphNode,
@@ -16,8 +18,10 @@ export {
   type SearchResponse,
   type TimelineOptions,
 } from "@aiet/storage";
+/** @deprecated Deprecated in v0.2. Import directly from "@aiet/mcp-server" instead. */
 export * from "@aiet/mcp-server";
 export * from "@aiet/compiler";
+/** @deprecated Deprecated in v0.2. Import directly from "@aiet/cli" instead. */
 export * from "@aiet/cli";
 export {
   MockEmbeddingProvider,

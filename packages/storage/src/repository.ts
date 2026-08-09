@@ -14,7 +14,14 @@ import {
 } from "@aiet/schema";
 import type Database from "better-sqlite3";
 import { ulid } from "ulid";
-import { type PAKBStorageOptions, createDatabaseConnection } from "./connection";
+import { type AIETStorageOptions, createDatabaseConnection } from "./connection";
+import type {
+  AuditChainVerification,
+  StorageAuditRecord,
+  StorageMutationInput,
+  StorageMutationResult,
+  StorageProposalRecord,
+} from "./governance-records";
 import { calculateJCSHash } from "./jcs-hash";
 
 export interface SearchOptions {
@@ -188,7 +195,8 @@ const EMBEDDED_DDL = `
   );
   CREATE TABLE IF NOT EXISTS audit_log (
     log_id TEXT PRIMARY KEY, timestamp TEXT NOT NULL, primitive_id TEXT NOT NULL,
-    operation_type TEXT NOT NULL, initiator TEXT NOT NULL, previous_jcs_hash TEXT, new_jcs_hash TEXT NOT NULL
+    operation_type TEXT NOT NULL, initiator TEXT NOT NULL, primitive_jcs_hash TEXT, previous_jcs_hash TEXT, new_jcs_hash TEXT NOT NULL,
+    chain_version INTEGER NOT NULL DEFAULT 0, chain_sequence INTEGER NOT NULL DEFAULT 0
   );
   CREATE TABLE IF NOT EXISTS vector_embeddings (
     primitive_id TEXT PRIMARY KEY REFERENCES primitives_registry(id) ON DELETE CASCADE,
@@ -209,6 +217,7 @@ const EMBEDDED_DDL = `
     candidate_primitive_json TEXT NOT NULL,
     decision_type TEXT NOT NULL,
     target_primitive_id TEXT REFERENCES primitives_registry(id) ON DELETE CASCADE,
+    expected_updated_at TEXT,
     confidence_score REAL NOT NULL,
     status TEXT NOT NULL,
     reasoning TEXT,
@@ -251,10 +260,10 @@ const EMBEDDED_DDL = `
   CREATE TRIGGER IF NOT EXISTS trg_events_lifecycle_insert AFTER INSERT ON events BEGIN INSERT INTO memory_lifecycle(primitive_id, importance_score, access_count, created_at, last_accessed_at, metadata) VALUES (new.id, 0.5, 0, new.created_at, new.created_at, new.metadata) ON CONFLICT(primitive_id) DO NOTHING; END;
 `;
 
-export class PAKBStorageRepository {
+export class AIETStorageRepository {
   private readonly db: Database.Database;
 
-  constructor(options: PAKBStorageOptions) {
+  constructor(options: AIETStorageOptions) {
     this.db = createDatabaseConnection(options);
     this.initializeSchema();
   }
@@ -268,6 +277,36 @@ export class PAKBStorageRepository {
       }
     }
     this.db.exec(ddl);
+    this.migrateGovernanceSchema();
+  }
+
+  /** Adds P1.2 columns without rewriting existing user databases. */
+  private migrateGovernanceSchema(): void {
+    const auditColumns = this.db.prepare("PRAGMA table_info(audit_log)").all() as Array<{
+      name: string;
+    }>;
+    if (!auditColumns.some((column) => column.name === "chain_version")) {
+      this.db.exec("ALTER TABLE audit_log ADD COLUMN chain_version INTEGER NOT NULL DEFAULT 0");
+    }
+    if (!auditColumns.some((column) => column.name === "chain_sequence")) {
+      this.db.exec("ALTER TABLE audit_log ADD COLUMN chain_sequence INTEGER NOT NULL DEFAULT 0");
+    }
+    if (!auditColumns.some((column) => column.name === "primitive_jcs_hash")) {
+      this.db.exec("ALTER TABLE audit_log ADD COLUMN primitive_jcs_hash TEXT");
+    }
+
+    const proposalColumns = this.db.prepare("PRAGMA table_info(memory_proposals)").all() as Array<{
+      name: string;
+    }>;
+    if (!proposalColumns.some((column) => column.name === "expected_updated_at")) {
+      this.db.exec("ALTER TABLE memory_proposals ADD COLUMN expected_updated_at TEXT");
+    }
+
+    this.db.exec(`
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_audit_log_v1_sequence
+      ON audit_log(chain_sequence)
+      WHERE chain_version = 1;
+    `);
   }
 
   public calculateJCSHash(primitive: AnyPrimitive): string {
@@ -330,6 +369,380 @@ export class PAKBStorageRepository {
     return primitives.filter((p): p is AnyPrimitive => p !== null);
   }
 
+  private getPrimitiveSync(id: string): AnyPrimitive | null {
+    const reg = this.db
+      .prepare("SELECT primitive_type FROM primitives_registry WHERE id = ?")
+      .get(id) as { primitive_type: string } | undefined;
+    if (!reg) return null;
+
+    const tableByType: Record<string, string> = {
+      entity: "entities",
+      directive: "directives",
+      assertion: "assertions",
+      event: "events",
+      relation: "relations",
+    };
+    const table = tableByType[reg.primitive_type];
+    if (!table) return null;
+    const row = this.db.prepare(`SELECT * FROM ${table} WHERE id = ?`).get(id) as
+      | Record<string, unknown>
+      | undefined;
+    if (!row) return null;
+    for (const key of Object.keys(row)) if (row[key] === null) delete row[key];
+    if (typeof row["locale_info"] === "string")
+      row["locale_info"] = JSON.parse(String(row["locale_info"]));
+    if (typeof row["metadata"] === "string") row["metadata"] = JSON.parse(String(row["metadata"]));
+    if (typeof row["tags"] === "string") row["tags"] = JSON.parse(String(row["tags"]));
+    return row as unknown as AnyPrimitive;
+  }
+
+  private primitiveType(
+    primitive: AnyPrimitive,
+  ): "entity" | "directive" | "assertion" | "event" | "relation" {
+    if (primitive.id.startsWith("dir_")) return "directive";
+    if (primitive.id.startsWith("ast_")) return "assertion";
+    if (primitive.id.startsWith("evt_")) return "event";
+    if (primitive.id.startsWith("rel_")) return "relation";
+    return "entity";
+  }
+
+  private constructMutation(
+    target: AnyPrimitive,
+    candidate: AnyPrimitive,
+    kind: "UPDATE" | "MERGE",
+  ): AnyPrimitive {
+    const targetType = this.primitiveType(target);
+    const targetData = target as unknown as Record<string, unknown>;
+    const candidateData = candidate as unknown as Record<string, unknown>;
+    if (targetType !== this.primitiveType(candidate)) {
+      throw new Error("Cannot mutate primitives with different types.");
+    }
+    if (candidate.sensitivity !== target.sensitivity) {
+      throw new ImmutableFieldViolationError(
+        `Sensitivity is immutable for primitive '${target.id}'.`,
+        PAKBErrorCode.IMMUTABLE_FIELD_VIOLATION_ERROR,
+        target.id,
+      );
+    }
+    if (
+      targetType === "relation" &&
+      (candidateData["source_id"] !== targetData["source_id"] ||
+        candidateData["target_id"] !== targetData["target_id"])
+    ) {
+      throw new ImmutableFieldViolationError(
+        `Relation endpoints are immutable for primitive '${target.id}'.`,
+        PAKBErrorCode.IMMUTABLE_FIELD_VIOLATION_ERROR,
+        target.id,
+      );
+    }
+
+    const mergedMetadata =
+      kind === "MERGE"
+        ? { ...(target.metadata ?? {}), ...(candidate.metadata ?? {}) }
+        : candidate.metadata;
+    const result: Record<string, unknown> = {
+      ...candidateData,
+      id: target.id,
+      schema_version: target.schema_version,
+      created_at: target.created_at,
+      sensitivity: target.sensitivity,
+      updated_at: new Date().toISOString().replace(/\.\d{3}Z$/, "Z"),
+      metadata: mergedMetadata,
+    };
+
+    if (kind === "MERGE") {
+      if (targetType === "entity") {
+        result["name"] = targetData["name"];
+        result["type"] = targetData["type"];
+        result["status"] = candidateData["status"] ?? targetData["status"];
+        result["locale_info"] = candidateData["locale_info"] ?? targetData["locale_info"];
+        result["description"] = candidateData["description"] ?? targetData["description"];
+      } else if (targetType === "directive") {
+        result["statement"] = targetData["statement"];
+        result["enforcement"] = targetData["enforcement"];
+        result["domain"] = targetData["domain"];
+        result["cadence"] = candidateData["cadence"] ?? targetData["cadence"];
+        result["exemption_scope"] =
+          candidateData["exemption_scope"] ?? targetData["exemption_scope"];
+        result["rationale"] = candidateData["rationale"] ?? targetData["rationale"];
+      } else if (targetType === "assertion") {
+        result["claim"] = targetData["claim"];
+        result["evidence_type"] = targetData["evidence_type"];
+        result["type"] = targetData["type"];
+        result["status"] = candidateData["status"] ?? targetData["status"];
+        result["source"] = candidateData["source"] ?? targetData["source"];
+        result["valid_from"] = candidateData["valid_from"] ?? targetData["valid_from"];
+        result["valid_to"] = candidateData["valid_to"] ?? targetData["valid_to"];
+      } else if (targetType === "event") {
+        result["timestamp"] = targetData["timestamp"];
+        result["summary"] = targetData["summary"];
+        result["type"] = candidateData["type"] ?? targetData["type"];
+        result["impact_summary"] = candidateData["impact_summary"] ?? targetData["impact_summary"];
+        result["tags"] = Array.from(
+          new Set([
+            ...(Array.isArray(targetData["tags"]) ? targetData["tags"] : []),
+            ...(Array.isArray(candidateData["tags"]) ? candidateData["tags"] : []),
+          ]),
+        );
+      } else {
+        result["source_id"] = targetData["source_id"];
+        result["target_id"] = targetData["target_id"];
+        result["predicate"] = targetData["predicate"];
+        result["weight"] = Math.max(
+          Number(targetData["weight"] ?? 0),
+          Number(candidateData["weight"] ?? 0),
+        );
+        result["valid_from"] = candidateData["valid_from"] ?? targetData["valid_from"];
+        result["valid_to"] = candidateData["valid_to"] ?? targetData["valid_to"];
+      }
+    }
+    validateOrThrow(result as unknown as AnyPrimitive);
+    return result as unknown as AnyPrimitive;
+  }
+
+  private insertPrimitiveRows(primitive: AnyPrimitive): void {
+    validateOrThrow(primitive);
+    const type = this.primitiveType(primitive);
+    const p = primitive as unknown as Record<string, unknown>;
+    if (type === "relation") {
+      const source = this.db
+        .prepare("SELECT 1 FROM primitives_registry WHERE id = ?")
+        .get(p["source_id"]);
+      const target = this.db
+        .prepare("SELECT 1 FROM primitives_registry WHERE id = ?")
+        .get(p["target_id"]);
+      if (!source || !target) {
+        throw new DanglingReferenceError(
+          `Dangling relation reference for '${primitive.id}'.`,
+          PAKBErrorCode.DANGLING_REFERENCE_ERROR,
+          primitive.id,
+        );
+      }
+    }
+    this.db
+      .prepare("INSERT INTO primitives_registry (id, primitive_type) VALUES (?, ?)")
+      .run(primitive.id, type);
+    if (type === "entity") {
+      this.db
+        .prepare(
+          "INSERT INTO entities (id, schema_version, created_at, updated_at, last_verified, sensitivity, volatility, activation, name, type, status, locale_info, description, metadata) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        )
+        .run(
+          p["id"],
+          p["schema_version"],
+          p["created_at"],
+          p["updated_at"],
+          p["last_verified"],
+          p["sensitivity"],
+          p["volatility"],
+          p["activation"],
+          p["name"],
+          p["type"],
+          p["status"] ?? null,
+          p["locale_info"] ? JSON.stringify(p["locale_info"]) : null,
+          p["description"] ?? null,
+          p["metadata"] ? JSON.stringify(p["metadata"]) : null,
+        );
+    } else if (type === "directive") {
+      this.db
+        .prepare(
+          "INSERT INTO directives (id, schema_version, created_at, updated_at, last_verified, sensitivity, volatility, activation, statement, enforcement, domain, cadence, exemption_scope, rationale, metadata) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        )
+        .run(
+          p["id"],
+          p["schema_version"],
+          p["created_at"],
+          p["updated_at"],
+          p["last_verified"],
+          p["sensitivity"],
+          p["volatility"],
+          p["activation"],
+          p["statement"],
+          p["enforcement"],
+          p["domain"],
+          p["cadence"] ?? null,
+          p["exemption_scope"] ?? null,
+          p["rationale"] ?? null,
+          p["metadata"] ? JSON.stringify(p["metadata"]) : null,
+        );
+    } else if (type === "assertion") {
+      this.db
+        .prepare(
+          "INSERT INTO assertions (id, schema_version, created_at, updated_at, last_verified, sensitivity, volatility, activation, claim, evidence_type, type, status, source, valid_from, valid_to, metadata) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        )
+        .run(
+          p["id"],
+          p["schema_version"],
+          p["created_at"],
+          p["updated_at"],
+          p["last_verified"],
+          p["sensitivity"],
+          p["volatility"],
+          p["activation"],
+          p["claim"],
+          p["evidence_type"],
+          p["type"],
+          p["status"] ?? null,
+          p["source"] ?? null,
+          p["valid_from"] ?? null,
+          p["valid_to"] ?? null,
+          p["metadata"] ? JSON.stringify(p["metadata"]) : null,
+        );
+    } else if (type === "event") {
+      this.db
+        .prepare(
+          "INSERT INTO events (id, schema_version, created_at, updated_at, last_verified, sensitivity, volatility, activation, timestamp, summary, type, impact_summary, tags, metadata) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        )
+        .run(
+          p["id"],
+          p["schema_version"],
+          p["created_at"],
+          p["updated_at"],
+          p["last_verified"],
+          p["sensitivity"],
+          p["volatility"],
+          p["activation"],
+          p["timestamp"],
+          p["summary"],
+          p["type"] ?? null,
+          p["impact_summary"] ?? null,
+          p["tags"] ? JSON.stringify(p["tags"]) : null,
+          p["metadata"] ? JSON.stringify(p["metadata"]) : null,
+        );
+    } else {
+      this.db
+        .prepare(
+          "INSERT INTO relations (id, schema_version, created_at, updated_at, last_verified, sensitivity, volatility, activation, source_id, target_id, predicate, valid_from, valid_to, weight, metadata) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        )
+        .run(
+          p["id"],
+          p["schema_version"],
+          p["created_at"],
+          p["updated_at"],
+          p["last_verified"],
+          p["sensitivity"],
+          p["volatility"],
+          p["activation"],
+          p["source_id"],
+          p["target_id"],
+          p["predicate"],
+          p["valid_from"] ?? null,
+          p["valid_to"] ?? null,
+          p["weight"] ?? null,
+          p["metadata"] ? JSON.stringify(p["metadata"]) : null,
+        );
+    }
+  }
+
+  private updatePrimitiveRows(primitive: AnyPrimitive, expectedUpdatedAt: string): number {
+    validateOrThrow(primitive);
+    const p = primitive as unknown as Record<string, unknown>;
+    const type = this.primitiveType(primitive);
+    if (type === "entity")
+      return this.db
+        .prepare(
+          "UPDATE entities SET updated_at = ?, last_verified = ?, volatility = ?, activation = ?, name = ?, type = ?, status = ?, locale_info = ?, description = ?, metadata = ? WHERE id = ? AND updated_at = ? AND sensitivity = ?",
+        )
+        .run(
+          p["updated_at"],
+          p["last_verified"],
+          p["volatility"],
+          p["activation"],
+          p["name"],
+          p["type"],
+          p["status"] ?? null,
+          p["locale_info"] ? JSON.stringify(p["locale_info"]) : null,
+          p["description"] ?? null,
+          p["metadata"] ? JSON.stringify(p["metadata"]) : null,
+          p["id"],
+          expectedUpdatedAt,
+          p["sensitivity"],
+        ).changes;
+    if (type === "directive")
+      return this.db
+        .prepare(
+          "UPDATE directives SET updated_at = ?, last_verified = ?, volatility = ?, activation = ?, statement = ?, enforcement = ?, domain = ?, cadence = ?, exemption_scope = ?, rationale = ?, metadata = ? WHERE id = ? AND updated_at = ? AND sensitivity = ?",
+        )
+        .run(
+          p["updated_at"],
+          p["last_verified"],
+          p["volatility"],
+          p["activation"],
+          p["statement"],
+          p["enforcement"],
+          p["domain"],
+          p["cadence"] ?? null,
+          p["exemption_scope"] ?? null,
+          p["rationale"] ?? null,
+          p["metadata"] ? JSON.stringify(p["metadata"]) : null,
+          p["id"],
+          expectedUpdatedAt,
+          p["sensitivity"],
+        ).changes;
+    if (type === "assertion")
+      return this.db
+        .prepare(
+          "UPDATE assertions SET updated_at = ?, last_verified = ?, volatility = ?, activation = ?, claim = ?, evidence_type = ?, type = ?, status = ?, source = ?, valid_from = ?, valid_to = ?, metadata = ? WHERE id = ? AND updated_at = ? AND sensitivity = ?",
+        )
+        .run(
+          p["updated_at"],
+          p["last_verified"],
+          p["volatility"],
+          p["activation"],
+          p["claim"],
+          p["evidence_type"],
+          p["type"],
+          p["status"] ?? null,
+          p["source"] ?? null,
+          p["valid_from"] ?? null,
+          p["valid_to"] ?? null,
+          p["metadata"] ? JSON.stringify(p["metadata"]) : null,
+          p["id"],
+          expectedUpdatedAt,
+          p["sensitivity"],
+        ).changes;
+    if (type === "event")
+      return this.db
+        .prepare(
+          "UPDATE events SET updated_at = ?, last_verified = ?, volatility = ?, activation = ?, timestamp = ?, summary = ?, type = ?, impact_summary = ?, tags = ?, metadata = ? WHERE id = ? AND updated_at = ? AND sensitivity = ?",
+        )
+        .run(
+          p["updated_at"],
+          p["last_verified"],
+          p["volatility"],
+          p["activation"],
+          p["timestamp"],
+          p["summary"],
+          p["type"] ?? null,
+          p["impact_summary"] ?? null,
+          p["tags"] ? JSON.stringify(p["tags"]) : null,
+          p["metadata"] ? JSON.stringify(p["metadata"]) : null,
+          p["id"],
+          expectedUpdatedAt,
+          p["sensitivity"],
+        ).changes;
+    return this.db
+      .prepare(
+        "UPDATE relations SET updated_at = ?, last_verified = ?, volatility = ?, activation = ?, predicate = ?, valid_from = ?, valid_to = ?, weight = ?, metadata = ? WHERE id = ? AND updated_at = ? AND sensitivity = ? AND source_id = ? AND target_id = ?",
+      )
+      .run(
+        p["updated_at"],
+        p["last_verified"],
+        p["volatility"],
+        p["activation"],
+        p["predicate"],
+        p["valid_from"] ?? null,
+        p["valid_to"] ?? null,
+        p["weight"] ?? null,
+        p["metadata"] ? JSON.stringify(p["metadata"]) : null,
+        p["id"],
+        expectedUpdatedAt,
+        p["sensitivity"],
+        p["source_id"],
+        p["target_id"],
+      ).changes;
+  }
+
   public async insertPrimitive(
     primitive: AnyPrimitive,
     options?: { autorename?: boolean },
@@ -386,8 +799,6 @@ export class PAKBStorageRepository {
     else if (targetPrimitive.id.startsWith("ast_")) primType = "assertion";
     else if (targetPrimitive.id.startsWith("evt_")) primType = "event";
     else if (targetPrimitive.id.startsWith("rel_")) primType = "relation";
-
-    const newHash = calculateJCSHash(targetPrimitive);
 
     this.db.transaction(() => {
       this.db
@@ -515,157 +926,261 @@ export class PAKBStorageRepository {
           );
       }
 
-      const logId = `log_${ulid()}`;
-      this.db
-        .prepare(`
-        INSERT INTO audit_log (log_id, timestamp, primitive_id, operation_type, initiator, previous_jcs_hash, new_jcs_hash)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-      `)
-        .run(
-          logId,
-          new Date().toISOString().replace(/\.\d{3}Z$/, "Z"),
-          targetPrimitive.id,
-          "CREATE",
-          "human_user",
-          null,
-          newHash,
-        );
+      this.appendAuditRecordSync(targetPrimitive, "CREATE", "human_user");
     })();
   }
 
+  public async getProposalRecord(proposalId: string): Promise<StorageProposalRecord | null> {
+    const row = this.db
+      .prepare("SELECT * FROM memory_proposals WHERE proposal_id = ?")
+      .get(proposalId) as Record<string, unknown> | undefined;
+    return row ? this.toProposalRecord(row) : null;
+  }
+
+  public async getPendingProposals(): Promise<readonly StorageProposalRecord[]> {
+    const rows = this.db
+      .prepare("SELECT * FROM memory_proposals WHERE status = 'pending' ORDER BY created_at DESC")
+      .all() as Array<Record<string, unknown>>;
+    return rows.map((row) => this.toProposalRecord(row));
+  }
+
+  public async getAuditHistory(): Promise<readonly StorageAuditRecord[]> {
+    const rows = this.db
+      .prepare(
+        "SELECT * FROM audit_log ORDER BY chain_version DESC, chain_sequence DESC, timestamp DESC",
+      )
+      .all() as Array<Record<string, unknown>>;
+    return rows.map((row) => this.toAuditRecord(row));
+  }
+
+  private toProposalRecord(row: Record<string, unknown>): StorageProposalRecord {
+    return {
+      proposal_id: String(row["proposal_id"]),
+      candidate_primitive_json: String(row["candidate_primitive_json"]),
+      decision_type: String(row["decision_type"]) as StorageProposalRecord["decision_type"],
+      target_primitive_id: row["target_primitive_id"]
+        ? String(row["target_primitive_id"])
+        : undefined,
+      expected_updated_at: row["expected_updated_at"]
+        ? String(row["expected_updated_at"])
+        : undefined,
+      confidence_score: Number(row["confidence_score"]),
+      status: String(row["status"]) as StorageProposalRecord["status"],
+      reasoning: String(row["reasoning"] ?? ""),
+      created_at: String(row["created_at"]),
+    };
+  }
+
+  private toAuditRecord(row: Record<string, unknown>): StorageAuditRecord {
+    return {
+      log_id: String(row["log_id"]),
+      timestamp: String(row["timestamp"]),
+      primitive_id: String(row["primitive_id"]),
+      operation_type: String(row["operation_type"]),
+      initiator: String(row["initiator"]),
+      primitive_jcs_hash: String(row["primitive_jcs_hash"] ?? ""),
+      previous_jcs_hash: String(row["previous_jcs_hash"] ?? ""),
+      new_jcs_hash: String(row["new_jcs_hash"]),
+      chain_version: Number(row["chain_version"] ?? 0),
+      chain_sequence: Number(row["chain_sequence"] ?? 0),
+    };
+  }
+
+  private saveProposalRecordSync(record: StorageProposalRecord): void {
+    this.db
+      .prepare(`
+      INSERT INTO memory_proposals (proposal_id, candidate_primitive_json, decision_type, target_primitive_id, expected_updated_at, confidence_score, status, reasoning, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(proposal_id) DO UPDATE SET
+        target_primitive_id = excluded.target_primitive_id,
+        expected_updated_at = excluded.expected_updated_at,
+        confidence_score = excluded.confidence_score,
+        status = excluded.status,
+        reasoning = excluded.reasoning
+    `)
+      .run(
+        record.proposal_id,
+        record.candidate_primitive_json,
+        record.decision_type,
+        record.target_primitive_id ?? null,
+        record.expected_updated_at ?? null,
+        record.confidence_score,
+        record.status,
+        record.reasoning,
+        record.created_at,
+      );
+  }
+
+  private appendAuditRecordSync(
+    primitive: AnyPrimitive,
+    operationType: string,
+    initiator: string,
+  ): StorageAuditRecord {
+    const latest = this.db
+      .prepare(
+        "SELECT * FROM audit_log WHERE chain_version = 1 ORDER BY chain_sequence DESC LIMIT 1",
+      )
+      .get() as Record<string, unknown> | undefined;
+    const chainSequence = Number(latest?.["chain_sequence"] ?? 0) + 1;
+    const previousJcsHash = latest ? String(latest["new_jcs_hash"]) : "0".repeat(64);
+    const logId = `log_${ulid().toUpperCase()}`;
+    const timestamp = new Date().toISOString().replace(/\.\d{3}Z$/, "Z");
+    const primitiveJcsHash = calculateJCSHash(primitive);
+    const payload = {
+      chain_version: 1,
+      chain_sequence: chainSequence,
+      previous_jcs_hash: previousJcsHash,
+      log_id: logId,
+      timestamp,
+      primitive_id: primitive.id,
+      operation_type: operationType,
+      initiator,
+      primitive_jcs_hash: primitiveJcsHash,
+    };
+    const newJcsHash = calculateJCSHash(payload);
+    this.db
+      .prepare(
+        "INSERT INTO audit_log (log_id, timestamp, primitive_id, operation_type, initiator, primitive_jcs_hash, previous_jcs_hash, new_jcs_hash, chain_version, chain_sequence) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, ?)",
+      )
+      .run(
+        logId,
+        timestamp,
+        primitive.id,
+        operationType,
+        initiator,
+        primitiveJcsHash,
+        previousJcsHash,
+        newJcsHash,
+        chainSequence,
+      );
+    return {
+      log_id: logId,
+      timestamp,
+      primitive_id: primitive.id,
+      operation_type: operationType,
+      initiator,
+      primitive_jcs_hash: primitiveJcsHash,
+      previous_jcs_hash: previousJcsHash,
+      new_jcs_hash: newJcsHash,
+      chain_version: 1,
+      chain_sequence: chainSequence,
+    };
+  }
+
+  public executeAtomicMutationTransaction(input: StorageMutationInput): StorageMutationResult {
+    const transaction = this.db.transaction(() => {
+      let persisted: AnyPrimitive;
+      if (input.type === "CREATE") {
+        if (this.getPrimitiveSync(input.candidate_primitive.id)) {
+          throw new IDCollisionError(
+            `ID collision for primitive '${input.candidate_primitive.id}'.`,
+          );
+        }
+        persisted = input.candidate_primitive;
+        this.insertPrimitiveRows(persisted);
+      } else {
+        if (!input.target_primitive_id || !input.expected_updated_at) {
+          throw new Error(`${input.type} requires target_primitive_id and expected_updated_at.`);
+        }
+        const target = this.getPrimitiveSync(input.target_primitive_id);
+        if (!target) {
+          throw new PrimitiveNotFoundError(`Primitive '${input.target_primitive_id}' not found.`);
+        }
+        if (target.updated_at !== input.expected_updated_at) {
+          throw new ConcurrentModificationError(`OCC lock error for '${target.id}'.`);
+        }
+        persisted = this.constructMutation(target, input.candidate_primitive, input.type);
+        if (this.updatePrimitiveRows(persisted, input.expected_updated_at) !== 1) {
+          throw new ConcurrentModificationError(`OCC lock error for '${target.id}'.`);
+        }
+      }
+      this.saveProposalRecordSync(input.proposal);
+      const audit = this.appendAuditRecordSync(persisted, input.operation_type, input.initiator);
+      return {
+        persisted_primitive: persisted,
+        proposal_record: input.proposal,
+        audit_record: audit,
+      };
+    });
+    return transaction();
+  }
+
+  public saveProposalWithAudit(
+    proposal: StorageProposalRecord,
+    auditPrimitive: AnyPrimitive,
+    operationType: string,
+    initiator: string,
+  ): StorageAuditRecord {
+    const transaction = this.db.transaction(() => {
+      this.saveProposalRecordSync(proposal);
+      return this.appendAuditRecordSync(auditPrimitive, operationType, initiator);
+    });
+    return transaction();
+  }
+
+  public verifyAuditChain(): AuditChainVerification {
+    const rows = this.db
+      .prepare("SELECT * FROM audit_log WHERE chain_version = 1 ORDER BY chain_sequence ASC")
+      .all() as Array<Record<string, unknown>>;
+    let previousHash = "0".repeat(64);
+    let expectedSequence = 1;
+    for (const row of rows) {
+      const audit = this.toAuditRecord(row);
+      if (audit.chain_sequence !== expectedSequence || audit.previous_jcs_hash !== previousHash) {
+        return {
+          valid: false,
+          broken_at_log_id: audit.log_id,
+          reason: "sequence or previous hash mismatch",
+        };
+      }
+      const payload = {
+        chain_version: 1,
+        chain_sequence: audit.chain_sequence,
+        previous_jcs_hash: audit.previous_jcs_hash,
+        log_id: audit.log_id,
+        timestamp: audit.timestamp,
+        primitive_id: audit.primitive_id,
+        operation_type: audit.operation_type,
+        initiator: audit.initiator,
+        primitive_jcs_hash: audit.primitive_jcs_hash,
+      };
+      if (calculateJCSHash(payload) !== audit.new_jcs_hash) {
+        return { valid: false, broken_at_log_id: audit.log_id, reason: "hash mismatch" };
+      }
+      previousHash = audit.new_jcs_hash;
+      expectedSequence++;
+    }
+    return { valid: true };
+  }
+
   public async updatePrimitive(primitive: AnyPrimitive, expectedUpdatedAt: string): Promise<void> {
-    validateOrThrow(primitive);
-
-    this.db.transaction(() => {
-      const reg = this.db
-        .prepare("SELECT primitive_type FROM primitives_registry WHERE id = ?")
-        .get(primitive.id) as { primitive_type: string } | undefined;
-      if (!reg) {
-        throw new PrimitiveNotFoundError(
-          `Primitive '${primitive.id}' not found.`,
-          PAKBErrorCode.PRIMITIVE_NOT_FOUND_ERROR,
-          primitive.id,
-        );
-      }
-
-      let existingRow: Record<string, unknown> | undefined;
-      if (reg.primitive_type === "entity")
-        existingRow = this.db
-          .prepare("SELECT * FROM entities WHERE id = ?")
-          .get(primitive.id) as Record<string, unknown>;
-      else if (reg.primitive_type === "directive")
-        existingRow = this.db
-          .prepare("SELECT * FROM directives WHERE id = ?")
-          .get(primitive.id) as Record<string, unknown>;
-      else if (reg.primitive_type === "assertion")
-        existingRow = this.db
-          .prepare("SELECT * FROM assertions WHERE id = ?")
-          .get(primitive.id) as Record<string, unknown>;
-      else if (reg.primitive_type === "event")
-        existingRow = this.db
-          .prepare("SELECT * FROM events WHERE id = ?")
-          .get(primitive.id) as Record<string, unknown>;
-      else if (reg.primitive_type === "relation")
-        existingRow = this.db
-          .prepare("SELECT * FROM relations WHERE id = ?")
-          .get(primitive.id) as Record<string, unknown>;
-
-      if (!existingRow) {
-        throw new PrimitiveNotFoundError(
-          `Primitive '${primitive.id}' not found.`,
-          PAKBErrorCode.PRIMITIVE_NOT_FOUND_ERROR,
-          primitive.id,
-        );
-      }
-
-      // Immutability Check
-      if (
-        existingRow["id"] !== primitive.id ||
-        existingRow["created_at"] !== primitive.created_at ||
-        existingRow["schema_version"] !== primitive.schema_version
-      ) {
-        throw new ImmutableFieldViolationError(
-          `Immutable field violation on primitive '${primitive.id}'.`,
-          PAKBErrorCode.IMMUTABLE_FIELD_VIOLATION_ERROR,
-          primitive.id,
-        );
-      }
-
-      // Atomic OCC Check inside transaction
-      if (existingRow["updated_at"] !== expectedUpdatedAt) {
+    const target = this.getPrimitiveSync(primitive.id);
+    if (!target) {
+      throw new PrimitiveNotFoundError(
+        `Primitive '${primitive.id}' not found.`,
+        PAKBErrorCode.PRIMITIVE_NOT_FOUND_ERROR,
+        primitive.id,
+      );
+    }
+    if (target.updated_at !== expectedUpdatedAt) {
+      throw new ConcurrentModificationError(
+        `OCC lock error for '${primitive.id}': expected '${expectedUpdatedAt}' but found '${target.updated_at}'.`,
+        PAKBErrorCode.CONCURRENT_MODIFICATION_ERROR,
+        primitive.id,
+      );
+    }
+    const updated = this.constructMutation(target, primitive, "UPDATE");
+    const transaction = this.db.transaction(() => {
+      if (this.updatePrimitiveRows(updated, expectedUpdatedAt) !== 1) {
         throw new ConcurrentModificationError(
-          `OCC lock error for '${primitive.id}': expected '${expectedUpdatedAt}' but found '${existingRow["updated_at"]}'.`,
+          `OCC lock error for '${primitive.id}'.`,
           PAKBErrorCode.CONCURRENT_MODIFICATION_ERROR,
           primitive.id,
         );
       }
-
-      const prevHash = calculateJCSHash(existingRow as unknown as AnyPrimitive);
-      const newHash = calculateJCSHash(primitive);
-
-      if (reg.primitive_type === "entity") {
-        const p = primitive as unknown as Record<string, unknown>;
-        this.db
-          .prepare(`
-          UPDATE entities SET updated_at = ?, last_verified = ?, sensitivity = ?, volatility = ?, activation = ?, name = ?, type = ?, status = ?, locale_info = ?, description = ?, metadata = ?
-          WHERE id = ? AND updated_at = ?
-        `)
-          .run(
-            p["updated_at"],
-            p["last_verified"],
-            p["sensitivity"],
-            p["volatility"],
-            p["activation"],
-            p["name"],
-            p["type"],
-            p["status"] ?? null,
-            p["locale_info"] ? JSON.stringify(p["locale_info"]) : null,
-            p["description"] ?? null,
-            p["metadata"] ? JSON.stringify(p["metadata"]) : null,
-            p["id"],
-            expectedUpdatedAt,
-          );
-      } else if (reg.primitive_type === "directive") {
-        const p = primitive as unknown as Record<string, unknown>;
-        this.db
-          .prepare(`
-          UPDATE directives SET updated_at = ?, last_verified = ?, sensitivity = ?, volatility = ?, activation = ?, statement = ?, enforcement = ?, domain = ?, cadence = ?, exemption_scope = ?, rationale = ?, metadata = ?
-          WHERE id = ? AND updated_at = ?
-        `)
-          .run(
-            p["updated_at"],
-            p["last_verified"],
-            p["sensitivity"],
-            p["volatility"],
-            p["activation"],
-            p["statement"],
-            p["enforcement"],
-            p["domain"],
-            p["cadence"] ?? null,
-            p["exemption_scope"] ?? null,
-            p["rationale"] ?? null,
-            p["metadata"] ? JSON.stringify(p["metadata"]) : null,
-            p["id"],
-            expectedUpdatedAt,
-          );
-      }
-
-      const logId = `log_${ulid()}`;
-      this.db
-        .prepare(`
-        INSERT INTO audit_log (log_id, timestamp, primitive_id, operation_type, initiator, previous_jcs_hash, new_jcs_hash)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-      `)
-        .run(
-          logId,
-          new Date().toISOString().replace(/\.\d{3}Z$/, "Z"),
-          primitive.id,
-          "UPDATE",
-          "human_user",
-          prevHash,
-          newHash,
-        );
-    })();
+      this.appendAuditRecordSync(updated, "UPDATE", "human_user");
+    });
+    transaction();
   }
 
   public async archivePrimitive(id: string): Promise<void> {
@@ -1335,3 +1850,8 @@ export class PAKBStorageRepository {
     this.db.close();
   }
 }
+
+/**
+ * @deprecated Use AIETStorageRepository instead.
+ */
+export { AIETStorageRepository as PAKBStorageRepository };

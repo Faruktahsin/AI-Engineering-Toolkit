@@ -1,16 +1,21 @@
 import Database from "better-sqlite3";
 
-export interface PAKBStorageOptions {
+export interface AIETStorageOptions {
   readonly db_path: string;
   readonly read_only?: boolean;
   readonly busy_timeout_ms?: number;
 }
 
 /**
+ * @deprecated Use AIETStorageOptions instead.
+ */
+export type PAKBStorageOptions = AIETStorageOptions;
+
+/**
  * Creates and configures SQLite database connection enforcing mandatory PRAGMAs.
  * PAKB-SQLite-Storage-Architecture-v1.0.md §2.
  */
-export function createDatabaseConnection(options: PAKBStorageOptions): Database.Database {
+export function createDatabaseConnection(options: AIETStorageOptions): Database.Database {
   const db = new Database(options.db_path, {
     readonly: options.read_only ?? false,
   });

@@ -256,6 +256,41 @@ describe("PAKB Storage Package (@aiet/storage Integration Tests)", () => {
     });
   });
 
+  describe("5.1. Versioned audit chain", () => {
+    it("should record CREATE and UPDATE as a verifiable immutable chain", async () => {
+      const entity = {
+        schema_version: "1.0.0",
+        id: generateULID("entity"),
+        created_at: "2026-08-05T12:00:00Z",
+        updated_at: "2026-08-05T12:00:00Z",
+        last_verified: "2026-08-05T12:00:00Z",
+        sensitivity: SensitivityTier.INTERNAL,
+        volatility: VolatilityRating.LOW,
+        activation: ActivationClass.ON_DEMAND,
+        name: "Audited entity",
+        type: EntityType.WORKSTREAM,
+      };
+
+      await repo.insertPrimitive(entity);
+      await repo.updatePrimitive({ ...entity, name: "Updated audited entity" }, entity.updated_at);
+
+      const audit = await repo.getAuditHistory();
+      expect(audit).toHaveLength(2);
+      expect(audit[0]).toMatchObject({
+        operation_type: "UPDATE",
+        chain_version: 1,
+        chain_sequence: 2,
+      });
+      expect(audit[1]).toMatchObject({
+        operation_type: "CREATE",
+        chain_version: 1,
+        chain_sequence: 1,
+      });
+      expect(audit[0]?.previous_jcs_hash).toBe(audit[1]?.new_jcs_hash);
+      expect(repo.verifyAuditChain()).toEqual({ valid: true });
+    });
+  });
+
   describe("6. FTS5 Search & Graph Traversal", () => {
     it("should search primitives via FTS5 and filter out restricted items", async () => {
       const assertion = {
