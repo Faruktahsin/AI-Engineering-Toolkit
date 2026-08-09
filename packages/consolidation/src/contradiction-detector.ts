@@ -137,7 +137,7 @@ export class ContradictionDetector {
   }
 
   private parsePreference(text: string): PreferenceStatement | null {
-    const normalizedText = this.normalizeScope(text).replace(/[.!?]+$/, "");
+    const normalizedText = this.stripTerminalPunctuation(this.normalizeScope(text));
     const marker = this.findPreferenceMarker(normalizedText);
     if (!marker) return null;
 
@@ -166,6 +166,14 @@ export class ContradictionDetector {
     }
 
     return null;
+  }
+
+  private stripTerminalPunctuation(text: string): string {
+    let end = text.length;
+
+    while (end > 0 && ".!?".includes(text[end - 1] ?? "")) end--;
+
+    return text.slice(0, end);
   }
 
   private hasSharedPreferenceScope(
