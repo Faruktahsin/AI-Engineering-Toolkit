@@ -134,11 +134,11 @@ describe("P1.3 Consolidation Generalization & Contradiction Benchmark", () => {
     // Evaluate Supported Rule Controls
     const controls = evaluateSubset("Supported Rule Controls", dataset.supported_rule_controls);
 
-    // Assert durable baseline for supported rules
-    expect(controls.total).toBeGreaterThanOrEqual(5);
-    expect(controls.tp).toBeGreaterThan(0); // Must demonstrate non-zero TP capability
-    expect(controls.fp).toBe(0); // Must maintain 100% precision
-    expect(controls.fn).toBe(0); // For perfectly matched known rules, recall should be perfect
+    // Assert exact durable baseline for supported rules
+    expect(controls.total).toBe(5);
+    expect(controls.tp).toBe(3);
+    expect(controls.fp).toBe(0);
+    expect(controls.fn).toBe(0);
     expect(controls.tn).toBe(2);
 
     // Evaluate Generalization Challenges
@@ -147,10 +147,10 @@ describe("P1.3 Consolidation Generalization & Contradiction Benchmark", () => {
       dataset.generalization_challenges,
     );
 
-    // Assert durable baseline for future algorithm improvements
+    // Assert exact durable baseline for future algorithm improvements
     expect(challenges.total).toBe(36);
-    expect(challenges.fp).toBe(0); // Zero unvetted mutations on realistic data
-    // Currently recall on natural language challenges is very low; explicitly document this baseline
+    expect(challenges.tp).toBe(0);
+    expect(challenges.fp).toBe(0);
     expect(challenges.fn).toBe(20);
     expect(challenges.tn).toBe(16);
   });
