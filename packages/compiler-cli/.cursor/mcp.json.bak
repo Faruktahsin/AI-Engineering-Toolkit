@@ -1,8 +1,0 @@
-{
-  "mcpServers": {
-    "aiet-memory": {
-      "command": "npx",
-      "args": ["-y", "@aiet/mcp-server"]
-    }
-  }
-}
