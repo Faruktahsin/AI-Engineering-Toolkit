@@ -21,8 +21,8 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@aiet/compiler": "workspace:*",
     "@aiet/cli": "workspace:*",
+    "@aiet/compiler": "workspace:*",
     "@aiet/consolidation": "workspace:*",
     "@aiet/core": "workspace:*",
     "@aiet/domain": "workspace:*",
@@ -35,6 +35,6 @@
     "tsup": "^8.2.4",
     "tsx": "^4.19.0",
     "typescript": "^5.5.4",
-    "vitest": "^2.0.5"
+    "vitest": "^4.1.10"
   }
 }

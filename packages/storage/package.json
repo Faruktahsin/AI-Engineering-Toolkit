@@ -25,7 +25,7 @@
     "@aiet/schema": "workspace:*",
     "better-sqlite3": "^11.1.2",
     "canonicalize": "^2.0.0",
-    "drizzle-orm": "^0.32.1",
+    "drizzle-orm": "^0.45.2",
     "ulid": "^2.3.0"
   },
   "devDependencies": {
@@ -33,6 +33,6 @@
     "@types/node": "^22.0.0",
     "tsup": "^8.2.4",
     "typescript": "^5.5.4",
-    "vitest": "^2.0.5"
+    "vitest": "^4.1.10"
   }
 }
