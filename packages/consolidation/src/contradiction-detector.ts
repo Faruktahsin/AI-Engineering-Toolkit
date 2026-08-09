@@ -137,20 +137,35 @@ export class ContradictionDetector {
   }
 
   private parsePreference(text: string): PreferenceStatement | null {
-    const match = text.match(
-      /^\s*([a-z0-9 _#-]+?)\s+(?:prefers?|preference for|favorite)\s+(.+?)[.!?]?\s*$/i,
-    );
+    const normalizedText = this.normalizeScope(text).replace(/[.!?]+$/, "");
+    const marker = this.findPreferenceMarker(normalizedText);
+    if (!marker) return null;
 
-    if (!match?.[1] || !match[2]) return null;
+    const subject = normalizedText.slice(0, marker.index).trim();
+    const remainder = normalizedText.slice(marker.index + marker.value.length).trim();
+    if (!subject || !remainder) return null;
 
-    const [value, context] = match[2].split(/\s+for\s+/i, 2);
-    if (!value) return null;
+    const contextIndex = remainder.indexOf(" for ");
+    const value = contextIndex === -1 ? remainder : remainder.slice(0, contextIndex);
+    const context = contextIndex === -1 ? null : remainder.slice(contextIndex + " for ".length);
+    if (!value || (contextIndex !== -1 && !context)) return null;
 
     return {
-      subject: this.normalizeScope(match[1]),
+      subject,
       value: this.normalizeScope(value),
       context: context ? this.normalizeScope(context) : null,
     };
+  }
+
+  private findPreferenceMarker(text: string): { index: number; value: string } | null {
+    const markers = [" preference for ", " prefers ", " prefer ", " favorite "];
+
+    for (const marker of markers) {
+      const index = text.indexOf(marker);
+      if (index > 0) return { index, value: marker };
+    }
+
+    return null;
   }
 
   private hasSharedPreferenceScope(
@@ -163,7 +178,11 @@ export class ContradictionDetector {
 
     const domain1 = "domain" in p1 && typeof p1.domain === "string" ? p1.domain : null;
     const domain2 = "domain" in p2 && typeof p2.domain === "string" ? p2.domain : null;
-    return domain1 !== null && domain1 === domain2;
+    if (domain1 !== null || domain2 !== null) return domain1 !== null && domain1 === domain2;
+
+    // Preferences without a narrower context are global preferences. Treat two such
+    // statements about the same subject as sharing the implicit global scope.
+    return preference1.context === null && preference2.context === null;
   }
 
   private normalizeScope(value: string): string {
