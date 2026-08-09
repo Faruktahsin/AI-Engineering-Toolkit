@@ -16,12 +16,15 @@ import { formatStatusReport, getSystemStatus } from "../src/status";
 
 describe("CLI Commands Product Layer Suite (Phase 6.2)", () => {
   let tempDir: string;
+  let originalCwd: string;
 
   beforeEach(() => {
     tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "aiet-cli-test-"));
+    originalCwd = process.cwd();
   });
 
   afterEach(() => {
+    process.chdir(originalCwd);
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 
@@ -60,6 +63,7 @@ describe("CLI Commands Product Layer Suite (Phase 6.2)", () => {
 
   describe("3. aiet connect <agent> Integration", () => {
     it("should auto-generate MCP configuration files for cursor and claude", () => {
+      process.chdir(tempDir);
       const cursorRes = connectAgent("cursor", { force: true });
       expect(cursorRes.success).toBe(true);
       expect(fs.existsSync(cursorRes.configPath)).toBe(true);
