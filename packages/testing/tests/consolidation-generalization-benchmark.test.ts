@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { ContradictionDetector } from "@aiet/consolidation";
-import type { AnyPrimitive, AssertionPrimitive, DirectivePrimitive } from "@aiet/schema";
+import type { AnyPrimitive, Assertion, Directive, Entity } from "@aiet/schema";
 import { describe, expect, it } from "vitest";
 
 interface Scenario {
@@ -44,36 +44,31 @@ function preparePrimitive(data: Record<string, unknown>): AnyPrimitive {
   if ("statement" in data) {
     return {
       ...base,
-      type: "directive" as const,
       statement: String(data.statement),
+      enforcement: "hard_rule",
       domain: "domain" in data ? String(data.domain) : "general",
-    } satisfies DirectivePrimitive;
+    } satisfies Directive;
   }
 
   if ("claim" in data) {
     return {
       ...base,
-      type: "assertion" as const,
       claim: String(data.claim),
-      confidence: 1.0,
-      evidence: [],
-    } satisfies AssertionPrimitive;
+      evidence_type: "user_provided",
+      type: "fact",
+    } satisfies Assertion;
   }
 
   if ("name" in data) {
     return {
       ...base,
-      type: "entity" as const,
       name: String(data.name),
-      summary: "summary" in data ? String(data.summary) : "",
-    } as unknown as AnyPrimitive;
+      type: "system",
+      description: "summary" in data ? String(data.summary) : "",
+    } satisfies Entity;
   }
 
-  // Fallback for generalization challenges
-  return {
-    ...base,
-    ...data,
-  } as unknown as AnyPrimitive;
+  throw new Error(`Unsupported fixture primitive structure: ${JSON.stringify(data)}`);
 }
 
 function evaluateSubset(name: string, scenarios: Scenario[]) {
