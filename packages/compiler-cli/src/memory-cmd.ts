@@ -73,7 +73,7 @@ export async function memoryImport(options?: {
   const files: string[] = [];
   function walkDir(dir: string) {
     if (!fs.existsSync(dir)) return;
-    const list = fs.readdirSync(dir);
+    const list = fs.readdirSync(dir).sort();
     for (const file of list) {
       const fileA = path.join(dir, file);
       const stat = fs.statSync(fileA);
