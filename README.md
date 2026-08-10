@@ -150,6 +150,14 @@ console.log(auditLog);
 
 ---
 
+## 💖 Support AIET
+
+If AIET is useful to you, consider sponsoring its open-source development through GitHub Sponsors.
+
+[Become a sponsor](https://github.com/sponsors/Faruktahsin)
+
+---
+
 ## 📄 License
 
 AIET is open-source software licensed under the [Apache-2.0 License](LICENSE).
