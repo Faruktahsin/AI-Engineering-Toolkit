@@ -127,7 +127,8 @@ describe("CLI Commands Product Layer Suite (Phase 6.2)", () => {
         dbPath,
       });
       expect(importDryOutput).toContain("(DRY RUN)");
-      expect(importDryOutput).toContain("Valid/Imported:    3"); // system, rules, facts
+      expect(importDryOutput).toContain("Valid:                     3");
+      expect(importDryOutput).toContain("Would Import:              3");
 
       let report = await getSystemStatus({ dbPath });
       expect(report.totalPrimitives).toBe(0);
@@ -138,7 +139,8 @@ describe("CLI Commands Product Layer Suite (Phase 6.2)", () => {
         dryRun: false,
         dbPath,
       });
-      expect(importOutput).toContain("Valid/Imported:    3");
+      expect(importOutput).toContain("Valid:                     3");
+      expect(importOutput).toContain("Imported:                  3");
 
       report = await getSystemStatus({ dbPath });
       expect(report.totalPrimitives).toBe(3);
@@ -149,8 +151,8 @@ describe("CLI Commands Product Layer Suite (Phase 6.2)", () => {
         dryRun: false,
         dbPath,
       });
-      expect(reImportOutput).toContain("Valid/Imported:    0");
-      expect(reImportOutput).toContain("Skipped:           3");
+      expect(reImportOutput).toContain("Imported:                  0");
+      expect(reImportOutput).toContain("Already Present / Skipped: 3");
 
       report = await getSystemStatus({ dbPath });
       expect(report.totalPrimitives).toBe(3); // unchanged
@@ -158,6 +160,54 @@ describe("CLI Commands Product Layer Suite (Phase 6.2)", () => {
       // Memory List (Populated)
       const populatedListOutput = await memoryList({ dbPath });
       expect(populatedListOutput).toContain("Memory Primitives (3 items");
+
+      // Invalid and Conflict Cases
+      const conflictDir = path.join(tempDir, "conflict_primitives");
+      fs.mkdirSync(conflictDir);
+
+      // 1. Conflict (same ID, different content)
+      fs.writeFileSync(
+        path.join(conflictDir, "ent_system.json"),
+        JSON.stringify({
+          id: "ent_01H00000000000000000000001", // Existing ID
+          schema_version: "1.0.0",
+          type: "organization",
+          name: "Different System",
+          description: "Conflicting content",
+          sensitivity: "public",
+          volatility: "low",
+          activation: "always_on",
+          created_at: "2026-01-01T00:00:00Z",
+          updated_at: "2026-01-01T00:00:00Z",
+          last_verified: "2026-01-01T00:00:00Z",
+        }),
+      );
+
+      // 2. Invalid JSON
+      fs.writeFileSync(path.join(conflictDir, "bad.json"), "{ bad: json ");
+
+      // 3. Schema invalid
+      fs.writeFileSync(
+        path.join(conflictDir, "schema_bad.json"),
+        JSON.stringify({
+          id: "ent_02H00000000000000000000000",
+          name: "Missing fields",
+        }),
+      );
+
+      const conflictOutput = await memoryImport({
+        input: conflictDir,
+        dryRun: false,
+        dbPath,
+      });
+
+      expect(conflictOutput).toContain("Valid:                     1"); // Only the conflict one was valid JSON + schema
+      expect(conflictOutput).toContain("Imported:                  0");
+      expect(conflictOutput).toContain("Already Present / Skipped: 0");
+      expect(conflictOutput).toContain("Invalid:                   2");
+      expect(conflictOutput).toContain("Conflicts / Errors:        1");
+      expect(conflictOutput).toContain("[CONFLICT]");
+      expect(conflictOutput).toContain("[INVALID]");
 
       // Memory Search
       const searchOutput = await memorySearch("safety", { dbPath });

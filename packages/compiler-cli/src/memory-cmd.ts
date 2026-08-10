@@ -84,9 +84,11 @@ export async function memoryImport(options?: {
 
   try {
     walkDir(inputDir);
+    let valid = 0;
     let imported = 0;
     let skipped = 0;
     let invalid = 0;
+    let conflicts = 0;
     const errors: string[] = [];
 
     for (const file of files) {
@@ -94,6 +96,7 @@ export async function memoryImport(options?: {
         const content = fs.readFileSync(file, "utf8");
         const json = JSON.parse(content);
         const validated = validateOrThrow(json);
+        valid++;
 
         const existing = await repo.getPrimitive(validated.id);
         if (existing) {
@@ -103,6 +106,11 @@ export async function memoryImport(options?: {
             skipped++;
             continue;
           }
+          conflicts++;
+          errors.push(
+            `[CONFLICT] ${path.basename(file)}: primitive ID '${validated.id}' already exists with different content`,
+          );
+          continue;
         }
 
         if (!options?.dryRun) {
@@ -111,7 +119,7 @@ export async function memoryImport(options?: {
             imported++;
           } catch (e) {
             // Collision or DB error
-            invalid++;
+            conflicts++;
             errors.push(
               `[ERROR] ${path.basename(file)}: ${e instanceof Error ? e.message : String(e)}`,
             );
@@ -133,11 +141,15 @@ export async function memoryImport(options?: {
         ? "            Memory Import (DRY RUN)               "
         : "               Memory Import Result               ",
       "==================================================",
-      `Scanned Directory: ${inputDir}`,
-      `Files Found:       ${files.length}`,
-      `Valid/Imported:    ${imported}`,
-      `Skipped:           ${skipped}`,
-      `Invalid:           ${invalid}`,
+      `Scanned Directory:         ${inputDir}`,
+      `Files Found:               ${files.length}`,
+      `Valid:                     ${valid}`,
+      options?.dryRun
+        ? `Would Import:              ${imported}`
+        : `Imported:                  ${imported}`,
+      `Already Present / Skipped: ${skipped}`,
+      `Invalid:                   ${invalid}`,
+      `Conflicts / Errors:        ${conflicts}`,
       "--------------------------------------------------",
     ];
 
