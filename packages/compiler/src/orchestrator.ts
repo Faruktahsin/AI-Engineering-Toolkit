@@ -33,7 +33,7 @@ export class BuildOrchestrator {
     // 2. Incremental Build Detection
     if (priorManifest && priorManifest.source_aggregate_hash === fingerprint.aggregate_hash) {
       const currentTier0Budget = options?.max_tier0_budget ?? 500;
-      const priorTier0Budget = priorManifest.tier0_budget;
+      const priorTier0Budget = priorManifest.selection_budget;
       const currentCompilerVersion = options?.compiler_version ?? "1.0.0";
       const priorCompilerVersion = priorManifest.compiler_version;
 

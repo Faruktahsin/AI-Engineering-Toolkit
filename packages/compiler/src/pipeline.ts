@@ -240,10 +240,13 @@ export class CompilerPipeline {
           context.options.max_tier0_budget ?? 500,
         );
       case PipelineStage.EMIT: {
-        // Compute canonical hash of the fit result for the manifest
-        const hash = computeInputFingerprint(primitives).aggregate_hash;
+        // Compute canonical hash of the primitives array for the manifest
+        const sortedPrimitives = [...(primitives as readonly AnyPrimitive[])].sort((a, b) =>
+          a.id.localeCompare(b.id),
+        );
+        const hash = computeInputFingerprint(sortedPrimitives).aggregate_hash;
         return this.emitStage(
-          primitives as BudgetFitResult,
+          primitives as BudgetFitResult, // Note: runStage signature uses primitives param for all input types
           context.options.compiler_version ?? "1.0.0",
           hash,
         );
@@ -345,6 +348,10 @@ export class CompilerPipeline {
     current = this.runStage(PipelineStage.NORMALIZE, current, context) as readonly AnyPrimitive[];
     stageResults.NORMALIZE = current.length;
 
+    // Compute canonical source aggregate hash from normalized primitives in deterministic order
+    const sortedForHash = [...current].sort((a, b) => a.id.localeCompare(b.id));
+    const sourceAggregateHash = computeInputFingerprint(sortedForHash).aggregate_hash;
+
     // Stage 5: FILTER
     current = this.runStage(PipelineStage.FILTER, current, context) as readonly AnyPrimitive[];
     stageResults.FILTER = current.length;
@@ -358,8 +365,6 @@ export class CompilerPipeline {
     stageResults.FIT = fitResult.tier0.length;
 
     // Stage 8: EMIT
-    // Use canonical hash of fitResult (or the primitives) for the source hash
-    const sourceAggregateHash = computeInputFingerprint(fitResult).aggregate_hash;
     const emittedArtifacts = this.emitStage(
       fitResult,
       context.options.compiler_version ?? "1.0.0",

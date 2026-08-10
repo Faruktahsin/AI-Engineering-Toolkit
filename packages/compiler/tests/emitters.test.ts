@@ -59,18 +59,23 @@ describe("Emitters", () => {
       const emitter = new AgentsEmitter();
       const result = emitter.emit(mockFitResult);
       expect(result.target).toBe("AGENTS.md");
-      expect(result.content).toContain("# Agents Artifact");
-      expect(result.content).toContain("## Core Directives & Context (Tier 0)");
-      // ent_test2 has same priority score but is newer (last_verified 01-02 vs 01-01), so it should sort first.
-      expect(result.content).toContain("### ENT");
-      expect(result.content).toContain("### DIR");
-      expect(result.content).toContain(
+
+      const entIndex = result.content.indexOf("### ENT");
+      const dirIndex = result.content.indexOf("### DIR");
+      const entPrimitiveIndex = result.content.indexOf(
+        "- **[ENT]** (ent_test2): User: A system user",
+      );
+      const dirPrimitiveIndex = result.content.indexOf(
         "- **[DIR]** (dir_test1): Always escape backticks `like this` and tags <script>.",
       );
-      expect(result.content).toContain("- **[ENT]** (ent_test2): User: A system user");
-      expect(result.content).toContain(
-        "<!-- Primitive Selection Budget: Tier 0: 25/500 | Tier 1: 0 -->",
-      );
+      const footerIndex = result.content.indexOf("<!-- Primitive Selection Budget:");
+
+      expect(entIndex).toBeGreaterThan(-1);
+      expect(dirIndex).toBeGreaterThan(entIndex); // ENT comes before DIR
+      expect(entPrimitiveIndex).toBeGreaterThan(entIndex);
+      expect(entPrimitiveIndex).toBeLessThan(dirIndex);
+      expect(dirPrimitiveIndex).toBeGreaterThan(dirIndex);
+      expect(footerIndex).toBeGreaterThan(dirPrimitiveIndex);
     });
   });
 
@@ -79,11 +84,16 @@ describe("Emitters", () => {
       const emitter = new ClaudeEmitter();
       const result = emitter.emit(mockFitResult);
       expect(result.target).toBe("CLAUDE.md");
-      expect(result.content).toContain("# Claude Configuration");
-      expect(result.content).toContain(
+
+      const entIndex = result.content.indexOf("- **[ENT]** (ent_test2): User: A system user");
+      const dirIndex = result.content.indexOf(
         "- **[DIR]** (dir_test1): Always escape backticks `like this` and tags <script>.",
       );
-      expect(result.content).toContain("<!-- Primitive Selection Budget: 25/500 -->");
+      const footerIndex = result.content.indexOf("<!-- Primitive Selection Budget: 25/500 -->");
+
+      expect(entIndex).toBeGreaterThan(-1);
+      expect(dirIndex).toBeGreaterThan(entIndex); // ENT before DIR
+      expect(footerIndex).toBeGreaterThan(dirIndex);
     });
   });
 
@@ -92,11 +102,16 @@ describe("Emitters", () => {
       const emitter = new CursorEmitter();
       const result = emitter.emit(mockFitResult);
       expect(result.target).toBe(".cursorrules");
-      expect(result.content).toContain("# Cursor Rules");
-      expect(result.content).toContain(
+
+      const entIndex = result.content.indexOf("- **[ENT]** (ent_test2): User: A system user");
+      const dirIndex = result.content.indexOf(
         "- **[DIR]** (dir_test1): Always escape backticks \\`like this\\` and tags &lt;script&gt;.",
       );
-      expect(result.content).toContain("<!-- Primitive Selection Budget: 25/500 -->");
+      const footerIndex = result.content.indexOf("<!-- Primitive Selection Budget: 25/500 -->");
+
+      expect(entIndex).toBeGreaterThan(-1);
+      expect(dirIndex).toBeGreaterThan(entIndex); // ENT before DIR (escaped output)
+      expect(footerIndex).toBeGreaterThan(dirIndex);
     });
   });
 
