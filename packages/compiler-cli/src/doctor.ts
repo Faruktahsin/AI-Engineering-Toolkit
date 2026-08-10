@@ -22,10 +22,10 @@ export async function runDiagnostics(): Promise<DoctorReport> {
   messages.push("1. Environment Checks");
   const nodeVersion = process.version;
   const major = Number.parseInt(nodeVersion.replace("v", "").split(".")[0] || "0", 10);
-  if (major >= 18) {
+  if (major >= 22) {
     messages.push(`   ✓ Node.js Version: ${nodeVersion} (Supported)`);
   } else {
-    messages.push(`   ✗ Node.js Version: ${nodeVersion} (Unsupported, please upgrade to v18+)`);
+    messages.push(`   ✗ Node.js Version: ${nodeVersion} (Unsupported, please upgrade to v22+)`);
     isHealthy = false;
   }
 

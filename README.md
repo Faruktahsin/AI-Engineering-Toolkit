@@ -91,7 +91,7 @@ npm install @aiet/core
 npm install -g @aiet/cli
 ```
 
-### 2. Initialize Workspace & Connect MCP
+### 2. Initialize Workspace
 
 ```bash
 # Initialize AIET workspace (creates sample JSON source files)

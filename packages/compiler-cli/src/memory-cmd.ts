@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { type AnyPrimitive, validateOrThrow } from "@aiet/domain";
+import { validateOrThrow } from "@aiet/domain";
 import { GovernanceManager } from "@aiet/governance";
 import { PAKBStorageRepository } from "@aiet/storage";
 
@@ -93,17 +93,27 @@ export async function memoryImport(options?: {
       try {
         const content = fs.readFileSync(file, "utf8");
         const json = JSON.parse(content);
-        validateOrThrow(json);
+        const validated = validateOrThrow(json);
+
+        const existing = await repo.getPrimitive(validated.id);
+        if (existing) {
+          const existingHash = repo.calculateJCSHash(existing);
+          const incomingHash = repo.calculateJCSHash(validated);
+          if (existingHash === incomingHash) {
+            skipped++;
+            continue;
+          }
+        }
 
         if (!options?.dryRun) {
           try {
-            await repo.insertPrimitive(json as AnyPrimitive);
+            await repo.insertPrimitive(validated);
             imported++;
           } catch (e) {
             // Collision or DB error
-            skipped++;
+            invalid++;
             errors.push(
-              `[SKIP] ${path.basename(file)}: ${e instanceof Error ? e.message : String(e)}`,
+              `[ERROR] ${path.basename(file)}: ${e instanceof Error ? e.message : String(e)}`,
             );
           }
         } else {

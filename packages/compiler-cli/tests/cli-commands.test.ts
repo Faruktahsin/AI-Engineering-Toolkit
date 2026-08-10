@@ -83,6 +83,19 @@ describe("CLI Commands Product Layer Suite (Phase 6.2)", () => {
       expect(output).toContain("MCP Config:");
       expect(output).not.toContain("AIET System Status"); // verify it is distinct
     });
+
+    it("should reject Node versions below v22", async () => {
+      const originalVersion = process.version;
+      try {
+        Object.defineProperty(process, "version", { value: "v21.9.9", configurable: true });
+        const report = await runDiagnostics();
+        const output = report.messages.join("\n");
+        expect(output).toContain("Unsupported, please upgrade to v22+");
+        expect(report.isHealthy).toBe(false);
+      } finally {
+        Object.defineProperty(process, "version", { value: originalVersion, configurable: true });
+      }
+    });
   });
 
   describe("3. aiet connect <agent> Integration", () => {
@@ -136,8 +149,8 @@ describe("CLI Commands Product Layer Suite (Phase 6.2)", () => {
         dryRun: false,
         dbPath,
       });
-      expect(reImportOutput).toContain("Valid/Imported:    3");
-      expect(reImportOutput).toContain("Skipped:           0");
+      expect(reImportOutput).toContain("Valid/Imported:    0");
+      expect(reImportOutput).toContain("Skipped:           3");
 
       report = await getSystemStatus({ dbPath });
       expect(report.totalPrimitives).toBe(3); // unchanged
