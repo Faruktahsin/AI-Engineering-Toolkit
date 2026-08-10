@@ -178,7 +178,7 @@ export class CompilerPipeline {
    */
   public emitStage(
     fitResult: BudgetFitResult,
-    _compilerVersion = "1.0.0",
+    compilerVersion = "1.0.0",
   ): Record<string, EmitterResult> {
     const agentsEmitter = new AgentsEmitter();
     const claudeEmitter = new ClaudeEmitter();
@@ -188,16 +188,22 @@ export class CompilerPipeline {
     const agentsResult = agentsEmitter.emit(fitResult);
     const claudeResult = claudeEmitter.emit(fitResult);
     const cursorResult = cursorEmitter.emit(fitResult);
-    const manifestResult = manifestEmitter.emit(fitResult);
-
-    const emitted: Record<string, EmitterResult> = {
+    const partialArtifacts = {
       [agentsResult.target]: agentsResult,
       [claudeResult.target]: claudeResult,
       [cursorResult.target]: cursorResult,
-      [manifestResult.target]: manifestResult,
     };
 
-    return Object.freeze(emitted);
+    const manifestResult = manifestEmitter.emit(
+      fitResult,
+      compilerVersion,
+      partialArtifacts as Record<string, EmitterResult>,
+    );
+
+    // Add the manifest result to the final emitted artifacts
+    partialArtifacts[manifestResult.target as keyof typeof partialArtifacts] = manifestResult;
+
+    return Object.freeze(partialArtifacts);
   }
 
   /**

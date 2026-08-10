@@ -1,12 +1,26 @@
-export class ClaudeEmitter {
-  emit(_input: unknown) {
-    const content = "# Claude\n\nGenerated deterministic Claude artifact.\n";
-    return {
-      target: "CLAUDE.md",
-      content,
-      bytes: Buffer.byteLength(content, "utf8"),
-      sha256: "",
-      line_count: content.split("\n").length,
-    };
+import type { BudgetFitResult } from "../budget";
+import type { EmitterResult, IEmitter } from "../emitter";
+import { createEmitterResult, formatPrimitiveForMarkdown, sortPrimitives } from "./utils";
+
+export class ClaudeEmitter implements IEmitter {
+  readonly target = "CLAUDE.md";
+
+  emit(fitResult: BudgetFitResult): EmitterResult {
+    let content = "# Claude Configuration\n\n";
+
+    if (fitResult.tier0.length === 0) {
+      content += "No active directives or context.\n";
+    } else {
+      content += "## System Instructions\n\n";
+      const sorted = sortPrimitives(fitResult.tier0);
+      for (const p of sorted) {
+        content += `${formatPrimitiveForMarkdown(p, false)}\n`;
+      }
+    }
+
+    // Add Token Budget footer
+    content += `\n---\n<!-- AIET Budget: ${fitResult.tier0_tokens}/${fitResult.budget} -->\n`;
+
+    return createEmitterResult(this.target, content);
   }
 }
