@@ -1,6 +1,6 @@
 import type { AnyPrimitive } from "@aiet/schema";
 import { type DeterministicBuildManifest, generateDeterministicManifest } from "./build-manifest";
-import { computeInputFingerprint } from "./fingerprint";
+
 import { CompilerPipeline, type PipelineOptions } from "./pipeline";
 import { verifyArtifactsOrThrow } from "./verifier";
 
@@ -27,11 +27,11 @@ export class BuildOrchestrator {
     options?: PipelineOptions,
     priorManifest?: DeterministicBuildManifest | null,
   ): BuildOrchestrationResult {
-    // 1. Compute Input Fingerprint
-    const fingerprint = computeInputFingerprint(primitives);
+    // 1. Compute Input Fingerprint (Canonical normalized hash)
+    const sourceAggregateHash = this.pipeline.computeSourceHash(primitives, options);
 
     // 2. Incremental Build Detection
-    if (priorManifest && priorManifest.source_aggregate_hash === fingerprint.aggregate_hash) {
+    if (priorManifest && priorManifest.source_aggregate_hash === sourceAggregateHash) {
       const currentTier0Budget = options?.max_tier0_budget ?? 500;
       const priorTier0Budget = priorManifest.selection_budget;
       const currentCompilerVersion = options?.compiler_version ?? "1.0.0";
@@ -56,7 +56,7 @@ export class BuildOrchestrator {
     const manifest = generateDeterministicManifest(
       pipelineResult.fit_result,
       pipelineResult.emitted_artifacts,
-      fingerprint.aggregate_hash,
+      sourceAggregateHash,
       options?.compiler_version ?? "1.0.0",
     );
 

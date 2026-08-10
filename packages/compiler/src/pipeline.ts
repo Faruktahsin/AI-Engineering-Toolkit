@@ -25,6 +25,14 @@ import { PIPELINE_STAGE_ORDER, PipelineStage } from "./stages";
 
 export type { PipelineOptions, PipelineResult };
 
+/**
+ * Computes canonical hash from an array of already normalized primitives.
+ */
+export function computeHashFromNormalized(normalizedPrimitives: readonly AnyPrimitive[]): string {
+  const sortedForHash = [...normalizedPrimitives].sort((a, b) => a.id.localeCompare(b.id));
+  return computeInputFingerprint(sortedForHash).aggregate_hash;
+}
+
 export class CompilerPipeline {
   /**
    * Executes Stage 1: INGEST
@@ -240,15 +248,14 @@ export class CompilerPipeline {
           context.options.max_tier0_budget ?? 500,
         );
       case PipelineStage.EMIT: {
-        // Compute canonical hash of the primitives array for the manifest
-        const sortedPrimitives = [...(primitives as readonly AnyPrimitive[])].sort((a, b) =>
-          a.id.localeCompare(b.id),
-        );
-        const hash = computeInputFingerprint(sortedPrimitives).aggregate_hash;
+        // Note: runStage signature uses primitives param for all input types.
+        // If runStage(EMIT) is invoked directly with a BudgetFitResult, we cannot safely re-compute
+        // the source aggregate hash here since the original normalized primitives are lost.
+        // We pass an empty string, expecting orchestrator/pipeline to call emitStage directly instead.
         return this.emitStage(
-          primitives as BudgetFitResult, // Note: runStage signature uses primitives param for all input types
+          primitives as BudgetFitResult,
           context.options.compiler_version ?? "1.0.0",
-          hash,
+          "",
         );
       }
       default: {
@@ -313,6 +320,15 @@ export class CompilerPipeline {
   }
 
   /**
+   * Computes the canonical source aggregate hash from raw primitives.
+   * Runs the pipeline sequentially up to the NORMALIZE stage to ensure correctness.
+   */
+  public computeSourceHash(primitives: readonly AnyPrimitive[], options?: PipelineOptions): string {
+    const { primitives: normalized } = this.runUntil(PipelineStage.NORMALIZE, primitives, options);
+    return computeHashFromNormalized(normalized as readonly AnyPrimitive[]);
+  }
+
+  /**
    * Runs the complete pipeline including INGEST ➔ SANITIZE ➔ VALIDATE ➔ NORMALIZE ➔ FILTER ➔ RANK ➔ FIT ➔ EMIT.
    */
   public run(primitives: readonly AnyPrimitive[], options?: PipelineOptions): PipelineResult {
@@ -348,9 +364,8 @@ export class CompilerPipeline {
     current = this.runStage(PipelineStage.NORMALIZE, current, context) as readonly AnyPrimitive[];
     stageResults.NORMALIZE = current.length;
 
-    // Compute canonical source aggregate hash from normalized primitives in deterministic order
-    const sortedForHash = [...current].sort((a, b) => a.id.localeCompare(b.id));
-    const sourceAggregateHash = computeInputFingerprint(sortedForHash).aggregate_hash;
+    // Compute canonical source aggregate hash from normalized primitives
+    const sourceAggregateHash = computeHashFromNormalized(current);
 
     // Stage 5: FILTER
     current = this.runStage(PipelineStage.FILTER, current, context) as readonly AnyPrimitive[];
