@@ -19,7 +19,7 @@ export class CursorEmitter implements IEmitter {
     }
 
     // Add Token Budget footer
-    content += `\n---\n<!-- AIET Budget: ${fitResult.tier0_tokens}/${fitResult.budget} -->\n`;
+    content += `<!-- Primitive Selection Budget: ${fitResult.tier0_tokens}/${fitResult.budget} -->\n`;
 
     return createEmitterResult(this.target, content);
   }

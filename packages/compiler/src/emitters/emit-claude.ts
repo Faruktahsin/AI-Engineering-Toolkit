@@ -18,8 +18,8 @@ export class ClaudeEmitter implements IEmitter {
       }
     }
 
-    // Add Token Budget footer
-    content += `\n---\n<!-- AIET Budget: ${fitResult.tier0_tokens}/${fitResult.budget} -->\n`;
+    // Add Primitive Selection Budget footer
+    content += `\n---\n<!-- Primitive Selection Budget: ${fitResult.tier0_tokens}/${fitResult.budget} -->\n`;
 
     return createEmitterResult(this.target, content);
   }

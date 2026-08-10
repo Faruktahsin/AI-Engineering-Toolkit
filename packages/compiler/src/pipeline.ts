@@ -15,6 +15,7 @@ import {
 import type { EmitterResult } from "./emitter";
 import { AgentsEmitter, ClaudeEmitter, CursorEmitter, ManifestEmitter } from "./emitters";
 import { filterPrimitives } from "./filter";
+import { computeInputFingerprint } from "./fingerprint";
 import { BudgetFitter } from "./fitting";
 import type { CompilationResult } from "./index";
 import { normalizePrimitive } from "./normalize";
@@ -179,6 +180,7 @@ export class CompilerPipeline {
   public emitStage(
     fitResult: BudgetFitResult,
     compilerVersion = "1.0.0",
+    sourceAggregateHash = "",
   ): Record<string, EmitterResult> {
     const agentsEmitter = new AgentsEmitter();
     const claudeEmitter = new ClaudeEmitter();
@@ -198,6 +200,7 @@ export class CompilerPipeline {
       fitResult,
       compilerVersion,
       partialArtifacts as Record<string, EmitterResult>,
+      sourceAggregateHash,
     );
 
     // Add the manifest result to the final emitted artifacts
@@ -236,11 +239,15 @@ export class CompilerPipeline {
           primitives as readonly RankedPrimitive[],
           context.options.max_tier0_budget ?? 500,
         );
-      case PipelineStage.EMIT:
+      case PipelineStage.EMIT: {
+        // Compute canonical hash of the fit result for the manifest
+        const hash = computeInputFingerprint(primitives).aggregate_hash;
         return this.emitStage(
           primitives as BudgetFitResult,
           context.options.compiler_version ?? "1.0.0",
+          hash,
         );
+      }
       default: {
         const _exhaustiveCheck: never = stage;
         throw new SchemaValidationError(
@@ -351,7 +358,13 @@ export class CompilerPipeline {
     stageResults.FIT = fitResult.tier0.length;
 
     // Stage 8: EMIT
-    const emittedArtifacts = this.emitStage(fitResult, context.options.compiler_version ?? "1.0.0");
+    // Use canonical hash of fitResult (or the primitives) for the source hash
+    const sourceAggregateHash = computeInputFingerprint(fitResult).aggregate_hash;
+    const emittedArtifacts = this.emitStage(
+      fitResult,
+      context.options.compiler_version ?? "1.0.0",
+      sourceAggregateHash,
+    );
     stageResults.EMIT = Object.keys(emittedArtifacts).length;
 
     const endTime = performance.now();

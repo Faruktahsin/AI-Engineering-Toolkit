@@ -43,8 +43,8 @@ export class AgentsEmitter implements IEmitter {
       }
     }
 
-    // Add Token Budget footer
-    content += `---\n<!-- Token Budget: Tier 0: ${fitResult.tier0_tokens}/${fitResult.budget} | Tier 1: ${fitResult.tier1_tokens} -->\n`;
+    // Add Primitive Selection Budget footer
+    content += `<!-- Primitive Selection Budget: Tier 0: ${fitResult.tier0_tokens}/${fitResult.budget} | Tier 1: ${fitResult.tier1_tokens} -->\n`;
 
     return createEmitterResult(this.target, content);
   }

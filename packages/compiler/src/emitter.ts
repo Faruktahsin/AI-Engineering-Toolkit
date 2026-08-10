@@ -14,5 +14,6 @@ export interface IEmitter {
     fitResult: BudgetFitResult,
     compilerVersion?: string,
     existingArtifacts?: Record<string, EmitterResult>,
+    sourceAggregateHash?: string,
   ): EmitterResult;
 }

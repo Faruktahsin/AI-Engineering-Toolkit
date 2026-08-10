@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 import type { EmitterResult } from "../emitter";
-import type { RankedPrimitive } from "../ranking";
+import { type RankedPrimitive, RankingEngine } from "../ranking";
 
 export function createEmitterResult(target: string, content: string): EmitterResult {
   const hash = crypto.createHash("sha256").update(content, "utf8").digest("hex");
@@ -54,11 +54,6 @@ export function groupPrimitives(
 }
 
 export function sortPrimitives(primitives: readonly RankedPrimitive[]): RankedPrimitive[] {
-  return [...primitives].sort((a, b) => {
-    // Sort by importance descending, then lexicographically by id
-    if (b.priority_score !== a.priority_score) {
-      return a.priority_score - b.priority_score;
-    }
-    return a.primitive.id.localeCompare(b.primitive.id);
-  });
+  const rankingEngine = new RankingEngine();
+  return rankingEngine.stableSort(primitives);
 }

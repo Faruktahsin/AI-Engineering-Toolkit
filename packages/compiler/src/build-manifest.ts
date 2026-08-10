@@ -17,8 +17,9 @@ export interface DeterministicBuildManifest {
   readonly tier0_primitive_ids: readonly string[];
   readonly tier1_primitive_ids: readonly string[];
   readonly overflow_primitive_ids: readonly string[];
-  readonly total_token_usage: number;
-  readonly tier0_budget: number;
+  readonly selection_tokens_tier0: number;
+  readonly selection_budget: number;
+  readonly _design_note: string;
   readonly source_aggregate_hash: string;
   readonly manifest_hash: string;
 }
@@ -59,8 +60,10 @@ export function generateDeterministicManifest(
     tier0_primitive_ids: tier0Ids,
     tier1_primitive_ids: tier1Ids,
     overflow_primitive_ids: overflowIds,
-    total_token_usage: fitResult.tier0_tokens,
-    tier0_budget: fitResult.budget,
+    selection_tokens_tier0: fitResult.tier0_tokens,
+    selection_budget: fitResult.budget,
+    _design_note:
+      "Token counts represent primitive selection budget, not strict serialized artifact sizes.",
     source_aggregate_hash: sourceAggregateHash,
   };
 
