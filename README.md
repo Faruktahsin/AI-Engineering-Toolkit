@@ -94,11 +94,23 @@ npm install -g @aiet/cli
 ### 2. Initialize Workspace & Connect MCP
 
 ```bash
-# Initialize AIET workspace
+# Initialize AIET workspace (creates sample JSON source files)
 aiet init
 
-# Check system diagnostics
+# Check system health and diagnostics
 aiet doctor
+
+# Compile context artifacts in dry-run mode
+aiet compile --dry-run
+
+# Preview memory ingestion from sample files
+aiet memory import --dry-run
+
+# Validate and ingest primitives into persistent memory
+aiet memory import
+
+# View runtime dashboard and storage status
+aiet status
 
 # Connect AIET MCP server to Claude Code or Cursor
 aiet connect claude

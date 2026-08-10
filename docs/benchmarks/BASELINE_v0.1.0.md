@@ -3,11 +3,11 @@
 ## 1. Environment Metadata & Benchmark Configuration
 
 - **Benchmark Infrastructure Version**: `0.1.0-alpha`
-- **AIET Commit SHA**: `20a1cf1`
+- **AIET Commit SHA**: `46e8bd8`
 - **Node.js Version**: `v22.23.2`
 - **pnpm Version**: `11.20.0`
 - **Platform / Architecture**: `darwin (arm64)`
-- **Benchmark Timestamp**: `2026-08-09T19:13:36.734Z`
+- **Benchmark Timestamp**: `2026-08-09T21:15:54.212Z`
 - **Dataset Version**: `1.1.0`
 - **Seeded Corpus Size**: `100` primitives
 - **Evaluated Query Count**: `13` ground-truth queries
@@ -23,9 +23,9 @@
 
 | Strategy | Model / Provider Info | Precision@1 | Precision@3 | Recall@3 | MRR | nDCG@3 | Mean Latency | p95 Latency | Quality Claim Valid? |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **BM25_Lexical** | SQLite FTS5 (Lexical Only) | `0.0769` | `0.0256` | `0.0769` | `0.0769` | `0.0769` | `0.096ms` | `0.329ms` | ✅ YES |
-| **Mock_Vector_Structural_Only** | Deterministic Seed Vector (Structural Mechanics Only) | `0` | `0` | `0` | `0` | `0` | `0.017ms` | `0.089ms` | ⚠️ NO (Structural Only) |
-| **Hybrid_RRF** | Reciprocal Rank Fusion (k=60) | `0.0769` | `0.0256` | `0.0769` | `0.0769` | `0.0769` | `0.071ms` | `0.191ms` | ✅ YES |
+| **BM25_Lexical** | SQLite FTS5 (Lexical Only) | `0.0769` | `0.0256` | `0.0769` | `0.0769` | `0.0769` | `0.073ms` | `0.201ms` | ✅ YES |
+| **Mock_Vector_Structural_Only** | Deterministic Seed Vector (Structural Mechanics Only) | `0` | `0` | `0` | `0` | `0` | `0.013ms` | `0.059ms` | ⚠️ NO (Structural Only) |
+| **Hybrid_RRF** | Reciprocal Rank Fusion (k=60) | `0.0769` | `0.0256` | `0.0769` | `0.0769` | `0.0769` | `0.068ms` | `0.183ms` | ✅ YES |
 
 ### B. Context Compiler Token Efficiency & Budget Matrix
 
@@ -42,8 +42,8 @@ Workload Stress Scale: **~6,500 raw input tokens** evaluated against 500, 1000, 
 
 | Test Scope | Executions | Identical SHA-256 Hashes | Match Rate (%) | Aggregate Output Fingerprint |
 | :--- | :---: | :---: | :---: | :--- |
-| **In-Process Sequential** | `25` | `25` | `100%` | `3ef08beb893cfb59be6772e452eabc3cfb527cc9d27d7e9c3cb90d1ba1570432` |
-| **Cross-Instance Isolated (In-Memory Pipeline)** | `10` | `10` | `100%` | `3ef08beb893cfb59be6772e452eabc3cfb527cc9d27d7e9c3cb90d1ba1570432` |
+| **In-Process Sequential** | `25` | `25` | `100%` | `31092aea3f409b54067d99979f397fa641d856d8704e89582deb21ebe39de2d9` |
+| **Cross-Instance Isolated (In-Memory Pipeline)** | `10` | `10` | `100%` | `31092aea3f409b54067d99979f397fa641d856d8704e89582deb21ebe39de2d9` |
 
 *Observed Determinism*: **100% observed reproducibility across 25 in-process and 10 cross-process executions under identical input state and compiler configuration.**
 

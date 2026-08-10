@@ -3,10 +3,12 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { connectAgent } from "../src/connect";
+import { runDiagnostics } from "../src/doctor";
 import { initializeProject } from "../src/init";
 import {
   memoryApprove,
   memoryExplain,
+  memoryImport,
   memoryInspect,
   memoryList,
   memoryReject,
@@ -43,6 +45,13 @@ describe("CLI Commands Product Layer Suite (Phase 6.2)", () => {
       initializeProject(tempDir);
       expect(() => initializeProject(tempDir)).toThrow(/already exists/);
     });
+
+    it("should leave database primitive count at zero upon init", async () => {
+      initializeProject(tempDir);
+      const dbPath = path.join(tempDir, ".aiet", "memory.db");
+      const report = await getSystemStatus({ dbPath });
+      expect(report.totalPrimitives).toBe(0);
+    });
   });
 
   describe("2. aiet status & doctor Diagnostics", () => {
@@ -58,6 +67,21 @@ describe("CLI Commands Product Layer Suite (Phase 6.2)", () => {
       const formatted = formatStatusReport(report);
       expect(formatted).toContain("AIET System Status");
       expect(formatted).toContain("✓ Storage Connected");
+    });
+
+    it("should run diagnostics (doctor) with different output than status", async () => {
+      process.chdir(tempDir);
+      initializeProject(tempDir);
+      const report = await runDiagnostics();
+      const output = report.messages.join("\n");
+
+      expect(output).toContain("AIET Health & Diagnostics");
+      expect(output).toContain("Node.js Version:");
+      expect(output).toContain("SQLite Engine:");
+      expect(output).toContain("Storage Access:");
+      expect(output).toContain("Provider:");
+      expect(output).toContain("MCP Config:");
+      expect(output).not.toContain("AIET System Status"); // verify it is distinct
     });
   });
 
@@ -78,9 +102,49 @@ describe("CLI Commands Product Layer Suite (Phase 6.2)", () => {
       initializeProject(tempDir);
       const dbPath = path.join(tempDir, ".aiet", "memory.db");
 
-      // Memory List
+      // Memory List (Empty)
       const listOutput = await memoryList({ dbPath });
-      expect(listOutput).toBeDefined();
+      expect(listOutput).toContain("No persisted memory primitives found");
+      expect(listOutput).toContain("aiet memory import");
+
+      // Memory Import (Dry Run)
+      const importDryOutput = await memoryImport({
+        input: path.join(tempDir, "primitives"),
+        dryRun: true,
+        dbPath,
+      });
+      expect(importDryOutput).toContain("(DRY RUN)");
+      expect(importDryOutput).toContain("Valid/Imported:    3"); // system, rules, facts
+
+      let report = await getSystemStatus({ dbPath });
+      expect(report.totalPrimitives).toBe(0);
+
+      // Memory Import (Actual)
+      const importOutput = await memoryImport({
+        input: path.join(tempDir, "primitives"),
+        dryRun: false,
+        dbPath,
+      });
+      expect(importOutput).toContain("Valid/Imported:    3");
+
+      report = await getSystemStatus({ dbPath });
+      expect(report.totalPrimitives).toBe(3);
+
+      // Memory Import (Duplicate handling)
+      const reImportOutput = await memoryImport({
+        input: path.join(tempDir, "primitives"),
+        dryRun: false,
+        dbPath,
+      });
+      expect(reImportOutput).toContain("Valid/Imported:    3");
+      expect(reImportOutput).toContain("Skipped:           0");
+
+      report = await getSystemStatus({ dbPath });
+      expect(report.totalPrimitives).toBe(3); // unchanged
+
+      // Memory List (Populated)
+      const populatedListOutput = await memoryList({ dbPath });
+      expect(populatedListOutput).toContain("Memory Primitives (3 items");
 
       // Memory Search
       const searchOutput = await memorySearch("safety", { dbPath });
