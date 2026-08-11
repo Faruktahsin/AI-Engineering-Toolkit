@@ -38,4 +38,25 @@ describe("@aiet/embeddings-ollama", () => {
       }),
     );
   });
+
+  it.each(["http://localhost:11434", "http://localhost:11434/", "http://localhost:11434////"])(
+    "should normalize trailing slashes in custom base URL %s",
+    async (baseUrl) => {
+      const mockFetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ embedding: [0.1] }),
+      });
+      const provider = new OllamaEmbeddingProvider({
+        baseUrl,
+        fetchFn: mockFetch as unknown as typeof fetch,
+      });
+
+      await provider.embed("hello");
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        "http://localhost:11434/api/embeddings",
+        expect.anything(),
+      );
+    },
+  );
 });

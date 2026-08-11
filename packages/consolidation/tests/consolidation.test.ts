@@ -181,6 +181,47 @@ describe("@aiet/consolidation Integration Suite", () => {
       expect(contradictions).toHaveLength(1);
       expect(contradictions[0]?.conflict_type).toBe("PREFERENCE_CONFLICT");
     });
+
+    it("should detect bounded subject-attribute conflicts without regex parsing", () => {
+      const base = {
+        schema_version: "1.0.0",
+        id: generateULID("assertion"),
+        created_at: "2026-08-05T12:00:00Z",
+        updated_at: "2026-08-05T12:00:00Z",
+        last_verified: "2026-08-05T12:00:00Z",
+        sensitivity: SensitivityTier.PUBLIC,
+        volatility: VolatilityRating.LOW,
+        activation: ActivationClass.ALWAYS_ON,
+        evidence_type: EvidenceType.STATED,
+        type: AssertionType.FACT,
+      };
+      const ast1 = { ...base, claim: "AIET uses SQLite" };
+      const ast2 = { ...base, id: generateULID("assertion"), claim: "AIET uses Postgres" };
+
+      const contradictions = contradictionDetector.findContradictions([ast1, ast2]);
+
+      expect(contradictions).toHaveLength(1);
+      expect(contradictions[0]?.conflict_type).toBe("CONTRADICTING_ASSERTION");
+    });
+
+    it("should safely evaluate long non-matching text", () => {
+      const base = {
+        schema_version: "1.0.0",
+        id: generateULID("assertion"),
+        created_at: "2026-08-05T12:00:00Z",
+        updated_at: "2026-08-05T12:00:00Z",
+        last_verified: "2026-08-05T12:00:00Z",
+        sensitivity: SensitivityTier.PUBLIC,
+        volatility: VolatilityRating.LOW,
+        activation: ActivationClass.ALWAYS_ON,
+        evidence_type: EvidenceType.STATED,
+        type: AssertionType.FACT,
+      };
+      const ast1 = { ...base, claim: "a ".repeat(50_000) };
+      const ast2 = { ...base, id: generateULID("assertion"), claim: "b ".repeat(50_000) };
+
+      expect(() => contradictionDetector.findContradictions([ast1, ast2])).not.toThrow();
+    });
   });
 
   describe("3. Governance Proposal & Memory Lineage Rollback Safety", () => {
