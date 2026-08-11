@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.1] - 2026-08-12
+
+### Fixed
+
+- Removed ReDoS-prone URL normalization and contradiction parsing patterns.
+- Added a clean-directory CLI onboarding smoke test to continuous integration.
+- Declared Node.js 22.x as the supported runtime for native SQLite workflows.
+- Corrected public documentation for compiler stages, local-first privacy boundaries, and the CLI package path.
+
+### Changed
+
+- Standardized the release workflow around stable v1 releases, dynamic GitHub release notes, and tag-to-package-version verification.
+
+---
+
 ## [0.1.0-alpha] - 2026-08-08
 
 ### Added

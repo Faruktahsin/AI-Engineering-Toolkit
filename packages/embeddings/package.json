@@ -1,6 +1,6 @@
 {
   "name": "@aiet/embeddings",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Pluggable embedding provider abstraction and vector similarity utilities for AIET hybrid memory search",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

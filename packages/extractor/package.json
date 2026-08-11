@@ -1,6 +1,6 @@
 {
   "name": "@aiet/extractor",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Autonomous conversation turn parsing and memory primitive extraction for AIET",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

@@ -1,6 +1,6 @@
 {
   "name": "@aiet/config",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Typed configuration loader, environment variable parser, runtime validator, and immutable config engine for AIET",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

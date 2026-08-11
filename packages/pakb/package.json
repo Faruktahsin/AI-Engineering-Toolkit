@@ -1,6 +1,6 @@
 {
   "name": "@aiet/pakb",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Flagship Personal AI Knowledge Base (PAKB) subsystem wrapper package for AIET",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

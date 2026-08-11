@@ -32,10 +32,16 @@ jobs:
 
       - name: Full Verification Matrix
         run: |
+          pnpm check:node
           pnpm lint
           pnpm build
+          pnpm smoke:cli
           pnpm typecheck
           pnpm test
+          pnpm audit
+
+      - name: Verify Tag and Package Versions
+        run: pnpm check:release-version
 
       - name: Publish Packages to npm
         run: pnpm -r publish --access public --no-git-checks
@@ -45,8 +51,8 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          body_path: RELEASE_NOTES_v0.1.0.md
           draft: false
-          prerelease: true
+          prerelease: false
+          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

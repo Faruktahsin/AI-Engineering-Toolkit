@@ -1,6 +1,6 @@
 {
   "name": "@aiet/compiler",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Deterministic cl100k_base token profiler, priority ranker, and context compiler pipeline for PAKB",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

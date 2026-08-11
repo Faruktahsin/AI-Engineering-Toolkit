@@ -1,6 +1,6 @@
 {
   "name": "@aiet/domain",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Canonical Prefixed Base32 ULID generator, text sanitizer, and schema validation engine for PAKB",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

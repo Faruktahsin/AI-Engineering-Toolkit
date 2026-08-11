@@ -1,6 +1,6 @@
 {
   "name": "@aiet/example-coding-agent",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "AI Coding Assistant with persistent developer memory built on AIET infrastructure",
   "type": "module",

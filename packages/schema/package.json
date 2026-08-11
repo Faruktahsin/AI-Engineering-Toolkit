@@ -1,6 +1,6 @@
 {
   "name": "@aiet/schema",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Canonical JSON Schema Draft 2020-12 and TypeScript interfaces for AI Engineering Toolkit (AIET)",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

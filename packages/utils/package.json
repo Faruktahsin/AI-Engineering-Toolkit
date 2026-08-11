@@ -1,6 +1,6 @@
 {
   "name": "@aiet/utils",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Pure reusable utilities for hashing, filesystem, paths, JSON, UTF-8, retries, async, and collections for AIET",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
