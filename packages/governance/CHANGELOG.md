@@ -1,0 +1,14 @@
+# @aiet/governance
+
+## 1.0.1
+
+### Patch Changes
+
+- dca3dcb: chore(funding): add GitHub Sponsors metadata
+- Updated dependencies [dca3dcb]
+- Updated dependencies
+  - @aiet/decision-engine@1.0.1
+  - @aiet/domain@1.0.1
+  - @aiet/extractor@1.0.1
+  - @aiet/schema@1.0.1
+  - @aiet/storage@1.0.1

@@ -1,6 +1,6 @@
 {
   "name": "@aiet/governance",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Autonomous memory governance safety layer, proposal staging queue, and audit ledger for AIET",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

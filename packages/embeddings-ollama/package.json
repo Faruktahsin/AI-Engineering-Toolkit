@@ -1,6 +1,6 @@
 {
   "name": "@aiet/embeddings-ollama",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Local-first Ollama embedding provider for AIET vector memory",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

@@ -1,6 +1,6 @@
 {
   "name": "@aiet/contracts",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Shared contract interfaces, types, schemas, and typed registries for AI Engineering Toolkit (AIET)",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

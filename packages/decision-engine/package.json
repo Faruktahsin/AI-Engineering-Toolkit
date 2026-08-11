@@ -1,6 +1,6 @@
 {
   "name": "@aiet/decision-engine",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Autonomous memory candidate evaluation and decision engine for AIET",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

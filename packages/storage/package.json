@@ -1,6 +1,6 @@
 {
   "name": "@aiet/storage",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Canonical SQLite storage engine, DDL migrations, Drizzle ORM, JCS hash, and graph query engine for PAKB",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

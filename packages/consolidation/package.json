@@ -1,6 +1,6 @@
 {
   "name": "@aiet/consolidation",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Autonomous memory consolidation engine for AIET (duplicate detection, contradiction resolution, memory lineage, governance proposal integration)",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

@@ -1,6 +1,6 @@
 {
   "name": "@aiet/example-customer-support-agent",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "Enterprise AI Customer Support Agent with Vercel AI SDK integration and governance safety built on AIET",
   "type": "module",

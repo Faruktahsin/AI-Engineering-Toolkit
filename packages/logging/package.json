@@ -1,6 +1,6 @@
 {
   "name": "@aiet/logging",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Structured logger, JSON/human log formatters, child loggers, and deterministic formatting for AIET",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
