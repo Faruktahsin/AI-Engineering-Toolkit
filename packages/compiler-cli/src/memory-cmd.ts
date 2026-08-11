@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { validateOrThrow } from "@aiet/domain";
 import { GovernanceManager } from "@aiet/governance";
 import { PAKBStorageRepository } from "@aiet/storage";
 
@@ -29,7 +30,7 @@ export async function memoryList(options?: {
       : primitives;
 
     if (filtered.length === 0) {
-      return "No memory primitives found in storage.";
+      return "No persisted memory primitives found.\nSample source primitives may exist in ./primitives.\nRun 'aiet memory import --dry-run' to preview them, then 'aiet memory import' to store validated primitives.";
     }
 
     const lines: string[] = [
@@ -46,6 +47,114 @@ export async function memoryList(options?: {
       else if ("summary" in p) summary = p.summary;
 
       lines.push(`[${typeStr}] ${p.id} - ${summary.substring(0, 60)} (${p.sensitivity})`);
+    }
+
+    return lines.join("\n");
+  } finally {
+    await repo.close();
+  }
+}
+
+export async function memoryImport(options?: {
+  input?: string;
+  dryRun?: boolean;
+  dbPath?: string;
+}): Promise<string> {
+  const cwd = process.cwd();
+  const inputDir = options?.input ? path.resolve(cwd, options.input) : path.join(cwd, "primitives");
+
+  if (!fs.existsSync(inputDir)) {
+    return `[ERROR] Input directory '${inputDir}' does not exist.`;
+  }
+
+  const dbPath = resolveDbPath(options?.dbPath);
+  const repo = new PAKBStorageRepository({ db_path: dbPath });
+
+  const files: string[] = [];
+  function walkDir(dir: string) {
+    if (!fs.existsSync(dir)) return;
+    const list = fs.readdirSync(dir).sort();
+    for (const file of list) {
+      const fileA = path.join(dir, file);
+      const stat = fs.statSync(fileA);
+      if (stat?.isDirectory()) walkDir(fileA);
+      else if (fileA.endsWith(".json")) files.push(fileA);
+    }
+  }
+
+  try {
+    walkDir(inputDir);
+    let valid = 0;
+    let imported = 0;
+    let skipped = 0;
+    let invalid = 0;
+    let conflicts = 0;
+    const errors: string[] = [];
+
+    for (const file of files) {
+      try {
+        const content = fs.readFileSync(file, "utf8");
+        const json = JSON.parse(content);
+        const validated = validateOrThrow(json);
+        valid++;
+
+        const existing = await repo.getPrimitive(validated.id);
+        if (existing) {
+          const existingHash = repo.calculateJCSHash(existing);
+          const incomingHash = repo.calculateJCSHash(validated);
+          if (existingHash === incomingHash) {
+            skipped++;
+            continue;
+          }
+          conflicts++;
+          errors.push(
+            `[CONFLICT] ${path.basename(file)}: primitive ID '${validated.id}' already exists with different content`,
+          );
+          continue;
+        }
+
+        if (!options?.dryRun) {
+          try {
+            await repo.insertPrimitive(validated);
+            imported++;
+          } catch (e) {
+            // Collision or DB error
+            conflicts++;
+            errors.push(
+              `[ERROR] ${path.basename(file)}: ${e instanceof Error ? e.message : String(e)}`,
+            );
+          }
+        } else {
+          imported++;
+        }
+      } catch (err) {
+        invalid++;
+        errors.push(
+          `[INVALID] ${path.basename(file)}: ${err instanceof Error ? err.message : String(err)}`,
+        );
+      }
+    }
+
+    const lines = [
+      "==================================================",
+      options?.dryRun
+        ? "            Memory Import (DRY RUN)               "
+        : "               Memory Import Result               ",
+      "==================================================",
+      `Scanned Directory:         ${inputDir}`,
+      `Files Found:               ${files.length}`,
+      `Valid:                     ${valid}`,
+      options?.dryRun
+        ? `Would Import:              ${imported}`
+        : `Imported:                  ${imported}`,
+      `Already Present / Skipped: ${skipped}`,
+      `Invalid:                   ${invalid}`,
+      `Conflicts / Errors:        ${conflicts}`,
+      "--------------------------------------------------",
+    ];
+
+    if (errors.length > 0) {
+      lines.push(...errors);
     }
 
     return lines.join("\n");

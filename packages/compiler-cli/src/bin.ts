@@ -4,10 +4,12 @@ import { Command } from "commander";
 import { PAKBCLI } from "./cli";
 import { loadConfig, resolveConfig } from "./config";
 import { type AgentTarget, connectAgent } from "./connect";
+import { runDiagnostics } from "./doctor";
 import { initializeProject } from "./init";
 import {
   memoryApprove,
   memoryExplain,
+  memoryImport,
   memoryInspect,
   memoryList,
   memoryReject,
@@ -24,7 +26,7 @@ program.name("aiet").description("AI Engineering Toolkit (AIET) CLI").version("1
 program
   .command("init [directory]")
   .description(
-    "Initialize a new AIET project with config, SQLite memory DB, and default primitives",
+    "Initialize a new AIET project with config, SQLite memory DB, and sample primitives as source files",
   )
   .option("-f, --force", "Overwrite existing configuration and files")
   .action((directory: string | undefined, options: { force?: boolean }) => {
@@ -32,10 +34,16 @@ program
       const targetDir = directory ?? ".";
       const rootPath = initializeProject(targetDir, { force: options.force });
       console.log(`[SUCCESS] Initialized AIET project in '${rootPath}'.`);
+      console.log(
+        "\nNote: Sample primitives have been created as JSON source files in ./primitives",
+      );
+      console.log("but have NOT yet been stored in the persistent memory database.");
       console.log("\nNext steps:");
       console.log("  1. Run 'aiet doctor' to check environment health");
-      console.log("  2. Run 'aiet connect claude' or 'aiet connect cursor' to configure MCP");
-      console.log("  3. Run 'aiet compile' to generate AGENTS.md / CLAUDE.md");
+      console.log("  2. Run 'aiet compile --dry-run' to test generation");
+      console.log("  3. Run 'aiet memory import --dry-run' to preview sample ingestion");
+      console.log("  4. Run 'aiet memory import' to store validated primitives");
+      console.log("  5. Run 'aiet status' to view persistent database status");
       process.exit(0);
     } catch (err) {
       console.error(`[INIT ERROR] ${err instanceof Error ? err.message : String(err)}`);
@@ -48,9 +56,9 @@ program
   .command("doctor")
   .description("Run system health and environment diagnostics")
   .action(async () => {
-    const report = await getSystemStatus();
-    console.log(formatStatusReport(report));
-    process.exit(0);
+    const report = await runDiagnostics();
+    console.log(report.messages.join("\n"));
+    process.exit(report.isHealthy ? 0 : 1);
   });
 
 // 3. aiet status
@@ -141,6 +149,20 @@ memoryGroup
     const limit = Number.parseInt(options.limit ?? "50", 10);
     const typeOpt = options.type ? { type: options.type } : {};
     const output = await memoryList({ limit, ...typeOpt });
+    console.log(output);
+    process.exit(0);
+  });
+
+memoryGroup
+  .command("import")
+  .description("Safely ingest, validate, and store memory primitives from source files")
+  .option("-i, --input <directory>", "Input directory containing primitive JSON files")
+  .option("--dry-run", "Validate and preview import without saving to the database")
+  .action(async (options: { input?: string; dryRun?: boolean }) => {
+    const args: { input?: string; dryRun?: boolean } = {};
+    if (options.input !== undefined) args.input = options.input;
+    if (options.dryRun !== undefined) args.dryRun = options.dryRun;
+    const output = await memoryImport(args);
     console.log(output);
     process.exit(0);
   });
