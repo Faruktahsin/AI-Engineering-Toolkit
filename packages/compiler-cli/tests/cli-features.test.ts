@@ -1,9 +1,10 @@
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { PAKBConfigSchema, initializeProject, loadConfig, startWatchMode } from "../src";
 
-const TEST_DIR = path.resolve("./scratch/test-cli-init");
+const TEST_DIR = path.join(os.tmpdir(), "test-cli-init-fixture");
 
 describe("CLI DX Features (Init, Watch, Zod Config)", () => {
   beforeEach(() => {
