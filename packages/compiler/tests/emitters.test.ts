@@ -1,9 +1,16 @@
 import { describe, expect, it } from "vitest";
 import type { BudgetFitResult } from "../src/budget";
 import { AgentsEmitter, ClaudeEmitter, CursorEmitter, ManifestEmitter } from "../src/emitters";
+import { escapeMarkdown } from "../src/emitters/utils";
 import type { RankedPrimitive } from "../src/ranking";
 
 describe("Emitters", () => {
+  describe("escapeMarkdown", () => {
+    it("escapes a backslash before a backtick so it cannot bypass backtick escaping", () => {
+      expect([...escapeMarkdown("\\`")]).toEqual(["\\", "\\", "\\", "`"]);
+    });
+  });
+
   const mockRankedPrimitive1: RankedPrimitive = {
     primitive: {
       id: "dir_test1",

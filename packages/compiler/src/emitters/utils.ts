@@ -15,7 +15,11 @@ export function createEmitterResult(target: string, content: string): EmitterRes
 
 export function escapeMarkdown(text: string): string {
   // Prevent unclosed codeblocks and basic markdown injection
-  return text.replace(/`/g, "\\`").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  return text
+    .replace(/\\/g, "\\\\")
+    .replace(/`/g, "\\`")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
 }
 
 export function formatPrimitiveForMarkdown(p: RankedPrimitive, shouldEscape = false): string {
