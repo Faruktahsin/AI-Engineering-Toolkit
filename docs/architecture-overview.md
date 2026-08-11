@@ -22,7 +22,7 @@
        v                                v                               v                      v
 +------------------+         +--------------------+         +--------------------+   +-------------------+
 |  @aiet/compiler  |         |   @aiet/storage    |         |   @aiet/mcp-server |   |    @aiet/schema   |
-| (7-Stage Engine) |         | (SQLite WAL/FTS5)  |         | (MCP Tool Handlers)|   | (Ajv Validations) |
+| (8-Stage Engine) |         | (SQLite WAL/FTS5)  |         | (MCP Tool Handlers)|   | (Ajv Validations) |
 +------------------+         +--------------------+         +--------------------+   +-------------------+
        |                                |                               |                      |
        +--------------------------------+-------------------------------+----------------------+
@@ -40,7 +40,7 @@
 | :--- | :--- | :--- |
 | `packages/core` | `@aiet/core` | Primary public SDK facade re-exporting compiler, storage, schema, and MCP server primitives. |
 | `packages/compiler-cli` | `@aiet/cli` | Production CLI binary (`pakb`) providing `init`, `compile`, and `--watch` live development workflows. |
-| `packages/compiler` | `@aiet/compiler` | Deterministic 7-stage prompt context compilation engine with `cl100k_base` (tiktoken) budgeting. |
+| `packages/compiler` | `@aiet/compiler` | Deterministic 8-stage prompt context compilation engine with `cl100k_base` (tiktoken) budgeting. |
 | `packages/storage` | `@aiet/storage` | SQLite WAL storage repository providing schema migrations, JCS hashes, FTS5 BM25 search, and recursive CTE graph traversal. |
 | `packages/schema` | `@aiet/schema` | Ajv Draft 2020-12 JSON Schemas and TypeScript interface definitions for the 5 PAKB primitives. |
 | `packages/errors` | `@aiet/errors` | Single source of truth for all domain and infrastructure exception classes. |

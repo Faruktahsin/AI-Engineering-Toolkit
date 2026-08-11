@@ -68,7 +68,7 @@ Workload Stress Scale: **~6,500 raw input tokens** evaluated against 500, 1000, 
 
 1. **Synthetic Vector Scope**: Mock vector embeddings test SQLite vector index storage mechanics and RRF score calculation, but do not measure real semantic embedding recall. Real vector quality benchmarks require precomputed semantic embeddings or local ONNX embedding models.
 2. **Ranking vs Network Latency**: Benchmark metrics strictly capture SQLite query execution and in-memory scoring latency. Network latency from remote embedding providers (e.g. OpenAI API) is intentionally excluded from ranking algorithm latency metrics.
-3. **Determinism Boundary**: Bit-for-bit determinism applies strictly to the 7-stage context compiler pipeline and fitted Tier 0 primitives. External non-deterministic LLM text generation is outside the deterministic compiler boundary.
+3. **Determinism Boundary**: Bit-for-bit determinism applies strictly to the 8-stage context compiler pipeline and fitted Tier 0 primitives. External non-deterministic LLM text generation is outside the deterministic compiler boundary.
 4. **Consolidation Precision Boundary**: The detector now requires a shared subject and decision scope (or explicit primitive domain) for preference conflicts, and at least two discriminative subject tokens for historical assertions. The synthetic dataset verifies this rule boundary; it does not replace semantic contradiction evaluation across arbitrary natural language.
 
 ---
