@@ -10,5 +10,10 @@ export interface EmitterResult {
 
 export interface IEmitter {
   readonly target: string;
-  emit(fitResult: BudgetFitResult, compilerVersion?: string): EmitterResult;
+  emit(
+    fitResult: BudgetFitResult,
+    compilerVersion?: string,
+    existingArtifacts?: Record<string, EmitterResult>,
+    sourceAggregateHash?: string,
+  ): EmitterResult;
 }

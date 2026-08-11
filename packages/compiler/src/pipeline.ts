@@ -15,6 +15,7 @@ import {
 import type { EmitterResult } from "./emitter";
 import { AgentsEmitter, ClaudeEmitter, CursorEmitter, ManifestEmitter } from "./emitters";
 import { filterPrimitives } from "./filter";
+import { computeInputFingerprint } from "./fingerprint";
 import { BudgetFitter } from "./fitting";
 import type { CompilationResult } from "./index";
 import { normalizePrimitive } from "./normalize";
@@ -23,6 +24,14 @@ import { RankingEngine } from "./ranking";
 import { PIPELINE_STAGE_ORDER, PipelineStage } from "./stages";
 
 export type { PipelineOptions, PipelineResult };
+
+/**
+ * Computes canonical hash from an array of already normalized primitives.
+ */
+export function computeHashFromNormalized(normalizedPrimitives: readonly AnyPrimitive[]): string {
+  const sortedForHash = [...normalizedPrimitives].sort((a, b) => a.id.localeCompare(b.id));
+  return computeInputFingerprint(sortedForHash).aggregate_hash;
+}
 
 export class CompilerPipeline {
   /**
@@ -178,7 +187,8 @@ export class CompilerPipeline {
    */
   public emitStage(
     fitResult: BudgetFitResult,
-    _compilerVersion = "1.0.0",
+    compilerVersion = "1.0.0",
+    sourceAggregateHash = "",
   ): Record<string, EmitterResult> {
     const agentsEmitter = new AgentsEmitter();
     const claudeEmitter = new ClaudeEmitter();
@@ -188,16 +198,23 @@ export class CompilerPipeline {
     const agentsResult = agentsEmitter.emit(fitResult);
     const claudeResult = claudeEmitter.emit(fitResult);
     const cursorResult = cursorEmitter.emit(fitResult);
-    const manifestResult = manifestEmitter.emit(fitResult);
-
-    const emitted: Record<string, EmitterResult> = {
+    const partialArtifacts = {
       [agentsResult.target]: agentsResult,
       [claudeResult.target]: claudeResult,
       [cursorResult.target]: cursorResult,
-      [manifestResult.target]: manifestResult,
     };
 
-    return Object.freeze(emitted);
+    const manifestResult = manifestEmitter.emit(
+      fitResult,
+      compilerVersion,
+      partialArtifacts as Record<string, EmitterResult>,
+      sourceAggregateHash,
+    );
+
+    // Add the manifest result to the final emitted artifacts
+    partialArtifacts[manifestResult.target as keyof typeof partialArtifacts] = manifestResult;
+
+    return Object.freeze(partialArtifacts);
   }
 
   /**
@@ -230,11 +247,17 @@ export class CompilerPipeline {
           primitives as readonly RankedPrimitive[],
           context.options.max_tier0_budget ?? 500,
         );
-      case PipelineStage.EMIT:
+      case PipelineStage.EMIT: {
+        // Note: runStage signature uses primitives param for all input types.
+        // If runStage(EMIT) is invoked directly with a BudgetFitResult, we cannot safely re-compute
+        // the source aggregate hash here since the original normalized primitives are lost.
+        // We pass an empty string, expecting orchestrator/pipeline to call emitStage directly instead.
         return this.emitStage(
           primitives as BudgetFitResult,
           context.options.compiler_version ?? "1.0.0",
+          "",
         );
+      }
       default: {
         const _exhaustiveCheck: never = stage;
         throw new SchemaValidationError(
@@ -297,6 +320,15 @@ export class CompilerPipeline {
   }
 
   /**
+   * Computes the canonical source aggregate hash from raw primitives.
+   * Runs the pipeline sequentially up to the NORMALIZE stage to ensure correctness.
+   */
+  public computeSourceHash(primitives: readonly AnyPrimitive[], options?: PipelineOptions): string {
+    const { primitives: normalized } = this.runUntil(PipelineStage.NORMALIZE, primitives, options);
+    return computeHashFromNormalized(normalized as readonly AnyPrimitive[]);
+  }
+
+  /**
    * Runs the complete pipeline including INGEST ➔ SANITIZE ➔ VALIDATE ➔ NORMALIZE ➔ FILTER ➔ RANK ➔ FIT ➔ EMIT.
    */
   public run(primitives: readonly AnyPrimitive[], options?: PipelineOptions): PipelineResult {
@@ -332,6 +364,9 @@ export class CompilerPipeline {
     current = this.runStage(PipelineStage.NORMALIZE, current, context) as readonly AnyPrimitive[];
     stageResults.NORMALIZE = current.length;
 
+    // Compute canonical source aggregate hash from normalized primitives
+    const sourceAggregateHash = computeHashFromNormalized(current);
+
     // Stage 5: FILTER
     current = this.runStage(PipelineStage.FILTER, current, context) as readonly AnyPrimitive[];
     stageResults.FILTER = current.length;
@@ -345,7 +380,11 @@ export class CompilerPipeline {
     stageResults.FIT = fitResult.tier0.length;
 
     // Stage 8: EMIT
-    const emittedArtifacts = this.emitStage(fitResult, context.options.compiler_version ?? "1.0.0");
+    const emittedArtifacts = this.emitStage(
+      fitResult,
+      context.options.compiler_version ?? "1.0.0",
+      sourceAggregateHash,
+    );
     stageResults.EMIT = Object.keys(emittedArtifacts).length;
 
     const endTime = performance.now();
