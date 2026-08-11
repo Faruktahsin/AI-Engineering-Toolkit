@@ -46,4 +46,26 @@ describe("@aiet/embeddings-openai", () => {
       }),
     );
   });
+
+  it.each(["https://example.test/v1", "https://example.test/v1/", "https://example.test/v1////"])(
+    "should normalize trailing slashes in custom base URL %s",
+    async (baseUrl) => {
+      const mockFetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ data: [{ index: 0, embedding: [0.1] }] }),
+      });
+      const provider = new OpenAIEmbeddingProvider({
+        apiKey: "test-key",
+        baseUrl,
+        fetchFn: mockFetch as unknown as typeof fetch,
+      });
+
+      await provider.embed("hello");
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        "https://example.test/v1/embeddings",
+        expect.anything(),
+      );
+    },
+  );
 });

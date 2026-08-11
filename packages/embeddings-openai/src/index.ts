@@ -1,5 +1,15 @@
 import type { AIETEmbeddingProvider } from "@aiet/embeddings";
 
+function trimTrailingSlashes(url: string): string {
+  let normalized = url;
+
+  while (normalized.endsWith("/")) {
+    normalized = normalized.slice(0, -1);
+  }
+
+  return normalized;
+}
+
 export interface OpenAIEmbeddingOptions {
   readonly apiKey?: string | undefined;
   readonly model?: string | undefined;
@@ -20,7 +30,7 @@ export class OpenAIEmbeddingProvider implements AIETEmbeddingProvider {
     this.apiKey = options.apiKey ?? process.env["OPENAI_API_KEY"] ?? "";
     this.model = options.model ?? "text-embedding-3-small";
     this.dimensions = options.dimensions ?? 1536;
-    this.baseUrl = (options.baseUrl ?? "https://api.openai.com/v1").replace(/\/+$/, "");
+    this.baseUrl = trimTrailingSlashes(options.baseUrl ?? "https://api.openai.com/v1");
     this.fetchFn = options.fetchFn ?? globalThis.fetch;
     this.name = `openai-${this.model}`;
   }

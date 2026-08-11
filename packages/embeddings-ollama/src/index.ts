@@ -1,5 +1,15 @@
 import type { AIETEmbeddingProvider } from "@aiet/embeddings";
 
+function trimTrailingSlashes(url: string): string {
+  let normalized = url;
+
+  while (normalized.endsWith("/")) {
+    normalized = normalized.slice(0, -1);
+  }
+
+  return normalized;
+}
+
 export interface OllamaEmbeddingOptions {
   readonly model?: string | undefined;
   readonly dimensions?: number | undefined;
@@ -17,7 +27,7 @@ export class OllamaEmbeddingProvider implements AIETEmbeddingProvider {
   constructor(options: OllamaEmbeddingOptions = {}) {
     this.model = options.model ?? "nomic-embed-text";
     this.dimensions = options.dimensions ?? 768;
-    this.baseUrl = (options.baseUrl ?? "http://localhost:11434").replace(/\/+$/, "");
+    this.baseUrl = trimTrailingSlashes(options.baseUrl ?? "http://localhost:11434");
     this.fetchFn = options.fetchFn ?? globalThis.fetch;
     this.name = `ollama-${this.model}`;
   }

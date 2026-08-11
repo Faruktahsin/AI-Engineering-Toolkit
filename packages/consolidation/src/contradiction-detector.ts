@@ -60,24 +60,16 @@ export class ContradictionDetector {
     }
 
     // Rule 2: Subject-attribute contradiction ("uses X" vs "uses Y")
-    const useRegex = /([a-z0-9_#-]+)\s+(?:uses|implements|requires|built with)\s+([a-z0-9_#-]+)/i;
-    const uMatch1 = t1.match(useRegex);
-    const uMatch2 = t2.match(useRegex);
+    const usage1 = this.parseUsageStatement(t1);
+    const usage2 = this.parseUsageStatement(t2);
 
-    if (
-      uMatch1 &&
-      uMatch2 &&
-      uMatch1[1] &&
-      uMatch2[1] &&
-      uMatch1[1] === uMatch2[1] &&
-      uMatch1[2] !== uMatch2[2]
-    ) {
+    if (usage1 && usage2 && usage1.subject === usage2.subject && usage1.value !== usage2.value) {
       return {
         contradiction_id: `cnt_${ulid().toUpperCase()}`,
         primitive_a: p1,
         primitive_b: p2,
         conflict_type: "CONTRADICTING_ASSERTION",
-        reasoning: `Subject '${uMatch1[1]}' has contradictory attributes: '${uMatch1[2]}' vs '${uMatch2[2]}'.`,
+        reasoning: `Subject '${usage1.subject}' has contradictory attributes: '${usage1.value}' vs '${usage2.value}'.`,
       };
     }
 
@@ -163,6 +155,28 @@ export class ContradictionDetector {
     for (const marker of markers) {
       const index = text.indexOf(marker);
       if (index > 0) return { index, value: marker };
+    }
+
+    return null;
+  }
+
+  private parseUsageStatement(text: string): { subject: string; value: string } | null {
+    const tokens = text.split(/[^a-z0-9_#-]+/i).filter(Boolean);
+
+    for (let index = 1; index < tokens.length - 1; index++) {
+      const subject = tokens[index - 1];
+      const verb = tokens[index];
+      const value = tokens[index + 1];
+      if (!subject || !verb || !value) continue;
+
+      if (verb === "uses" || verb === "implements" || verb === "requires") {
+        return { subject, value };
+      }
+
+      if (verb === "built" && value === "with" && index + 2 < tokens.length) {
+        const technology = tokens[index + 2];
+        if (technology) return { subject, value: technology };
+      }
     }
 
     return null;
