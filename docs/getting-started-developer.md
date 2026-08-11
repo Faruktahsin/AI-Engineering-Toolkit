@@ -56,7 +56,7 @@ aiet doctor
 
 Output:
 ```
-✓ [Node.js Environment] Node.js v22.4.0 detected (meets requirement >= v18)
+✓ [Node.js Environment] Node.js v22.4.0 detected (meets requirement v22.x)
 ✓ [SQLite Engine Support] SQLite WAL mode and FTS5 extension fully supported
 ✓ [Storage Path Access] Database location set to './my-agent-memory.db'
 ✓ [Embedding Provider (Mock)] Local-first mock embedding provider active

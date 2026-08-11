@@ -18,6 +18,9 @@
     }
   },
   "files": ["dist"],
+  "engines": {
+    "node": ">=22.0.0 <23.0.0"
+  },
   "scripts": {
     "build": "tsup src/index.ts src/bin.ts --format cjs,esm && tsc --emitDeclarationOnly",
     "test": "vitest run",

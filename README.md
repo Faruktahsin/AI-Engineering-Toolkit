@@ -5,7 +5,7 @@
 [![CI](https://github.com/Faruktahsin/AI-Engineering-Toolkit/actions/workflows/ci.yml/badge.svg)](https://github.com/Faruktahsin/AI-Engineering-Toolkit/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![npm version](https://img.shields.io/npm/v/@aiet/core.svg)](https://www.npmjs.com/package/@aiet/core)
-[![Node: >=22.0.0](https://img.shields.io/badge/Node.js-%3E%3D22.0.0-green.svg)](https://nodejs.org)
+[![Node: 22.x](https://img.shields.io/badge/Node.js-22.x-green.svg)](https://nodejs.org)
 [![pnpm: >=11.20.0](https://img.shields.io/badge/pnpm-%3E%3D11.20.0-red.svg)](https://pnpm.io)
 
 ---
