@@ -1,7 +1,7 @@
 {
   "name": "@aiet/cli",
   "version": "1.0.0",
-  "description": "Production CLI for compiling Personal AI Knowledge Base (PAKB) context artifacts",
+  "description": "Developer CLI for AI Engineering Toolkit (AIET) context and memory workflows",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",

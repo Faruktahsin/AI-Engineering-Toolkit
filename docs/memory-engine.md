@@ -17,7 +17,7 @@ AIET structures agent memory into two operational tiers:
                                             v                              v
                               +--------------------------+   +--------------------------+
                               |    @aiet/compiler        |   |     @aiet/storage        |
-                              |  - 7-Stage Token Budget  |   |  - SQLite WAL Engine     |
+                              |  - 8-Stage Token Budget  |   |  - SQLite WAL Engine     |
                               |  - Reproducible Preambles|   |  - FTS5 Keyword Index    |
                               |  - AGENTS.md / CLAUDE.md |   |  - Vector Embeddings     |
                               +--------------------------+   |  - Memory Lifecycle      |
@@ -26,7 +26,7 @@ AIET structures agent memory into two operational tiers:
 
 ### 1. Short-Term Working Memory
 - **Purpose**: Fits active task rules, system directives, and high-priority entities into strict token budgets (e.g. 500 tokens).
-- **Engine**: `@aiet/compiler` 7-stage deterministic compilation pipeline.
+- **Engine**: `@aiet/compiler` 8-stage deterministic compilation pipeline.
 
 ### 2. Long-Term Persistent Memory
 - **Purpose**: Stores historical assertions, entity relationships, event milestones, and facts over indefinite periods.

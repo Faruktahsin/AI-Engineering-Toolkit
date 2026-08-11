@@ -2,11 +2,12 @@
 
 ## Overview
 
-The **AI Engineering Toolkit (AIET)** is built around strict **privacy-first**, **local-first**, and **zero-egress** core design principles.
+The **AI Engineering Toolkit (AIET)** is built around **privacy-first** and **local-first** core design principles. The default local storage and mock/local embedding paths do not include built-in telemetry or remote reporting.
 
-- **Local Storage**: All persistent memories, vector embeddings, proposals, and audit logs remain strictly within local SQLite WAL databases (`.aiet/memory.db` or configured local path).
-- **Zero Egress**: AIET does not transmit or report local memory primitives, search queries, or environment context to any remote telemetry or third-party server.
-- **Sensitivity Tiers**: Memory primitives enforce sensitivity boundaries (`PUBLIC`, `INTERNAL`, `RESTRICTED`). Restricted memories are never compiled into context outputs or transmitted unless explicitly approved via `@aiet/governance`.
+- **Local Storage**: Persistent memories, vector embeddings, proposals, and audit logs use local SQLite WAL databases (`.aiet/memory.db` or a configured local path).
+- **No Built-In Telemetry**: AIET does not include telemetry that reports local memory primitives, search queries, or environment context.
+- **Optional Remote Providers**: Selecting an external provider, such as `@aiet/embeddings-openai`, sends the content required for that provider request to its configured endpoint. Configure remote providers only when this data flow is acceptable for your use case.
+- **Sensitivity Tiers**: Memory primitives enforce sensitivity boundaries (`PUBLIC`, `INTERNAL`, `RESTRICTED`). Restricted memories are excluded from context outputs unless explicitly approved via `@aiet/governance`; remote-provider use remains an explicit deployment decision.
 
 ---
 

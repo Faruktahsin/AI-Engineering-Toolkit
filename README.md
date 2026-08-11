@@ -12,7 +12,7 @@
 
 ## 💡 What is AIET?
 
-**AI-Engineering-Toolkit (`AIET`)** is a production-grade infrastructure framework designed for software engineers building stateful, persistent-memory AI agents.
+**AI-Engineering-Toolkit (`AIET`)** is an open-source infrastructure framework for software engineers building stateful, persistent-memory AI agents.
 
 AIET is **local-first by default; use of external embedding providers is explicit opt-in and may transmit data to that provider.**
 
@@ -21,9 +21,9 @@ AIET solves the challenges of unstructured prompt context, context overflows, me
 - **5 Standardized Memory Primitives**: (`Entity`, `Directive`, `Assertion`, `Event`, `Relation`) with strict Zod & JSON Schemas.
 - **Autonomous Memory Formation**: Candidate extraction (`@aiet/extractor`) and scoring engine (`@aiet/decision-engine`) for `CREATE`, `UPDATE`, `MERGE`, and `IGNORE` decisions.
 - **Mandatory Safety & Governance**: Proposal approval workflows (`memory_proposals`) and tamper-evident audit ledger (`audit_log`) using JCS SHA-256 hash chains.
-- **Autonomous Memory Consolidation**: Duplicate & contradiction detection (`@aiet/consolidation`) to supersede outdated facts or resolve conflicting preferences.
-- **Deterministic 7-Stage Context Compiler**: Fits context into strict token budgets with bit-for-bit reproducible build manifests (`AGENTS.md`, `CLAUDE.md`, `.cursorrules`).
-- **Hybrid RRF Retrieval Engine**: SQLite WAL database with FTS5 BM25 search, vector embeddings, recency decay, and RRF ranking.
+- **Rule-Based Memory Consolidation**: Duplicate detection and scope-aware contradiction rules (`@aiet/consolidation`) for supported structured patterns.
+- **Deterministic 8-Stage Context Compiler**: Ingests, sanitizes, validates, normalizes, filters, ranks, fits, and emits context artifacts within configured token budgets (`AGENTS.md`, `CLAUDE.md`, `.cursorrules`).
+- **Hybrid RRF Retrieval Infrastructure**: SQLite WAL database with FTS5 BM25 search, vector embeddings, recency decay, and RRF ranking.
 - **Framework Adapters & MCP Integration**: Native adapters for Vercel AI SDK, LangGraph, OpenAI Agents SDK, and Model Context Protocol (MCP) for Claude Code, Cursor, and Windsurf.
 
 ---
@@ -58,7 +58,7 @@ For a detailed deep dive into the monorepo architecture, read the **[Architectur
 | Package | Role | Description |
 | :--- | :--- | :--- |
 | [`@aiet/core`](packages/core) | **Primary SDK Facade** | Single entrypoint combining memory, compiler, governance, and diagnostics |
-| [`@aiet/cli`](packages/cli) | **Developer CLI** | Production CLI command runner (`aiet init`, `aiet doctor`, `aiet connect`) |
+| [`@aiet/cli`](packages/compiler-cli) | **Developer CLI** | CLI command runner (`aiet init`, `aiet doctor`, `aiet connect`) |
 | [`@aiet/mcp-server`](packages/mcp-server) | **MCP Stdio Server** | Model Context Protocol server for Claude Code, Cursor, and Windsurf |
 | [`@aiet/adapter-vercel`](packages/adapter-vercel) | **Vercel AI SDK Adapter** | `AIETMemoryProvider` and context middleware for Vercel AI SDK |
 | [`@aiet/adapter-langgraph`](packages/adapter-langgraph) | **LangGraph Adapter** | LangGraph checkpointer (`createAIETCheckpointer`) and memory saver |
@@ -157,7 +157,7 @@ console.log(auditLog);
 - **[npm Publishing Strategy](docs/npm-publishing-strategy.md)**: Package matrix and semantic versioning SLA.
 - **[Releasing Guide](docs/releasing.md)**: Maintainer guide for releases.
 - **[Contributing Guide](CONTRIBUTING.md)**: Developer setup, PR standards, and conventional commit rules.
-- **[Security Policy](SECURITY.md)**: Local-first zero-egress policies and vulnerability reporting.
+- **[Security Policy](SECURITY.md)**: Local-first privacy model, optional remote-provider boundaries, and vulnerability reporting.
 - **[Changelog](CHANGELOG.md)**: Detailed release history.
 
 ---
