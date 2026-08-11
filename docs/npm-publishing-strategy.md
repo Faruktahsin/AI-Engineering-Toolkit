@@ -10,7 +10,7 @@ The **AI Engineering Toolkit (AIET)** is structured as a pnpm monorepo of 28 wor
 
 ### Category 1: Public Framework Packages (`@aiet/*`) — Published to npm registry
 
-| Package Name | Role & Purpose | Access | Published Version |
+| Package Name | Role & Purpose | Access | Target Release Version |
 | :--- | :--- | :--- | :---: |
 | `@aiet/core` | **Primary Unified SDK Facade** combining client, memory, compiler, governance, and diagnostics | `public` | `1.0.1` |
 | `@aiet/cli` | **Developer CLI** (`aiet init`, `aiet memory`, `aiet compile`, `aiet doctor`) | `public` | `1.0.1` |
@@ -38,7 +38,7 @@ The **AI Engineering Toolkit (AIET)** is structured as a pnpm monorepo of 28 wor
 
 ### Category 2: Compatibility & Deprecated Packages
 
-| Package Name | Purpose & Status | Access | Published Version |
+| Package Name | Purpose & Status | Access | Target Release Version |
 | :--- | :--- | :--- | :---: |
 | `@aiet/pakb` | **Backward Compatibility Alias**: Re-exports `@aiet/core` to prevent breaking legacy installations | `public` | `1.0.1` |
 
@@ -99,7 +99,7 @@ Every public package `package.json` must contain:
    - `ulid`: ULID generation.
 
 3. **Semantic Versioning Specification**:
-   - Current stable production version: `1.0.1`.
+   - Next stable release version: `1.0.1` (prepared on `main`; published only when the `v1.0.1` tag is created).
    - Patch releases (`1.0.x`) deliver bug fixes without contract breaking changes.
    - Minor releases (`1.x.0`) introduce backward-compatible feature enhancements.
 
