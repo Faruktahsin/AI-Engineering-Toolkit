@@ -16,6 +16,8 @@ pnpm add @aiet/core
 pnpm add -g @aiet/cli
 ```
 
+> **First-time workspace install note:** On a clean clone, pnpm can print a temporary `Failed to create bin ... dist/bin.js` warning before the workspace has been built. Installation still completes; run `corepack pnpm build` before invoking the local CLI. The CI `pnpm smoke:cli` check verifies the built CLI from a clean directory.
+
 ---
 
 ## Step 2: Initialize Your Project
@@ -143,3 +145,6 @@ console.log(`Compiled ${result.token_count} tokens into ${result.target_format}`
 - Explore Autonomous Memory Governance in [`docs/memory-governance.md`](./memory-governance.md)
 - Learn about Memory Consolidation & Rollback in [`docs/memory-consolidation.md`](./memory-consolidation.md)
 - Check out example applications in `examples/`
+# First-time install note
+
+On a clean clone, pnpm can print a temporary `Failed to create bin ... dist/bin.js` warning before the workspace has been built. This does not prevent installation; run `corepack pnpm build` before invoking the local CLI. The CI `pnpm smoke:cli` check verifies the built CLI from a clean directory.

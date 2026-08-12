@@ -1,6 +1,6 @@
-# AIET Official Demo: AI Coding Assistant
+# AIET Reference Example: AI Coding Assistant
 
-This official example demonstrates how software engineers build an AI Coding Assistant with persistent memory, architecture tracking, and context compilation using the **AI-Engineering-Toolkit (AIET)**.
+This runnable console example exercises AIET memory, retrieval, and context-compilation APIs. It is a small reference implementation, not a production coding assistant or MCP integration service.
 
 ---
 

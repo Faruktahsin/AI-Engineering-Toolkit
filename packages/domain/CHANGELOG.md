@@ -1,5 +1,13 @@
 # @aiet/domain
 
+## 1.0.2
+
+### Patch Changes
+
+- Add Apache-2.0, repository, homepage, issue tracker, and author metadata to all public package manifests.
+- Updated dependencies
+  - @aiet/schema@1.0.2
+
 ## 1.0.1
 
 ### Patch Changes

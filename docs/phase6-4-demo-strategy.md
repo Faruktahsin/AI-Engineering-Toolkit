@@ -1,5 +1,7 @@
 # AIET Phase 6.4: Official Demo Applications Strategy
 
+> **Historical planning artifact.** This document records the intended Phase 6.4 scope; it is not a statement that the current examples are production applications. For current scope, see the root README and `docs/examples-guide.md`.
+
 ## 1. Executive Strategy & Objectives
 
 The goal of Phase 6.4 is to transform the AI-Engineering-Toolkit (AIET) from a high-performance infrastructure framework into a turnkey developer-ready platform by providing official, production-quality example applications under `examples/`.

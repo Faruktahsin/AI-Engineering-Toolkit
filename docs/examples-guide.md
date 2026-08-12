@@ -1,17 +1,17 @@
-# AIET Official Examples Guide
+# AIET Reference Examples Guide
 
-Welcome to the AI-Engineering-Toolkit (AIET) Official Examples Guide. This document helps developers select the right demo application based on their framework ecosystem, agent archetype, and required memory capabilities.
+These runnable, minimal console examples exercise selected AIET SDK and adapter APIs. They are reference implementations for developers—not production services, complete framework integrations, or security/compliance certifications.
 
 ---
 
-## 1. Overview of Official Demo Applications
+## 1. Overview of Reference Examples
 
 | Example Application | Path | Ecosystem / Adapter | Core Capabilities Demonstrated |
 | :--- | :--- | :--- | :--- |
-| **AI Coding Assistant** | [`examples/coding-agent/`](file:///Users/faruktahsinarik/Documents/AI-Engineering-Toolkit/examples/coding-agent) | `@aiet/core`, `@aiet/mcp-server`, CLI | Developer preference enforcement, architecture decisions, `CLAUDE.md` / `AGENTS.md` compilation |
-| **Research Agent** | [`examples/research-agent/`](file:///Users/faruktahsinarik/Documents/AI-Engineering-Toolkit/examples/research-agent) | `@aiet/adapter-langgraph`, `@aiet/consolidation` | Multi-session research memory, source tracking, contradiction detection, graph checkpoints |
-| **Customer Support Agent** | [`examples/customer-support-agent/`](file:///Users/faruktahsinarik/Documents/AI-Engineering-Toolkit/examples/customer-support-agent) | `@aiet/adapter-vercel`, `@aiet/governance` | Customer entities, support history, policy exemptions, governance approval workflows |
-| **Personal Assistant** | [`examples/personal-assistant/`](file:///Users/faruktahsinarik/Documents/AI-Engineering-Toolkit/examples/personal-assistant) | `@aiet/adapter-openai-agents` | OpenAI function calling tools, user tasks, preferences, memory explainability |
+| **AI Coding Assistant** | [`examples/coding-agent/`](../examples/coding-agent) | `@aiet/core` | Directive/assertion storage, retrieval, and context compilation |
+| **Research Agent** | [`examples/research-agent/`](../examples/research-agent) | `@aiet/adapter-langgraph`, `@aiet/consolidation` | Finding storage, checkpointer invocation, and rule-based contradiction detection |
+| **Customer Support Agent** | [`examples/customer-support-agent/`](../examples/customer-support-agent) | `@aiet/adapter-vercel`, `@aiet/governance` | Restricted customer/event storage, memory-provider retrieval, and proposal creation |
+| **Personal Assistant** | [`examples/personal-assistant/`](../examples/personal-assistant) | `@aiet/adapter-openai-agents` | Tool construction, preference/task storage, and retrieval-score explanation |
 
 ---
 
@@ -19,25 +19,25 @@ Welcome to the AI-Engineering-Toolkit (AIET) Official Examples Guide. This docum
 
 ### Choose `coding-agent/` if you are:
 - Building an AI coding assistant, IDE plugin, or terminal tool.
-- Integrating with Claude Code, Cursor, or Windsurf over MCP.
+- Exploring context artifacts that can be used with Claude Code, Cursor, or Windsurf.
 - Compiling token-budgeted system prompts (`AGENTS.md`, `CLAUDE.md`, `.cursorrules`).
 
 ### Choose `research-agent/` if you are:
-- Building an autonomous web researcher or analytical agent.
+- Prototyping a research or analytical agent.
 - Using **LangGraph** for multi-step agent orchestration.
 - Needing to detect contradictory research findings over time.
-- Requiring state checkpointers that persist graph state into governed memory tables.
+- Exploring the checkpointer API with local AIET storage.
 
 ### Choose `customer-support-agent/` if you are:
 - Building enterprise CRM, helpdesk, or customer support AI agents.
-- Using the **Vercel AI SDK** (`useChat`, `streamText`).
+- Exploring the AIET Vercel adapter's memory-provider API.
 - Handling customer entities, support history, and confidential facts.
-- Needing **Governance Approval Workflows** to trap risky or sensitive memory updates for human review before persisting.
+- Exploring creation of governance proposals for review in an application you build.
 
 ### Choose `personal-assistant/` if you are:
 - Building general-purpose productivity or personal assistant agents.
-- Using **OpenAI Agents SDK** or function-calling models.
-- Needing **Memory Explainability** to answer "Why did the agent make this decision?".
+- Exploring construction of OpenAI Agents SDK-compatible tools.
+- Inspecting the retrieval score explanation returned by the demo.
 
 ---
 

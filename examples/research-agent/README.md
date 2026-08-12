@@ -1,6 +1,6 @@
-# AIET Official Demo: Long-Running Research Agent
+# AIET Reference Example: Research Agent
 
-This official example demonstrates how researchers and knowledge engineers build a long-running, multi-session AI Research Agent using **AIET**, `@aiet/adapter-langgraph`, and `@aiet/consolidation`.
+This runnable console example exercises finding storage, the LangGraph checkpointer API, and rule-based contradiction detection. It is a small reference implementation, not a production research service.
 
 ---
 

@@ -1,7 +1,17 @@
 {
   "name": "@aiet/governance",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Autonomous memory governance safety layer, proposal staging queue, and audit ledger for AIET",
+  "author": "Faruk Tahsin <faruktahsin@gmail.com>",
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/Faruktahsin/AI-Engineering-Toolkit#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Faruktahsin/AI-Engineering-Toolkit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Faruktahsin/AI-Engineering-Toolkit/issues"
+  },
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",

@@ -1,5 +1,7 @@
 # Phase 6.4 Completion Report: Official AIET Demo Applications
 
+> **Historical completion artifact.** The current runnable examples are intentionally small reference demonstrations, not production applications. For current scope, see the root README and `docs/examples-guide.md`.
+
 ## Executive Summary
 
 Phase 6.4 has been successfully implemented and validated for the **AI Engineering Toolkit (AIET)** infrastructure platform.

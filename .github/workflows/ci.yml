@@ -45,6 +45,9 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Verify Public Package Metadata
+        run: pnpm check:package-metadata
+
       - name: Lint & Format Check
         run: pnpm lint
 

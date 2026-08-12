@@ -1,7 +1,17 @@
 {
   "name": "@aiet/logging",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Structured logger, JSON/human log formatters, child loggers, and deterministic formatting for AIET",
+  "author": "Faruk Tahsin <faruktahsin@gmail.com>",
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/Faruktahsin/AI-Engineering-Toolkit#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Faruktahsin/AI-Engineering-Toolkit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Faruktahsin/AI-Engineering-Toolkit/issues"
+  },
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",

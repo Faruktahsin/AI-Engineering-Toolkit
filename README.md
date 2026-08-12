@@ -19,8 +19,8 @@ AIET is **local-first by default; use of external embedding providers is explici
 AIET solves the challenges of unstructured prompt context, context overflows, memory fragmentation, and unvetted autonomous agent mutations by providing:
 
 - **5 Standardized Memory Primitives**: (`Entity`, `Directive`, `Assertion`, `Event`, `Relation`) with strict Zod & JSON Schemas.
-- **Autonomous Memory Formation**: Candidate extraction (`@aiet/extractor`) and scoring engine (`@aiet/decision-engine`) for `CREATE`, `UPDATE`, `MERGE`, and `IGNORE` decisions.
-- **Mandatory Safety & Governance**: Proposal approval workflows (`memory_proposals`) and tamper-evident audit ledger (`audit_log`) using JCS SHA-256 hash chains.
+- **Memory Candidate Formation**: Candidate extraction (`@aiet/extractor`) and scoring components (`@aiet/decision-engine`) for `CREATE`, `UPDATE`, `MERGE`, and `IGNORE` decisions.
+- **Safety & Governance Components**: Proposal approval workflows (`memory_proposals`) and a JCS SHA-256 hash-linked audit ledger (`audit_log`).
 - **Rule-Based Memory Consolidation**: Duplicate detection and scope-aware contradiction rules (`@aiet/consolidation`) for supported structured patterns.
 - **Deterministic 8-Stage Context Compiler**: Ingests, sanitizes, validates, normalizes, filters, ranks, fits, and emits context artifacts within configured token budgets (`AGENTS.md`, `CLAUDE.md`, `.cursorrules`).
 - **Hybrid RRF Retrieval Infrastructure**: SQLite WAL database with FTS5 BM25 search, vector embeddings, recency decay, and RRF ranking.
@@ -30,7 +30,7 @@ AIET solves the challenges of unstructured prompt context, context overflows, me
 
 ## 🏛️ Architecture Overview
 
-AIET is organized as a high-performance monorepo of 28 workspace projects (24 publishable workspace packages plus 4 official example applications):
+AIET is organized as a monorepo of 28 workspace projects (24 publishable workspace packages plus 4 runnable reference examples):
 
 ```
                                   +------------------------------------+
@@ -66,16 +66,16 @@ For a detailed deep dive into the monorepo architecture, read the **[Architectur
 
 ---
 
-## 🚀 Framework Integration Matrix & Official Examples
+## 🚀 Framework Integration Matrix & Reference Examples
 
-AIET provides official, production-quality example applications demonstrating how to build autonomous agents across major frameworks:
+AIET includes runnable reference examples that exercise selected SDK and adapter APIs. They are intentionally small console demonstrations, not production applications or hosted services.
 
 | Framework / Adapter | Example Application | Capabilities Demonstrated | Link |
 | :--- | :--- | :--- | :--- |
-| **Native SDK (`@aiet/core`)** | `examples/coding-agent` | Developer preferences, ADR decision assertions, context compiler, MCP | [View Demo](examples/coding-agent) |
-| **LangGraph (`@aiet/adapter-langgraph`)** | `examples/research-agent` | State checkpointing (`createAIETCheckpointer`), contradiction detection, memory consolidation | [View Demo](examples/research-agent) |
-| **Vercel AI SDK (`@aiet/adapter-vercel`)** | `examples/customer-support-agent` | `AIETMemoryProvider`, SSE memory event streaming, governance approval workflow | [View Demo](examples/customer-support-agent) |
-| **OpenAI Agents SDK (`@aiet/adapter-openai-agents`)** | `examples/personal-assistant` | Function-calling tools (`createAIETAgentTools`), memory explainability | [View Demo](examples/personal-assistant) |
+| **Native SDK (`@aiet/core`)** | `examples/coding-agent` | Directive/assertion storage, retrieval, and compiled context | [View Example](examples/coding-agent) |
+| **LangGraph (`@aiet/adapter-langgraph`)** | `examples/research-agent` | Checkpointer API, finding storage, and rule-based contradiction detection | [View Example](examples/research-agent) |
+| **Vercel AI SDK (`@aiet/adapter-vercel`)** | `examples/customer-support-agent` | Customer/event storage, memory-provider retrieval, and proposal creation | [View Example](examples/customer-support-agent) |
+| **OpenAI Agents SDK (`@aiet/adapter-openai-agents`)** | `examples/personal-assistant` | Adapter tool construction, preference/task storage, and retrieval explanation | [View Example](examples/personal-assistant) |
 
 ---
 
