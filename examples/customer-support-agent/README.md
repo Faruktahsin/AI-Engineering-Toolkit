@@ -1,6 +1,6 @@
-# AIET Official Demo: Enterprise Customer Support Agent
+# AIET Reference Example: Customer Support Agent
 
-This official example demonstrates how enterprise developers build a compliant AI Customer Support Agent using **AIET**, `@aiet/adapter-vercel`, and `@aiet/governance`.
+This runnable console example exercises restricted customer/event storage, memory-provider retrieval, and governance proposal creation. It is a small reference implementation, not a production support system or compliance certification.
 
 ---
 

@@ -1,6 +1,6 @@
-# AIET Official Demo: General AI Personal Assistant
+# AIET Reference Example: Personal Assistant
 
-This official example demonstrates how developers build a General AI Personal Assistant using **AIET**, `@aiet/adapter-openai-agents`, and `@aiet/core`. *(Note: This is an infrastructure demonstration, not Personal AI PAKB).*
+This runnable console example exercises preference/task storage, OpenAI Agents-compatible tool construction, and retrieval-score explanation. It is a small reference implementation, not a production personal assistant. *(This is an infrastructure demonstration, not Personal AI PAKB.)*
 
 ---
 

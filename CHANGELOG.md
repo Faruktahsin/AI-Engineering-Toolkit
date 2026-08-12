@@ -7,7 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.0.1] - Unreleased
+## [1.0.2] - Unreleased
+
+### Fixed
+
+- Added complete Apache-2.0, repository, homepage, issue tracker, and author metadata to every public npm package.
+- Added CI and release checks that prevent future public packages from missing required npm metadata.
+- Corrected current-facing documentation so reference examples are not presented as production applications.
+
+---
+
+## [1.0.1] - 2026-08-12
 
 ### Fixed
 

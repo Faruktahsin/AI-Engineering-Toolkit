@@ -1,5 +1,7 @@
 # Phase 6: Architecture & Productization Review — AI Engineering Toolkit (AIET)
 
+> **Historical assessment.** This August 2026 review contains planning-era maturity labels and is not a current production-readiness claim. The root README, package manifests, and current CI results are the source of truth for the released project.
+
 > **Lead Architect & Product Engineer Assessment for AIET Open-Source Platform Evolution**  
 > *Date: August 8, 2026*
 

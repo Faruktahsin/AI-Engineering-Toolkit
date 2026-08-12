@@ -1,10 +1,18 @@
 {
   "name": "aiet-monorepo",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": true,
   "description": "AI Engineering Toolkit & PAKB Monorepo",
   "author": "Faruk Tahsin <faruktahsin@gmail.com>",
-  "license": "MIT",
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/Faruktahsin/AI-Engineering-Toolkit#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Faruktahsin/AI-Engineering-Toolkit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Faruktahsin/AI-Engineering-Toolkit/issues"
+  },
   "packageManager": "pnpm@11.20.0",
   "engines": {
     "node": ">=22.0.0 <23.0.0",
@@ -21,6 +29,7 @@
     "typecheck": "pnpm --recursive run typecheck",
     "clean": "pnpm --recursive run clean",
     "check:node": "node scripts/verify-node.mjs",
+    "check:package-metadata": "node scripts/verify-package-metadata.mjs",
     "check:release-version": "node scripts/verify-release-version.mjs",
     "check:zero-width": "node scripts/check-zero-width.mjs",
     "check:secrets": "node scripts/secret-scan.mjs"

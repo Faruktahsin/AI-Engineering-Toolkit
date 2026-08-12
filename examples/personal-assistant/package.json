@@ -1,6 +1,6 @@
 {
   "name": "@aiet/example-personal-assistant",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": true,
   "description": "General AI Personal Assistant with OpenAI Agents SDK integration and memory explainability built on AIET",
   "type": "module",

@@ -41,7 +41,9 @@ jobs:
           pnpm audit
 
       - name: Verify Tag and Package Versions
-        run: pnpm check:release-version
+        run: |
+          pnpm check:release-version
+          pnpm check:package-metadata
 
       - name: Publish Packages to npm
         run: pnpm -r publish --access public --no-git-checks
