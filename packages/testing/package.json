@@ -45,7 +45,7 @@
     "tsup": "^8.2.4",
     "tsx": "^4.19.0",
     "typescript": "^5.5.4",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.11"
   },
   "funding": {
     "type": "github",
