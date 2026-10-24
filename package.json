@@ -39,7 +39,7 @@
     "@changesets/cli": "^2.27.7",
     "husky": "^9.1.4",
     "lint-staged": "^15.2.8",
-    "pnpm": "11.20.0",
+    "pnpm": "11.21.0",
     "turbo": "^2.0.0",
     "typescript": "^5.5.4"
   }
