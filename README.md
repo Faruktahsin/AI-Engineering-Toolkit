@@ -21,7 +21,7 @@ AIET solves the challenges of unstructured prompt context, context overflows, me
 - **5 Standardized Memory Primitives**: (`Entity`, `Directive`, `Assertion`, `Event`, `Relation`) with strict Zod & JSON Schemas.
 - **Memory Candidate Formation**: Candidate extraction (`@aiet/extractor`) and scoring components (`@aiet/decision-engine`) for `CREATE`, `UPDATE`, `MERGE`, and `IGNORE` decisions.
 - **Safety & Governance Components**: Proposal approval workflows (`memory_proposals`) and a JCS SHA-256 hash-linked audit ledger (`audit_log`).
-- **Rule-Based Memory Consolidation**: Duplicate detection and scope-aware contradiction rules (`@aiet/consolidation`) for supported structured patterns.
+- **Rule-Based Memory Consolidation**: Duplicate detection and scope-aware contradiction rules (`@aiet/consolidation`) for supported structured patterns. The 36-case synthetic generalization challenge currently detects none of its 20 expected contradictions; this is not evidence of general natural-language recall.
 - **Deterministic 8-Stage Context Compiler**: Ingests, sanitizes, validates, normalizes, filters, ranks, fits, and emits context artifacts within configured token budgets (`AGENTS.md`, `CLAUDE.md`, `.cursorrules`).
 - **Hybrid RRF Retrieval Infrastructure**: SQLite WAL database with FTS5 BM25 search, vector embeddings, recency decay, and RRF ranking.
 - **Framework Adapters & MCP Integration**: Native adapters for Vercel AI SDK, LangGraph, OpenAI Agents SDK, and Model Context Protocol (MCP) for Claude Code, Cursor, and Windsurf.
@@ -120,30 +120,47 @@ aiet connect cursor
 ### 3. Usage in Node.js / TypeScript
 
 ```typescript
-import { createAIET } from "@aiet/core";
+import {
+  ActivationClass,
+  EnforcementSeverity,
+  SensitivityTier,
+  VolatilityRating,
+  createAIET,
+  generateULID,
+} from "@aiet/core";
 
-// Initialize AIET client
-const aiet = createAIET();
+const aiet = createAIET({ storage: ".aiet/memory.db", embeddings: "mock" });
+const now = new Date().toISOString();
 
-// Add persistent developer preference
-await aiet.memory.add({
-  schema_version: "1.0.0",
-  id: "dir_01H...",
-  statement: "Prefer TypeScript strict mode and pure functional helpers",
-  domain: "coding_style",
-});
+try {
+  // Add a persistent developer preference
+  const added = await aiet.memory.add({
+    schema_version: "1.0.0",
+    id: generateULID("directive"),
+    created_at: now,
+    updated_at: now,
+    last_verified: now,
+    sensitivity: SensitivityTier.PUBLIC,
+    volatility: VolatilityRating.LOW,
+    activation: ActivationClass.ALWAYS_ON,
+    statement: "Prefer TypeScript strict mode and pure functional helpers",
+    enforcement: EnforcementSeverity.SOFT,
+    domain: "coding_style",
+  });
+  console.log(added.status);
 
-// Perform Hybrid RRF memory search
-const searchRes = await aiet.memory.search("coding style preferences", { limit: 5 });
-console.log(searchRes.results);
+  // Search memory and compile a budgeted context preamble
+  const searchRes = await aiet.memory.search("coding style preferences", { limit: 5 });
+  console.log(searchRes.results);
 
-// Compile deterministic context files
-const compiled = await aiet.compiler.compile("AGENTS.md");
-console.log(compiled.content);
-
-// Inspect governance audit ledger
-const auditLog = await aiet.governance.getAuditHistory();
-console.log(auditLog);
+  const compiled = await aiet.compiler.compile({
+    targetFormat: "AGENTS.md",
+    tokenBudget: 500,
+  });
+  console.log(compiled.content);
+} finally {
+  await aiet.close();
+}
 ```
 
 ---

@@ -12,7 +12,7 @@ AIET adheres to **Semantic Versioning 2.0.0 (`MAJOR.MINOR.PATCH`)**:
 - **MINOR (`1.x.0`)**: New backward-compatible primitives, framework adapters (LangChain, Vercel AI SDK), or CLI commands (`pakb compile --watch`).
 - **PATCH (`1.0.x`)**: Backward-compatible bug fixes, performance optimizations, or schema validation updates.
 
-All packages in the monorepo maintain synchronized release versions (`1.0.0`) to prevent workspace resolution drift.
+All publishable packages in the monorepo maintain synchronized release versions; the current repository version is `1.0.2`.
 
 ---
 
@@ -32,21 +32,7 @@ Changelog updates are automatically generated during release runs using Conventi
 
 ## 3. Package Publishing Workflow
 
-AIET packages are published to the public npm registry under the `@aiet/` npm organization scope:
-
-- `@aiet/core`
-- `@aiet/cli`
-- `@aiet/compiler`
-- `@aiet/storage`
-- `@aiet/schema`
-- `@aiet/errors`
-- `@aiet/config`
-- `@aiet/mcp-server`
-- `@aiet/contracts`
-- `@aiet/utils`
-- `@aiet/logging`
-- `@aiet/testing`
-- `@aiet/pakb`
+All non-private `@aiet/*` workspace packages under `packages/` are published by the recursive release workflow. The package manifests and `docs/npm-publishing-strategy.md` define the current package matrix.
 
 ### Pre-Release Verification Checklist
 
@@ -68,10 +54,10 @@ corepack pnpm test
 
 ### Automated Release Pipeline (GitHub Actions)
 
-When a GitHub Release tag (e.g. `v1.0.0`) is published on GitHub:
-1. GitHub Actions checks out tag `v1.0.0`.
+When a version tag matching `v*` is pushed:
+1. GitHub Actions checks out the tagged commit.
 2. Runs the full validation suite (`build`, `typecheck`, `lint`, `test`).
-3. Publishes packages to npm with `--access public` and cryptographic OIDC build provenance (`--provenance`).
+3. Publishes packages to npm with `--access public`.
 
 ```bash
 # Manual CLI publishing (if required)

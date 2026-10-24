@@ -29,17 +29,17 @@ export class DoctorClient {
     // 1. Node.js Version Check
     const nodeVer = process.version;
     const major = Number.parseInt(nodeVer.replace("v", "").split(".")[0] ?? "0", 10);
-    if (major >= 18) {
+    if (major === 22) {
       checks.push({
         name: "Node.js Environment",
         status: "ok",
-        message: `Node.js ${nodeVer} detected (meets requirement >= v18)`,
+        message: `Node.js ${nodeVer} detected (meets requirement v22.x)`,
       });
     } else {
       checks.push({
         name: "Node.js Environment",
         status: "error",
-        message: `Node.js ${nodeVer} is unsupported. Please upgrade to Node.js v18+.`,
+        message: `Node.js ${nodeVer} is unsupported. Please use Node.js v22.x.`,
       });
     }
 

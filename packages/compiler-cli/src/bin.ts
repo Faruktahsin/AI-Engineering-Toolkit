@@ -68,7 +68,7 @@ program
   .action(async () => {
     const report = await getSystemStatus();
     console.log(formatStatusReport(report));
-    process.exit(0);
+    process.exit(report.dbConnected ? 0 : 1);
   });
 
 // 4. aiet connect <agent>

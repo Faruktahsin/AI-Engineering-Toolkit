@@ -12,6 +12,10 @@ export interface ConnectResult {
   readonly message: string;
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
 export function connectAgent(agent: AgentTarget, options?: { force?: boolean }): ConnectResult {
   const home = homedir.homedir();
   let targetPath = "";
@@ -37,19 +41,31 @@ export function connectAgent(agent: AgentTarget, options?: { force?: boolean }):
   let backupCreated: string | undefined;
 
   if (fs.existsSync(targetPath)) {
+    const raw = fs.readFileSync(targetPath, "utf-8");
+    let parsed: unknown;
     try {
-      const raw = fs.readFileSync(targetPath, "utf-8");
-      existingConfig = JSON.parse(raw) as Record<string, unknown>;
-
-      // Create backup file
-      backupCreated = `${targetPath}.bak`;
-      fs.writeFileSync(backupCreated, raw, "utf-8");
-    } catch {
-      existingConfig = { mcpServers: {} };
+      parsed = JSON.parse(raw);
+    } catch (err) {
+      throw new Error(
+        `MCP configuration '${targetPath}' contains invalid JSON and was left unchanged.`,
+        { cause: err },
+      );
     }
+    if (!isRecord(parsed)) {
+      throw new Error(`MCP configuration '${targetPath}' must contain a JSON object.`);
+    }
+    existingConfig = parsed;
+
+    const configuredServers = existingConfig["mcpServers"];
+    if (configuredServers !== undefined && !isRecord(configuredServers)) {
+      throw new Error(`MCP configuration '${targetPath}' has an invalid 'mcpServers' value.`);
+    }
+
+    backupCreated = `${targetPath}.bak`;
+    fs.writeFileSync(backupCreated, raw, "utf-8");
   }
 
-  const mcpServers = (existingConfig["mcpServers"] ?? {}) as Record<string, unknown>;
+  const mcpServers = isRecord(existingConfig["mcpServers"]) ? existingConfig["mcpServers"] : {};
 
   if (mcpServers["aiet-memory"] && !options?.force) {
     return {
