@@ -69,6 +69,17 @@ describe("CLI Commands Product Layer Suite (Phase 6.2)", () => {
       expect(formatted).toContain("✓ Storage Connected");
     });
 
+    it("should report a missing database without creating an in-memory success", async () => {
+      const dbPath = path.join(tempDir, "missing", "memory.db");
+      const report = await getSystemStatus({ dbPath });
+
+      expect(report.dbConnected).toBe(false);
+      expect(report.walEnabled).toBe(false);
+      expect(report.storageError).toContain("Run 'aiet init'");
+      expect(fs.existsSync(dbPath)).toBe(false);
+      expect(formatStatusReport(report)).toContain("✗ Storage Not Connected");
+    });
+
     it("should run diagnostics (doctor) with different output than status", async () => {
       process.chdir(tempDir);
       initializeProject(tempDir);
@@ -107,6 +118,18 @@ describe("CLI Commands Product Layer Suite (Phase 6.2)", () => {
 
       const content = JSON.parse(fs.readFileSync(cursorRes.configPath, "utf-8"));
       expect(content.mcpServers["aiet-memory"]).toBeDefined();
+    });
+
+    it("should leave malformed MCP configuration unchanged", () => {
+      process.chdir(tempDir);
+      const configPath = path.join(tempDir, ".cursor", "mcp.json");
+      fs.mkdirSync(path.dirname(configPath), { recursive: true });
+      const invalidConfig = "{ invalid json";
+      fs.writeFileSync(configPath, invalidConfig);
+
+      expect(() => connectAgent("cursor")).toThrow(/contains invalid JSON/);
+      expect(fs.readFileSync(configPath, "utf-8")).toBe(invalidConfig);
+      expect(fs.existsSync(`${configPath}.bak`)).toBe(false);
     });
   });
 

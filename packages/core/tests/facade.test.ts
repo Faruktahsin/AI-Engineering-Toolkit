@@ -1,3 +1,4 @@
+import { profileTokens } from "@aiet/compiler";
 import {
   ActivationClass,
   AssertionType,
@@ -6,7 +7,7 @@ import {
   VolatilityRating,
 } from "@aiet/schema";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { type AIETClient, createAIET } from "../src/index";
+import { type AIETClient, createAIET, generateULID } from "../src/index";
 
 describe("@aiet/core Facade SDK Integration Suite", () => {
   let aiet: AIETClient;
@@ -90,8 +91,30 @@ describe("@aiet/core Facade SDK Integration Suite", () => {
       });
 
       expect(compileRes.content).toContain("Always format code with Biome");
-      expect(compileRes.token_count).toBeGreaterThan(0);
+      expect(compileRes.token_count).toBe(profileTokens(compileRes.content));
+      expect(compileRes.token_count).toBeLessThanOrEqual(500);
       expect(compileRes.target_format).toBe("CLAUDE.md");
+    });
+
+    it("should keep the rendered output within the requested token budget", async () => {
+      await aiet.memory.add({
+        schema_version: "1.0.0",
+        id: generateULID("directive"),
+        created_at: "2026-08-05T12:00:00Z",
+        updated_at: "2026-08-05T12:00:00Z",
+        last_verified: "2026-08-05T12:00:00Z",
+        sensitivity: SensitivityTier.PUBLIC,
+        volatility: VolatilityRating.LOW,
+        activation: ActivationClass.ALWAYS_ON,
+        statement: `Use ${"token ".repeat(35)} in all source files`,
+        enforcement: "soft",
+        domain: "code_style",
+      });
+
+      const compileRes = await aiet.compiler.compile({ tokenBudget: 50 });
+
+      expect(compileRes.token_count).toBe(profileTokens(compileRes.content));
+      expect(compileRes.token_count).toBeLessThanOrEqual(50);
     });
   });
 
@@ -118,6 +141,21 @@ describe("@aiet/core Facade SDK Integration Suite", () => {
       const formatted = aiet.doctor.formatReport(report);
       expect(formatted).toContain("AIET Health & Diagnostics");
       expect(formatted).toContain("✓ [Node.js Environment]");
+      expect(formatted).toContain("meets requirement v22.x");
+    });
+
+    it("should reject Node versions outside the supported v22 line", async () => {
+      const originalVersion = process.version;
+      try {
+        Object.defineProperty(process, "version", { value: "v23.0.0", configurable: true });
+        const report = await aiet.doctor.diagnose();
+        const nodeCheck = report.checks.find((check) => check.name === "Node.js Environment");
+
+        expect(nodeCheck?.status).toBe("error");
+        expect(nodeCheck?.message).toContain("use Node.js v22.x");
+      } finally {
+        Object.defineProperty(process, "version", { value: originalVersion, configurable: true });
+      }
     });
   });
 });

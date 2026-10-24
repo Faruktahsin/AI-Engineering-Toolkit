@@ -19,6 +19,7 @@ export interface StatusReport {
   readonly embeddingProvider: string;
   readonly mcpConnected: boolean;
   readonly pendingProposals: number;
+  readonly storageError?: string | undefined;
 }
 
 export async function getSystemStatus(options?: { dbPath?: string }): Promise<StatusReport> {
@@ -27,51 +28,57 @@ export async function getSystemStatus(options?: { dbPath?: string }): Promise<St
   const fallbackPath = path.join(cwd, "aiet-memory.db");
 
   let dbPath = options?.dbPath ?? defaultPath;
-  if (!fs.existsSync(dbPath) && fs.existsSync(fallbackPath)) {
+  if (!options?.dbPath && !fs.existsSync(dbPath) && fs.existsSync(fallbackPath)) {
     dbPath = fallbackPath;
-  }
-  if (!fs.existsSync(dbPath)) {
-    dbPath = ":memory:";
   }
 
   let repo: PAKBStorageRepository | null = null;
   let dbConnected = false;
   let walEnabled = false;
   let totalPrimitives = 0;
+  let storageError: string | undefined;
   const primitiveCounts = { entity: 0, directive: 0, assertion: 0, event: 0, relation: 0 };
   let pendingProposalsCount = 0;
 
-  try {
-    repo = new PAKBStorageRepository({ db_path: dbPath });
-    dbConnected = true;
-    walEnabled = true;
+  if (!fs.existsSync(dbPath)) {
+    storageError = `Database does not exist at '${dbPath}'. Run 'aiet init' to create it.`;
+  } else {
+    try {
+      repo = new PAKBStorageRepository({ db_path: dbPath });
+      dbConnected = true;
+      walEnabled = true;
 
-    const primitives = await repo.getPrimitives(1000);
-    totalPrimitives = primitives.length;
+      const primitives = await repo.getPrimitives(1000);
+      totalPrimitives = primitives.length;
 
-    for (const p of primitives) {
-      if (p.id.startsWith("ent_")) primitiveCounts.entity++;
-      else if (p.id.startsWith("dir_")) primitiveCounts.directive++;
-      else if (p.id.startsWith("ast_")) primitiveCounts.assertion++;
-      else if (p.id.startsWith("evt_")) primitiveCounts.event++;
-      else if (p.id.startsWith("rel_")) primitiveCounts.relation++;
-    }
+      for (const p of primitives) {
+        if (p.id.startsWith("ent_")) primitiveCounts.entity++;
+        else if (p.id.startsWith("dir_")) primitiveCounts.directive++;
+        else if (p.id.startsWith("ast_")) primitiveCounts.assertion++;
+        else if (p.id.startsWith("evt_")) primitiveCounts.event++;
+        else if (p.id.startsWith("rel_")) primitiveCounts.relation++;
+      }
 
-    const gov = new GovernanceManager(repo);
-    const pending = await gov.getPendingProposals();
-    pendingProposalsCount = pending.length;
-  } catch {
-    dbConnected = false;
-  } finally {
-    if (repo) {
-      await repo.close();
+      const gov = new GovernanceManager(repo);
+      const pending = await gov.getPendingProposals();
+      pendingProposalsCount = pending.length;
+    } catch (err) {
+      dbConnected = false;
+      walEnabled = false;
+      storageError = err instanceof Error ? err.message : String(err);
+    } finally {
+      if (repo) {
+        await repo.close();
+      }
     }
   }
 
   const home = homedir.homedir();
   const claudePath = path.join(home, ".claude", "mcp-config.json");
   const cursorPath = path.join(cwd, ".cursor", "mcp.json");
-  const mcpConnected = fs.existsSync(claudePath) || fs.existsSync(cursorPath);
+  const windsurfPath = path.join(home, ".codeium", "windsurf", "mcp_config.json");
+  const mcpConnected =
+    fs.existsSync(claudePath) || fs.existsSync(cursorPath) || fs.existsSync(windsurfPath);
 
   const provider = process.env["OPENAI_API_KEY"]
     ? "OpenAI"
@@ -88,6 +95,7 @@ export async function getSystemStatus(options?: { dbPath?: string }): Promise<St
     embeddingProvider: provider,
     mcpConnected,
     pendingProposals: pendingProposalsCount,
+    ...(storageError ? { storageError } : {}),
   };
 }
 
@@ -96,12 +104,16 @@ export function formatStatusReport(report: StatusReport): string {
     "==================================================",
     "                AIET System Status                ",
     "==================================================",
-    `✓ Storage Connected:   ${report.dbPath}`,
+    `${report.dbConnected ? "✓" : "✗"} Storage ${report.dbConnected ? "Connected" : "Not Connected"}:   ${report.dbPath}`,
     `✓ SQLite WAL Mode:     ${report.walEnabled ? "Enabled" : "Disabled"}`,
     `✓ Active Primitives:   ${report.totalPrimitives} (${report.primitiveCounts.entity} entities, ${report.primitiveCounts.directive} directives, ${report.primitiveCounts.assertion} assertions)`,
     `✓ Embedding Provider:  ${report.embeddingProvider}`,
-    `✓ Agent MCP Status:    ${report.mcpConnected ? "Connected (Claude / Cursor)" : "Not Connected"}`,
+    `✓ Agent MCP Status:    ${report.mcpConnected ? "Configuration detected" : "Not Connected"}`,
   ];
+
+  if (report.storageError) {
+    lines.push(`    Storage Error:      ${report.storageError}`);
+  }
 
   if (report.pendingProposals > 0) {
     lines.push(

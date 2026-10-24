@@ -45,6 +45,14 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Check Repository Hygiene
+        run: |
+          pnpm check:zero-width
+          pnpm check:secrets
+
+      - name: Audit Dependencies
+        run: pnpm audit
+
       - name: Verify Public Package Metadata
         run: pnpm check:package-metadata
 
